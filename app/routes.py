@@ -76,7 +76,7 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/settings')
+@app.route('/settings') #TODO: If no action is done on this page for about one minute, leads to Broken Pipe Eroor on terminal but yet everything works fine
 def settings():
     return render_template('settings.html')
 
