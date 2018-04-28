@@ -49,8 +49,8 @@ Vue.component('app-clock', {
     template: `
       <div class="clock-widget" :class="theme">
            <div class="clock_bg">
-               <img src="./images/day.svg" class="dayIcon" alt="day icon">
-               <img src="./images/night.svg" class="nightIcon" alt="night icon">
+               <img src="../public/images/day.svg" class="dayIcon" alt="day icon">
+               <img src="../public/images/night.svg" class="nightIcon" alt="night icon">
            </div>
            <div class="clock_body">
                <TimeAndDate></TimeAndDate>
@@ -117,7 +117,7 @@ Vue.component('app-navbar', {
     data    : function () {
         return {
             title   : "یسنا",
-            logoSrc : './images/logo-white.png',
+            logoSrc : '../public/images/logo-white.png',
             showTime: !this.isIndex
         }
     }
@@ -142,7 +142,7 @@ new Vue({
 
 function openModal(message, iconSrc) {
     var modal = $('#alertModal');
-    var src   = (iconSrc && iconSrc.length) ? iconSrc : "images/warning.svg";
+    var src   = (iconSrc && iconSrc.length) ? iconSrc : "../public/images/warning.svg";
     modal.find('img').attr('src', src);
     modal.find('.message').text(message);
     modal.addClass('show');
@@ -150,7 +150,7 @@ function openModal(message, iconSrc) {
 
 function closeModal() {
     var modal = $('#alertModal');
-    var src   = "images/warning.svg";
+    var src   = "../public/images/warning.svg";
     modal.find('.icon img').attr('src', src);
     modal.find('.message').text("");
     modal.removeClass('show');
