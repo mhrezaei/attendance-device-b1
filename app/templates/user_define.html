@@ -1,0 +1,63 @@
+<!doctype html>
+<html xmlns:font-weight="http://www.w3.org/1999/xhtml" xmlns:margin-left="http://www.w3.org/1999/xhtml">
+<body>
+<a href="{{ url_for('settings') }}">Settings</a><br>
+<a href="{{ url_for('index') }}">Home</a><br>
+
+<h2 style="text-align: center;">User Define Form</h2>
+
+
+<form action="{{ url_for('user_define') }}" method='post'>
+    <fieldset>
+        <legend>User Define Form</legend>
+        {{ form.hidden_tag() }}
+
+        <div style=font-size:20px; font-weight:bold; margin-left:150px;>
+            {{ form.first_name.label }}<br>
+            {{ form.first_name }}
+            <br>
+            {{ form.last_name.label }}<br>
+            {{ form.last_name }}
+            <br>
+            {{ form.code_melli.label }}<br>
+            {{ form.code_melli }}
+            <br>
+            {{ form.submit }}
+        </div>
+
+    </fieldset>
+</form>
+
+
+{#------------------------#}
+{# Form validation errors #}
+{#------------------------#}
+{% for message in form.first_name.errors %}
+    <div>{{ message }}</div>
+{% endfor %}
+
+{% for message in form.last_name.errors %}
+    <div>{{ message }}</div>
+{% endfor %}
+
+{% for message in form.code_melli.errors %}
+    <div>{{ message }}</div>
+{% endfor %}
+
+
+{#------------------------#}
+{# Flash messages         #}
+{#------------------------#}
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul class=flashes>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endwith %}
+
+
+</body>
+</html>

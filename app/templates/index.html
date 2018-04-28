@@ -1,0 +1,84 @@
+<!-- templates/index.html -->
+<html>
+<head>
+    <meta http-equiv="refresh" content="60; URL={{ url_for('index') }}">
+    <title>Hello</title>
+    <link rel="stylesheet" href="/css/bootstrap.css">
+    <style type="text/css">
+        .table {
+
+        }
+    </style>
+</head>
+<body>
+
+<a href="{{ url_for('settings') }}">Settings</a>
+
+<div class="container">
+    <table class="table">
+        <tr>
+            <td>STATUS</td>
+            <td>SID</td>
+            <td>MESSAGE</td>
+            <td>SEND</td>
+        </tr>
+        <tr>
+            <td id="status"></td>
+            <td id="auth"></td>
+            <td id="message"></td>
+            <td>
+                <div id="button" class="btn btn-primary">Send</div>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<script src="/js/jquery.js"></script>
+<script src="/js/popper.js"></script>
+<script src="/js/bootstrap.js"></script>
+<script src="/js/socket.js"></script>
+
+<script>
+
+    $(document).ready(function () {
+        var connected = false;
+        var key = null;
+        const socket = io('http://localhost:5000');
+
+        socket.on('connect', function () {
+            $('#status').text("Connected.");
+            connected = true;
+            console.log('connected.');
+        });
+
+        socket.on('auth', function (data) {
+            $('#auth').text(data);
+        });
+
+
+        socket.on('message', function (data) {
+            $('#message').text(data);
+            console.log(data);
+        });
+
+        socket.on('disconnect', function () {
+            console.log('disconnected.');
+            connected = false;
+            $('#status').text("Disconnected.");
+        });
+
+        $('#button').click(function () {
+            if (connected)
+                socket.emit('temp', new Date().getTime());
+        });
+
+        setInterval(function () {
+            if (connected)
+                socket.emit('update');
+        }, 100);
+
+
+    });
+</script>
+</body>
+</html>
