@@ -35,10 +35,18 @@ class UserLog(Model):
     __table__ = 'user_logs'
 
 
+# --------------#
+#   Hardware    #
+# Initialization#
+# --------------#
 # Tries to initialize the sensor
 f = PyFingerprint('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
 
 
+# --------------#
+#   Sockets     #
+#               #
+# --------------#
 @socket.on('connect')
 def socket_connect():
     socket.emit('auth', request.sid)
@@ -55,6 +63,10 @@ def temp(data):
     socket.emit('message', str(data), room=request.sid)
 
 
+# --------------#
+#   Endpoints   #
+#               #
+# --------------#
 @app.route('/')
 @app.route('/index')
 def index():
