@@ -455,3 +455,22 @@ def daily_routine():
                             # time.sleep(3)
                             # return redirect('activate')
                             return jsonify(our_result)
+
+
+# -------------------------#
+#       RFID Write         #
+# -------------------------#
+@app.route('/rfid_write', methods=['POST', 'GET'])
+def rfid_write():
+    form = RfidWriteForm()  # TODO: Reconsider this
+
+    if request.method == 'POST':
+        the_id = request.form['id']
+
+
+# -------------------------#
+#       RFID Read          #
+# -------------------------#
+@app.route('/rfid_read', methods=['POST', 'GET'])
+def rfid_read():
+    pass  # TODO: Didn't work on it
