@@ -1,0 +1,55 @@
+/*
+*-------------------------------------------------------
+* Site Setting
+*-------------------------------------------------------
+*/
+
+// Mixins
+@import "mixins";
+
+
+// ----------------------
+// == Site settings
+// ----------------------
+
+// Fonts
+$font: 'Open Sans';
+
+// = Colors
+// -----------------------------
+
+
+// Graphic chart
+$color_yellow: #FFD333;
+$color_facebook: #3b5998;
+$color_twitter: #43bfe1;
+$color_orange: #f48734;
+$color_teal: #00bfa5;
+$color_purple: #9068d4;
+$color_pink: #d81b60;
+$color_green: #8bc34a;
+
+
+$color_dark-gray: #1E1E1E;
+$color_medium-gray: #303030;
+$color_normal-gray: #333;
+$color_gray: #656565;
+$color_light-gray: #BDBDBD;
+
+$color_transparent-white: rgba(255,255,255,0.9);
+$color_transparent-black: rgba(0,0,0,0.9);
+
+$color_black: #000;
+$color_white: #fff;
+
+$text_primary: $color_transparent-white;
+$text_secondry: $color_transparent-black;
+
+// = break Points
+// -----------------------------
+$tablet: 767px;
+$mobile: 424px;
+
+
+// Silent classes
+@import "silent-classes";
