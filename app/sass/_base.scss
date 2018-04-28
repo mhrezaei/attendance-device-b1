@@ -1,0 +1,32 @@
+*{
+  font-family: IRANSans;
+}
+
+html{
+  height: 100%;
+  body{
+    height:100%;
+    margin:0;
+    position: relative;
+    z-index: 0;
+  }
+}
+
+.col-centered{
+  float: none;
+  margin: 0 auto;
+}
+
+.col-xxs{
+  @media (max-width: 499px) {
+    width: 100%;
+  }
+}
+
+.text-align-start{
+  text-align: $start !important;
+}
+
+.text-align-end{
+  text-align: $end !important;
+}

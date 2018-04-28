@@ -1,0 +1,54 @@
+/**
+*
+*	Name:	IRAN Sans-Serif Font
+*	Version:	4.0
+*	Author:	Moslem Ebrahimi (moslemebrahimi.com)
+*	Created on:	Dec 25,2012
+*	Updated on:	Dec 12,2015
+*	Website:	http://fontiran.com
+*	Copyright:	Commercial/Proprietary Software
+--------------------------------------------------------------------------------------
+فونت های ایران سن سریف یک نرم افزار مالکیتی محسوب می شود. جهت آگاهی از قوانین استفاده از این فونت ها لطفا به وب سایت (فونت ایران دات کام) مراجعه نمایید
+--------------------------------------------------------------------------------------
+IRAN Sans-serif fonts are considered a proprietary software. To gain information about the laws regarding the use of these fonts,please visit www.fontiran.com
+This set of fonts are used in this project under the license: (RQKBM)
+--------------------------------------------------------------------------------------
+**/
+
+
+@font-face {
+	font-family:IRANSans;
+	/*font-style:bold;*/
+	font-weight:700;
+	src:url(../fonts/iransans/IRANSansWeb_Bold.eot?#iefix) format('embedded-opentype'), url(../fonts/iransans/IRANSansWeb_Bold.woff2) format('woff2'), url(../fonts/iransans/IRANSansWeb_Bold.woff) format('woff'), url(../fonts/iransans/IRANSansWeb_Bold.ttf) format('truetype');
+}
+
+
+@font-face {
+	font-family:IRANSans;
+	/*font-style:medium;*/
+	font-weight:500;
+	src:url(../fonts/iransans/IRANSansWeb_Medium.eot?#iefix) format('embedded-opentype'), url(../fonts/iransans/IRANSansWeb_Medium.woff2) format('woff2'), url(../fonts/iransans/IRANSansWeb_Medium.woff) format('woff'), url(../fonts/iransans/IRANSansWeb_Medium.ttf) format('truetype');
+}
+
+@font-face {
+	font-family:IRANSans;
+	font-style:normal;
+	font-weight:400;
+	src:url(../fonts/iransans/IRANSansWeb.eot?#iefix) format('embedded-opentype'), url(../fonts/iransans/IRANSansWeb.woff2) format('woff2'), url(../fonts/iransans/IRANSansWeb.woff) format('woff'), url(../fonts/iransans/IRANSansWeb.ttf) format('truetype');
+}
+
+
+@font-face {
+	font-family:IRANSans;
+	/*font-style:light;*/
+	font-weight:200;
+	src:url(../fonts/iransans/IRANSansWeb_Light.eot?#iefix) format('embedded-opentype'), url(../fonts/iransans/IRANSansWeb_Light.woff2) format('woff2'), url(../fonts/iransans/IRANSansWeb_Light.woff) format('woff'), url(../fonts/iransans/IRANSansWeb_Light.ttf) format('truetype');
+}
+
+@font-face {
+	font-family: IRANSans;
+	/*font-style:ultralight;*/
+	font-weight: 100;
+	src: url(../fonts/iransans/IRANSansWeb_UltraLight.eot?#iefix) format('embedded-opentype'), url(../fonts/iransans/IRANSansWeb_UltraLight.woff2) format('woff2'), url(../fonts/iransans/IRANSansWeb_UltraLight.woff) format('woff'), url(../fonts/iransans/IRANSansWeb_UltraLight.ttf) format('truetype');
+}

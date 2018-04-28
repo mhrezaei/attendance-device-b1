@@ -1,0 +1,168 @@
+//----------------------------------------------------
+// Only IE Show
+@mixin only-ie {
+  @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+    @content;
+  }
+}
+/*
+  Usage:
+  @include only-ie{}
+*/
+
+//----------------------------------------------------
+// Animations
+@mixin keyframes($animation-name) {
+  @-webkit-keyframes #{$animation-name} {
+    @content;
+  }
+  @-moz-keyframes #{$animation-name} {
+    @content;
+  }
+  @-ms-keyframes #{$animation-name} {
+    @content;
+  }
+  @-o-keyframes #{$animation-name} {
+    @content;
+  }
+  @keyframes #{$animation-name} {
+    @content;
+  }
+}
+
+@mixin animation($str) {
+  -webkit-animation: #{$str};
+  -moz-animation: #{$str};
+  -ms-animation: #{$str};
+  -o-animation: #{$str};
+  animation: #{$str};
+}
+/*
+ @include keyframes(slide-down) {}
+ @include animation('slide-down 5s 3');
+*/
+
+//-------------------------------------------------
+// Transition
+@mixin transition($args...) {
+  -webkit-transition: $args;
+  -moz-transition: $args;
+  -ms-transition: $args;
+  -o-transition: $args;
+  transition: $args;
+}
+/*
+  @include transition(color .3s ease);
+*/
+
+//-------------------------------------------------
+// Transform
+@mixin transform($args...) {
+  -webkit-transform: $args;
+  -moz-transform: $args;
+  -ms-transform: $args;
+  -o-transform: $args;
+  transform: $args;
+}
+/*
+  @include transform(scale(1));
+*/
+
+//-------------------------------------------------
+// Transform Origin
+@mixin transform-origin($args...) {
+  -webkit-transform-origin: $args;
+  -moz-transform-origin: $args;
+  -ms-transform-origin: $args;
+  -o-transform-origin: $args;
+  transform-origin: $args;
+}
+/*
+  @include transform-origin(top);
+*/
+
+//-------------------------------------------------
+// Transform style
+@mixin transform-style($args...) {
+  -webkit-transform-style: $args;
+  -moz-transform-style: $args;
+  -ms-transform-style: $args;
+  -o-transform-style: $args;
+  transform-style: $args;
+}
+/*
+  @include transform-style(preserve-3d);
+*/
+
+//-------------------------------------------------
+// Box-Shadow
+@mixin box-shadow($args...) {
+  -webkit-box-shadow: $args;
+  -moz-box-shadow: $args;
+  -ms-box-shadow: $args;
+  -o-box-shadow: $args;
+  box-shadow: $args;
+}
+/*
+  @include box-shadow();
+*/
+
+//----------------------------------------------------
+// px to em
+$browser-context: 16; // Default
+
+@function em($pixels, $context: $browser-context) {
+  @return #{$pixels/$context}em;
+}
+
+//----------------------------------------------------
+// Directional mixins
+
+@mixin padding-start($value){
+  padding-#{$start}: $value + px;
+}
+@mixin padding-end($value){
+  padding-#{$end}: $value + px;
+}
+@mixin margin-start($value){
+  margin-#{$start}: $value + px;
+}
+@mixin margin-end($value){
+  margin-#{$end}: $value + px;
+}
+@mixin border-start($value){
+  border-#{$start}: $value;
+}
+@mixin border-end($value){
+  border-#{$end}: $value;
+}
+@mixin border-start-width($value){
+  border-#{$start}-width: $value + px;
+}
+@mixin border-end-width($value){
+  border-#{$end}-width: $value + px;
+}
+@mixin border-start-style($value){
+  border-#{$start}-style: $value;
+}
+@mixin border-end-style($value){
+  border-#{$end}-style: $value;
+}
+@mixin border-bottom-start-radius($value){
+  border-bottom-#{$start}-radius: $value;
+}
+@mixin border-bottom-end-radius($value){
+  border-bottom-#{$end}-radius: $value;
+}
+@mixin border-top-start-radius($value){
+  border-top-#{$start}-radius: $value;
+}
+@mixin border-top-end-radius($value){
+  border-top-#{$end}-radius: $value;
+}
+@mixin start($value){
+  #{$start}: $value;
+}
+@mixin end($value){
+  #{$end}: $value;
+}

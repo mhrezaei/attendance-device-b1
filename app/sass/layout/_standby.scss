@@ -1,0 +1,54 @@
+/*
+*-------------------------------------------------------
+* Layout / Standby
+*-------------------------------------------------------
+*/
+
+.standby_page{
+  width: 100vw;
+  height: 100vh;
+  &.day{
+    background: linear-gradient(#F9A740 60%, #2b476d 100%);
+    .standby_clock{
+      .clock-widget{
+        .clock_body{
+          color: $text_secondry;
+        }
+      }
+    }
+  }
+  &.night{
+    background: linear-gradient(#345582 60%, #2b476d 100%);
+    .standby_clock{
+      .clock-widget{
+        .clock_body{
+          color: $text_primary;
+        }
+      }
+    }
+  }
+
+  .standby_clock{
+    width: 100%;
+    height: 75vh;
+    display: flex;
+    align-items: center;
+    .clock-widget{
+      width: 300px;
+      height: 300px;
+      margin: auto;
+    }
+  }
+
+  .standby_finger-print{
+    width: 100%;
+    height: 25vh;
+    .standby_finger-print_inner{
+      width: 12vh;
+      height: 100%;
+      margin:auto;
+      display: flex;
+      align-items: center;
+    }
+  }
+}
