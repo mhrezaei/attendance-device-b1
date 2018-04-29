@@ -33,6 +33,8 @@
     </table>
 </div>
 
+<div id="alert"></div>
+
 <script src="/js/jquery.js"></script>
 <script src="/js/popper.js"></script>
 <script src="/js/bootstrap.js"></script>
@@ -79,6 +81,67 @@
 
 
     });
+</script>
+<script>
+    function activate_fingerprint_js_func() {
+
+        {#var zeroth_message = 'Fingerprint is not read yet';#}
+        {#var first_message = 'Fingerprint is read';#}
+        var second_message = 'No match found!';
+        {#var third_message = 'Found template at position # + str(position_number)'; <!--TODO: Python variable in js, maybe with Jinja2 -->#}
+        {#var fourth_message = 'The accuracy score is: + str(accuracy_score)'; <!--TODO: Python variable in js, maybe with Jinja2 -->#}
+        {#var fifth_message = 'Finger does NOT exist!';#}
+        {#var sixth_message = 'Finger exists!';#}
+        {#var seventh_message = 'SHA-2 hash of template: + hashlib.sha256(characterics).hexdigest()'; <!--TODO: Python variable in js, maybe with Jinja2 -->#}
+        {#var eighth_message = 'The user_id is: + str(the_user_id)'; <!--TODO: Python variable in js, maybe with Jinja2 -->#}
+        {#var ninth_message = 'The user_logs table does NOT have this user_id. Inserting the record.';#}
+        {#var tenth_message = 'exited_at field is NOT empty!';#}
+        {#var eleventh_message = 'Inserting NEW fresh record in the table.';#}
+        {#var twelfth_message = 'exited_at field is empty!';#}
+        {#var thirteenth_message = 'the_very_last_entered_at: + str(the_very_last_entered_at)'; <!--TODO: Python variable in js, maybe with Jinja2 -->#}
+        {#var fourteenth_message = 'More than 60 seconds spent from this finger scan!';#}
+        var fifteenth_message = 'Welcome ';
+        {#var sixteenth_message = 'Less than 60 seconds spent from this finger scan!';#}
+        var seventeenth_message = 'Goodbye ';
+
+        $.ajax({
+            method: "POST",
+            url: "{{ url_for('daily_routine') }}"
+        }).done(function (msg) {
+            if (msg.status <= 2) {
+                $('#alert').text(second_message).fadeIn("slow", function () {
+                    $(this).delay(3000).fadeOut("slow");
+                });
+                setTimeout(function () {
+                    activate_fingerprint_js_func();
+                }, 3000);
+            }
+            if (msg.status >= 3 && msg.status <= 15) {
+                fifteenth_message = fifteenth_message + msg.first_name + ' ' + msg.last_name + '  Your last exit was on: ' + msg.last_action;
+                <!--TODO: parse last_action (GMT) -->
+                $('#alert').text(fifteenth_message).fadeIn("slow", function () {
+                    $(this).delay(3000).fadeOut("slow");
+                });
+                setTimeout(function () {
+                    activate_fingerprint_js_func();
+                }, 3000)
+            }
+            if (msg.status >= 16) {
+                seventeenth_message = seventeenth_message + msg.first_name + ' ' + msg.last_name + '  Your last enter was on: ' + msg.last_action;
+                <!--TODO: parse last_action (GMT) -->
+                $('#alert').text(seventeenth_message).fadeIn("slow", function () {
+                    $(this).delay(3000).fadeOut("slow");
+                });
+                setTimeout(function () {
+                    activate_fingerprint_js_func();
+                }, 3000)
+            }
+        }).fail(function () {
+            activate_fingerprint_js_func();
+        });
+    }
+
+    activate_fingerprint_js_func();
 </script>
 </body>
 </html>
