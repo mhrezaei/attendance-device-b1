@@ -45,7 +45,7 @@
     $(document).ready(function () {
         var connected = false;
         var key = null;
-        const socket = io('http://localhost:5000');
+        const socket = io('http://' + document.domain + ':' + location.port);
 
         socket.on('connect', function () {
             $('#status').text("Connected.");
