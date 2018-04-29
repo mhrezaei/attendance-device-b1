@@ -55,12 +55,13 @@
 
         socket.on('auth', function (data) {
             $('#auth').text(data);
+            socket.emit('setFingerPrintStatus', true);
         });
 
 
-        socket.on('message', function (data) {
-            $('#message').text(data);
-            console.log(data);
+        socket.on('fingerPrintStatus', function (data) {
+            $('#message').text(JSON.stringify(data));
+            console.log(JSON.stringify(data));
         });
 
         socket.on('disconnect', function () {
@@ -69,16 +70,10 @@
             $('#status').text("Disconnected.");
         });
 
-        $('#button').click(function () {
-            if (connected)
-                socket.emit('temp', new Date().getTime());
-        });
-
         setInterval(function () {
             if (connected)
                 socket.emit('update');
-        }, 100);
-
+        }, 500);
 
     });
 </script>

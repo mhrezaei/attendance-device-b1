@@ -7,14 +7,14 @@ store['fingerPrintEnabled'] = False
 
 def receive(action, message):
     if action == 'fingerPrintStatus':
-        for c in store['clients']:
-            socket.emit('fingerPrintStatus', message, namespace=c)
+        print(message)
+        socket.emit('fingerPrintStatus', message, broadcast=True)
     pass
 
 
 def run():
     if store['fingerPrintEnabled']:
-        sleep(0.02)
+        sleep(0.001)
         our_result = {'status': 0, 'first_name': '', 'last_name': '', 'last_action': ''}
         if fingerPrint.readImage() != 0:
             fingerPrint.convertImage(0x01)
@@ -122,7 +122,7 @@ def run():
                                 'desc').pluck(
                                 'exited_at')
 
-                            our_result['last_action'] = the_very_last_exited_at
+                            our_result['last_action'] = str(the_very_last_exited_at)
 
                             db.table('user_logs').insert(user_id=the_user_id,
                                                          template_position=the_template_position,

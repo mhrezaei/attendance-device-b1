@@ -1,8 +1,6 @@
 from flask import Flask, send_file
 from flask_socketio import SocketIO
 from . import SocketWorker, Store
-import routes
-from models import *
 import os
 from pyfingerprint.pyfingerprint import PyFingerprint
 
@@ -18,6 +16,8 @@ store = Store()
 
 
 
+import routes
+from models import *
 
 @socket.on('update')
 def update():

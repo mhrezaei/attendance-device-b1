@@ -16,17 +16,13 @@ def socket_connect():
 
 @socket.on('disconnect')
 def socket_disconnect():
+    store['fingerPrintEnabled'] = False
     store['clients'].remove(request.sid)
 
 
 @socket.on('setFingerPrintStatus')
 def set_fingerprint_status(data):
     store['fingerPrintEnabled'] = data
-
-
-@app.before_request
-def before_any_request():
-    store['fingerPrintEnabled'] = False
 
 # --------------#
 #   Endpoints   #
