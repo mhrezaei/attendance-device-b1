@@ -12,23 +12,15 @@
 </head>
 <body>
 
-<a href="{{ url_for('settings') }}">Settings</a>
+<a href="{{ url_for('settings') }}"><button type="button" class="btn">Settings</button></a>
 
 <div class="container">
     <table class="table">
         <tr>
-            <td>STATUS</td>
-            <td>SID</td>
             <td>MESSAGE</td>
-            <td>SEND</td>
         </tr>
         <tr>
-            <td id="status"></td>
-            <td id="auth"></td>
             <td id="message"></td>
-            <td>
-                <div id="button" class="btn btn-primary">Send</div>
-            </td>
         </tr>
     </table>
 </div>
@@ -60,8 +52,9 @@
 
 
         socket.on('fingerPrintStatus', function (data) {
-            $('#message').text(JSON.stringify(data));
-            console.log(JSON.stringify(data));
+            if(data.status > 1)
+                $('#message').text(data.first_name); //TODO: (ASK) Adaptive messages based on ENTER or EXIT - Ajax or not?
+
         });
 
         socket.on('disconnect', function () {
