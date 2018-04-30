@@ -187,7 +187,7 @@ def run():
                                 db.table('user_logs').where('entered_at', the_very_last_entered_at).update(
                                     exited_at=the_exited_at)
 
-                                our_result['last_action'] = the_very_last_entered_at
+                                our_result['last_action'] = str(the_very_last_entered_at)
                                 # time.sleep(3)
                                 # return redirect('activate')
                                 publish('fingerPrintStatus', our_result)
