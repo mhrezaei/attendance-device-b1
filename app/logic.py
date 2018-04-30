@@ -14,7 +14,7 @@ def receive(action, message):
 
 def run():
     if store['fingerPrintEnabled']: #boolean
-        sleep(0.001) #TODO: 1 second or not
+        # sleep(0.5) #TODO: 1 second or not
         our_result = {'status': 0, 'first_name': '', 'last_name': '', 'last_action': ''}
         if fingerPrint.readImage() != 0:
             fingerPrint.convertImage(0x01)
