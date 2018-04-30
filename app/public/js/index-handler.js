@@ -22,7 +22,7 @@
     $(document).ready(function () {
         var connected = false;
         var key = null;
-        const socket = io('http://' + document.domain + ':' + location.port);
+        const socket = io('http://localhost:5000');
 
         socket.on('connect', function () {
             $('#status').text("Connected.");
