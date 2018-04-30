@@ -4,11 +4,6 @@
     {#    <meta http-equiv="refresh" content="60; URL={{ url_for('index') }}">#}
     <title>Attendance Machine</title>
     <link rel="stylesheet" href="/css/bootstrap.css">
-    <style type="text/css">
-        .table {
-
-        }
-    </style>
 </head>
 <body>
 
@@ -16,18 +11,7 @@
     <button type="button" class="btn">Settings</button>
 </a>
 
-<div class="container">
-    <table class="table">
-        <tr>
-            <td>MESSAGE</td>
-        </tr>
-        <tr>
-            <td id="message"></td>
-        </tr>
-    </table>
-</div>
-
-<div id="alert"></div>
+<div id="message"></div>
 
 <script src="/js/jquery.js"></script>
 <script src="/js/popper.js"></script>
@@ -36,7 +20,7 @@
 
 <script>
 
-    {# Advisory messages which show each status on logic #}
+    {# Advisory messages which show each status on logic.py #}
 
     {#var zeroth_message = 'Fingerprint is not read yet';#}
     {#var first_message = 'Fingerprint is read';#}
@@ -65,7 +49,6 @@
         socket.on('connect', function () {
             $('#status').text("Connected.");
             connected = true;
-            console.log('connected.');
         });
 
         socket.on('auth', function (data) {
