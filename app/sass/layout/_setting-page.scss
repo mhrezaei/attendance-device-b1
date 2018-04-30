@@ -1,0 +1,61 @@
+/*
+*-------------------------------------------------------
+* Layout / Setting Page
+*-------------------------------------------------------
+*/
+
+
+.setting_page{
+  background: linear-gradient(#345582 60%, #2b476d 100%);
+  width: 100vw;
+  height: 100vh;
+  z-index: 3;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: none;
+  .heading{
+    height: 20vh;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    h1{
+      font-size: 35px;
+      color: $text_primary;
+      width: 100%;
+    }
+  }
+  .list{
+    height: 75vh;
+    width: 80%;
+    margin: auto;
+    background: white;
+    @include box-shadow(0 2px 5px rgba(0,0,0,0.4));
+    border-radius: 5px;
+    @include transform(translateY(120%));
+    overflow: auto;
+  }
+}
+
+
+.showSetting{
+  .setting_page{
+    display: block;
+    .list{
+      @include transform(translateY(0));
+      @include transition(1s ease-out);
+      transition-delay: 0.5s;
+    }
+  }
+}
+
+
+@include keyframes(slideIn) {
+  from{
+    @include transform(translateY(120%));
+  }
+  to{
+    @include transform(translateY(0));
+  }
+}
