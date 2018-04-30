@@ -168,7 +168,24 @@ function checkTheme() {
     }
 }
 
-$(document).ready(function () {
+function openSetting() {
+    $('body').addClass('showSetting');
+}
+
+function isAdmin() {
+    setTimeout(function () {
+        closeModal();
+        openSetting()
+    },3000);
+}
+
+function isNotAdmin() {
+    setTimeout(function () {
+        openModal("شما اجازه ورود به این بخش را ندارید.","../public/images/fingerprint-outline-with-close-button.svg");
+    },3000);
+}
+
+jQuery(function($){
     //Modal close function
     $('#alertModal').on('click',closeModal);
 
@@ -178,5 +195,22 @@ $(document).ready(function () {
         checkTheme();
     },30000);
 
-
-});
+    // Setting button clicked
+    $('.js-accessSetting').on('click',function () {
+        openModal('برای ورود به بخش تنظیمات مجددا انگشت‌ خود را اسکن کنید.', '../public/images/fingerprint-with-keyhole.svg');
+        $.ajax({
+            url: "../public/data/isAdmin.json",
+            dataType: "json",
+            success: function(response) {
+                if(response.isAdmin){
+                    isAdmin();
+                }else {
+                    isNotAdmin();
+                }
+            },
+            error: function () {
+                openModal('مجددا تلاش کنید.','../public/images/fingerprint-information-symbol.svg');
+            }
+        });
+    })
+}); //End Of siaf!
