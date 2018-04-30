@@ -1,7 +1,7 @@
 <!-- templates/index.html -->
 <html>
 <head>
-{#    <meta http-equiv="refresh" content="60; URL={{ url_for('index') }}">#}
+    {#    <meta http-equiv="refresh" content="60; URL={{ url_for('index') }}">#}
     <title>Hello</title>
     <link rel="stylesheet" href="/css/bootstrap.css">
     <style type="text/css">
@@ -12,7 +12,9 @@
 </head>
 <body>
 
-<a href="{{ url_for('settings') }}"><button type="button" class="btn">Settings</button></a>
+<a href="{{ url_for('settings') }}">
+    <button type="button" class="btn">Settings</button>
+</a>
 
 <div class="container">
     <table class="table">
@@ -73,8 +75,15 @@
 
 
         socket.on('fingerPrintStatus', function (data) {
-            if(data.status > 1)
-                $('#message').text(data.first_name);
+            if (data.status <= 2) {
+                $('#message').text(second_message);
+            }
+            if (data.status >= 3 && data.status <= 15) {
+                $('#message').text(fifteenth_message + data.first_name + ' ' + data.last_name + ', your last action was on: ' + data.last_action);
+            }
+            if (data.status >= 16) {
+                $('#message').text(seventeenth_message + data.first_name + ' ' + data.last_name + ', your last action was on: ' + data.last_action);
+            }
 
         });
 
