@@ -1,3 +1,9 @@
+/**
+ * Global Variables
+ */
+var App_router = "standby";
+var App_modalState = "close";
+
 /*
 *-------------------------------------------------------
 * Vue Related
@@ -178,6 +184,7 @@ Vue.component('app-details',{
     template:
             `
             <div class="member-tabs">
+                <h3 class="tabs-title">{{ member.name + " " + member.lastName}}</h3>
                 <ul class="nav nav-tabs">
                   <li class="active"><a data-toggle="tab" href="#member_attendance">لیست حضور و غیاب</a></li>
                   <li><a data-toggle="tab" href="#memeber_card">کارت</a></li>
@@ -187,7 +194,28 @@ Vue.component('app-details',{
                 
                 <div class="tab-content">
                   <div id="member_attendance" class="tab-pane fade in active">
-                    
+                    <div class="table-responsive">
+                        <table class="table table-bordered"> 
+                            <thead> 
+                                <tr> 
+                                <th style="width: 60px;">ردیف</th> 
+                                <th>تاریخ ورود</th> 
+                                <th>ساعت ورود</th> 
+                                <th>تاریخ خروج</th> 
+                                <th>ساعت خروج</th> 
+                                </tr> 
+                            </thead> 
+                            <tbody>
+                                <tr v-for="(report , index) in reports">
+                                    <td>{{ index + 1 }}</td>
+                                    <td>{{ report.enter_date }}</td>
+                                    <td>{{ report.enter_time }}</td>
+                                    <td>{{ report.exit_date }}</td>
+                                    <td>{{ report.exit_time }}</td>
+                                </tr>
+                            </tbody>
+                        </table> 
+                    </div>
                   </div>
                   <div id="memeber_card" class="tab-pane fade">
                     <h3>نمایش کارت</h3>
@@ -204,6 +232,7 @@ Vue.component('app-details',{
                 </div>
             </div>
             `,
+    props: ['member','reports'],
 });
 
 var Daytime = function () {
@@ -228,12 +257,6 @@ var vm = new Vue({
 * Vanilla JavaScript
 *-------------------------------------------------------
 */
-
-/**
- * Global Variables
- */
-var App_router = "standby";
-var App_modalState = "close";
 
 
 /**
@@ -356,7 +379,20 @@ function getMembersList() {
             renderMembers(response.members);
         },
         error: function () {
-            showError('خطا در برقراری ارتباط');
+            showError('خطا در برقراری ارتباط','#list');
+        }
+    })
+}
+
+function getMemberReport(id) {
+    $.ajax({
+        url: "../public/js/data/member1.json",
+        dataType: "json",
+        success: function (response) {
+            return response.reports;
+        },
+        error: function () {
+            showError('خطا در برقراری ارتباط','#member_attendance');
         }
     })
 }
@@ -375,19 +411,38 @@ function renderMembers(members) {
 }
 
 
-function showError(message) {
+function showError(message,parent) {
 
     $("<div class=\'message\'></div>")
-        .appendTo('#list')
+        .appendTo(parent)
         .text(message)
 }
 
 function showMember(member) {
     clearList();
-    $('<app-details></app-details>').appendTo('#list');
+    $('<app-details :member="member" :reports="reports"></app-details>').appendTo('#list');
 
     new Vue({
-        el: "#list"
+        el: "#list",
+        data:{
+            member: member,
+            reports: null
+        },
+        created: function () {
+            var id = this.member.id;
+            var reports = this.reports;
+
+            $.ajax({
+                url: "../public/js/data/member1.json",
+                dataType: "json",
+                success: function (response) {
+                    reports = response.reports;
+                },
+                error: function () {
+                    showError('خطا در برقراری ارتباط','#member_attendance');
+                }
+            })
+        }
     })
 }
 
