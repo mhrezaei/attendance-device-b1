@@ -1,5 +1,5 @@
 from config import app, publish, store, socket, fingerPrint
-from flask import render_template, request, flash, redirect, url_for
+from flask import render_template, request, flash, redirect, url_for, jsonify
 from models import *
 import time
 from forms import UserDefineForm, UserEnrollForm
@@ -153,7 +153,7 @@ def user_enroll():  # TODO: Seems NOT enrolling new users when sensor memory is 
                     # flash('Template already exists at position #' + str(position_number))
                     our_result['status'] = 2
                     # exit(0)
-                    return redirect(url_for('user_enroll'))
+                    return jsonify(our_result)
                     # TODO: Exits the program and closes the Attendance.py -- should find an alternative
 
                 # flash('Remove finger...')
@@ -173,7 +173,7 @@ def user_enroll():  # TODO: Seems NOT enrolling new users when sensor memory is 
                 if fingerPrint.compareCharacteristics() == 0:
                     # flash('Fingers do not match')
                     our_result['status'] = 5
-                    return redirect(url_for('user_enroll'))
+                    return jsonify(our_result)
 
                 # Creates a template
                 fingerPrint.createTemplate()
@@ -186,8 +186,8 @@ def user_enroll():  # TODO: Seems NOT enrolling new users when sensor memory is 
                 our_result['status'] = 7
                 db.table('fingers').insert(user_id=the_id, template_position=position_number)
 
-                flash('This user has been enrolled successfully.')
-                # our_result['status'] = 8
+                # flash('This user has been enrolled successfully.')
+                our_result['status'] = 8
                 return render_template('user_enroll.html',
                                        form=form,
                                        the_id=the_id,
@@ -201,8 +201,8 @@ def user_enroll():  # TODO: Seems NOT enrolling new users when sensor memory is 
                                        )
             # This id does not exist.
             elif id_existence_clause == 0:
-                flash('Please enter an existing ID number.')
-                # our_result['status'] = 9
+                # flash('Please enter an existing ID number.')
+                our_result['status'] = 9
                 return render_template('user_enroll.html',
                                        form=form,
                                        the_id=the_id,
