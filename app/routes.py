@@ -27,6 +27,7 @@ def socket_disconnect():
 def set_fingerprint_status(data):
     store['fingerPrintEnabled'] = data
 
+
 # --------------#
 #   Endpoints   #
 #               #
@@ -36,13 +37,22 @@ def set_fingerprint_status(data):
 def index():
     return render_template('index.html')
 
+
 @app.route('/index-page')
 def index_page():
     return render_template('index-page.html')
 
-@app.route('/settings') #TODO: If no action is done on this page for about one minute, leads to Broken Pipe Eroor on terminal but yet everything works fine
+
+@app.route('/index-page-playground')
+def index_page_playground():
+    return render_template('index-page-playground.html')
+
+
+@app.route(
+    '/settings')  # TODO: If no action is done on this page for about one minute, leads to Broken Pipe Eroor on terminal but yet everything works fine
 def settings():
     return render_template('settings.html')
+
 
 # -------------------------#
 #       User Define        #
@@ -79,6 +89,7 @@ def user_define():
                 return render_template('user_define.html', form=form)
     elif request.method == 'GET':
         return render_template('user_define.html', form=form)
+
 
 # -------------------------#
 #       User Enroll        #
@@ -125,7 +136,8 @@ def user_enroll():  # TODO: Seems NOT enrolling new users when sensor memory is 
 
             # This id exists and the user is ready to be enrolled.
             if id_existence_clause != 0:
-                flash('Currently used templates: ' + str(fingerPrint.getTemplateCount()) + ' / ' + str(fingerPrint.getStorageCapacity()))
+                flash('Currently used templates: ' + str(fingerPrint.getTemplateCount()) + ' / ' + str(
+                    fingerPrint.getStorageCapacity()))
                 our_result['status'] = 1
                 # Wait to read the finger
                 while fingerPrint.readImage() == 0:
