@@ -1,0 +1,44 @@
+{
+  "members": [
+    {
+      "id": "1",
+      "name": "نگار",
+      "lastName": "جمالی‌فرد",
+      "codeMelli": "0016246381",
+      "card": "11111111",
+      "fingerPrints": [
+        {
+          "id": "f1_1",
+          "name": "اولی"
+        },
+        {
+          "id": "f1_2",
+          "name": "دومی"
+        }
+      ]
+    },
+
+    {
+      "id": "2",
+      "name": "امی‌تیس",
+      "lastName": "یوسفی",
+      "codeMelli": "0016246381",
+      "card": false,
+      "fingerPrints": [
+        {
+          "id": "f2_1",
+          "name": "اولی"
+        }
+      ]
+    },
+
+    {
+      "id": "3",
+      "name": "پارسا",
+      "lastName": "میهن‌دوست",
+      "codeMelli": "0016246381",
+      "card": false,
+      "fingerPrints": []
+    }
+  ]
+}

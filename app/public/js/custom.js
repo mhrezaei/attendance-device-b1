@@ -242,7 +242,8 @@ function closeSetting() {
 function isAdmin() {
     setTimeout(function () {
         closeModal();
-        openSetting()
+        openSetting();
+        getMembersList();
     },3000);
 }
 
@@ -257,6 +258,38 @@ function isNotAdmin() {
 }
 
 
+/**
+ * Ajax - Gets Members List
+ */
+function getMembersList() {
+    if(App_router !== "setting"){
+        return
+    }
+
+    $.ajax({
+        url: "../public/js/data/members-list.json",
+        dataType: "json",
+        success: function (response) {
+            renderMembers(response.members);
+        },
+        error: function () {
+            showError('خطا در برقراری ارتباط');
+        }
+    })
+}
+
+
+function renderMembers(members) {
+    console.log(members);
+}
+
+
+function showError(message) {
+
+    $("<div class=\'message\'></div>")
+        .appendTo('#list')
+        .text(message)
+}
 
 /*
 *-------------------------------------------------------
@@ -300,6 +333,7 @@ jQuery(function($){
 
     // Back To Home
     $('.back-to-home').on('click',closeSetting);
+
 
 
 }); //End Of siaf!
