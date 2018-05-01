@@ -97,8 +97,6 @@ def user_define():
 @app.route('/user_enroll', methods=['POST', 'GET'])
 def user_enroll():  # TODO: Seems NOT enrolling new users when sensor memory is fresh - check again
 
-    # f.readImage() #TODO: sensor should be off when on this page, unless it is needed
-
     our_result = {'status': 0}
 
     form = UserEnrollForm()
