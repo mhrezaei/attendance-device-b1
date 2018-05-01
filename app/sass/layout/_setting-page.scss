@@ -36,6 +36,18 @@
     @include transform(translateY(120%));
     overflow: auto;
   }
+
+  .back-to-home{
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    width: 30px;
+    height: 30px;
+    font-size: 30px;
+    background: transparent;
+    border: 0;
+    color: $text_primary;
+  }
 }
 
 

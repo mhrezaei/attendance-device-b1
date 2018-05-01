@@ -1,3 +1,8 @@
+/*
+*-------------------------------------------------------
+* Vue Related
+*-------------------------------------------------------
+*/
 
 Vue.component('TimeAndDate', {
     template: `
@@ -140,22 +145,56 @@ new Vue({
     el: "#app"
 });
 
+/*
+*-------------------------------------------------------
+* Vanilla JavaScript
+*-------------------------------------------------------
+*/
+
+/**
+ * Global Variables
+ */
+var App_router = "standby";
+var App_modalState = "close";
+
+
+/**
+ * Opens Modal
+ * @param message
+ * @param iconSrc
+ */
 function openModal(message, iconSrc) {
     var modal = $('#alertModal');
     var src   = (iconSrc && iconSrc.length) ? iconSrc : "../public/images/warning.svg";
     modal.find('img').attr('src', src);
     modal.find('.message').text(message);
     modal.addClass('show');
+
+    App_modalState = "open";
 }
 
+
+/**
+ * Closes Modal
+ */
 function closeModal() {
+    if(App_modalState === "close"){
+        return
+    }
+
     var modal = $('#alertModal');
     var src   = "../public/images/warning.svg";
     modal.find('.icon img').attr('src', src);
     modal.find('.message').text("");
     modal.removeClass('show');
+
+    App_modalState = "close";
 }
 
+
+/**
+ * Changes Theme According To Time.
+ */
 function checkTheme() {
     var daytime = new Daytime();
 
@@ -168,10 +207,38 @@ function checkTheme() {
     }
 }
 
+
+/**
+ * Opens Setting Page
+ */
 function openSetting() {
+    if(App_router === "setting"){
+        return
+    }
+
     $('body').addClass('showSetting');
+
+    App_router = "setting";
 }
 
+
+/**
+ * Closes Setting Page
+ */
+function closeSetting() {
+    if(App_router !== "setting"){
+        return
+    }
+
+    $('body').removeClass('showSetting');
+
+    App_router = "standby";
+}
+
+
+/**
+ * Actions If Is Admin
+ */
 function isAdmin() {
     setTimeout(function () {
         closeModal();
@@ -179,15 +246,26 @@ function isAdmin() {
     },3000);
 }
 
+
+/**
+ * Actions If Is Not Admin
+ */
 function isNotAdmin() {
     setTimeout(function () {
         openModal("شما اجازه ورود به این بخش را ندارید.","../public/images/fingerprint-outline-with-close-button.svg");
     },3000);
 }
 
+
+
+/*
+*-------------------------------------------------------
+* Self Invoking Anonymous Function
+*-------------------------------------------------------
+*/
+
 jQuery(function($){
-    //Modal close function
-    $('#alertModal').on('click',closeModal);
+
 
     // StandBy theme
     checkTheme();
@@ -195,11 +273,16 @@ jQuery(function($){
         checkTheme();
     },30000);
 
+
+    //Modal close function
+    $('#alertModal .close').on('click',closeModal);
+
+
     // Setting button clicked
     $('.js-accessSetting').on('click',function () {
         openModal('برای ورود به بخش تنظیمات مجددا انگشت‌ خود را اسکن کنید.', '../public/images/fingerprint-with-keyhole.svg');
         $.ajax({
-            url: "../public/data/isAdmin.json",
+            url: "../public/js/data/isAdmin.json",
             dataType: "json",
             success: function(response) {
                 if(response.isAdmin){
@@ -212,5 +295,11 @@ jQuery(function($){
                 openModal('مجددا تلاش کنید.','../public/images/fingerprint-information-symbol.svg');
             }
         });
-    })
+    });
+
+
+    // Back To Home
+    $('.back-to-home').on('click',closeSetting);
+
+
 }); //End Of siaf!
