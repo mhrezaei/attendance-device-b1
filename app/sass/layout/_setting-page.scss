@@ -36,6 +36,11 @@
     @include transform(translateY(120%));
     overflow: auto;
     padding: 30px 20px;
+    .table{
+      .table-action{
+        text-align: center;
+      }
+    }
   }
 
   .back-to-home{

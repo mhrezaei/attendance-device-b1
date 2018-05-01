@@ -147,7 +147,7 @@ Vue.component('app-members-table',{
         </div>
         `,
     props:{
-        members: Array
+        members: Array,
     }
 });
 
@@ -160,13 +160,51 @@ Vue.component('app-row',{
                 <td>{{ row.name }}</td>
                 <td>{{ row.lastName }}</td>
                 <td>{{ row.codeMelli }}</td>
-                <td><button class="btn btn-default actions">عملیات</button></td>
+                <td class="table-action"><button class="btn btn-default actions" @click="showDetails(row)">عملیات</button></td>
             </tr>
         </tbody>
         `,
-    props: ['rows']
+    props: {
+        rows: Array,
+    },
+    methods: {
+        showDetails: function (member) {
+            showMember(member)
+        }
+    }
 });
 
+Vue.component('app-details',{
+    template:
+            `
+            <div class="member-tabs">
+                <ul class="nav nav-tabs">
+                  <li class="active"><a data-toggle="tab" href="#member_attendance">لیست حضور و غیاب</a></li>
+                  <li><a data-toggle="tab" href="#memeber_card">کارت</a></li>
+                  <li><a data-toggle="tab" href="#member_fingerprint">اثر انگشت‌ها</a></li>
+                  <li><a data-toggle="tab" href="#member_setting">تنظیمات</a></li>
+                </ul>
+                
+                <div class="tab-content">
+                  <div id="member_attendance" class="tab-pane fade in active">
+                    
+                  </div>
+                  <div id="memeber_card" class="tab-pane fade">
+                    <h3>نمایش کارت</h3>
+                    <p>Some content in menu 1.</p>
+                  </div>
+                  <div id="member_fingerprint" class="tab-pane fade">
+                    <h3>اثر انگشت‌ها</h3>
+                    <p>Some content in menu 2.</p>
+                  </div>
+                  <div id="member_setting" class="tab-pane fade">
+                    <h3>تنظیمات</h3>
+                    <p>Some content in menu 2.</p>
+                  </div>
+                </div>
+            </div>
+            `,
+});
 
 var Daytime = function () {
   persianDate.toLocale('en');
@@ -323,7 +361,6 @@ function getMembersList() {
     })
 }
 
-
 function renderMembers(members) {
     clearList();
     $('<app-members-table :members="members"></app-members-table>')
@@ -332,7 +369,7 @@ function renderMembers(members) {
     new Vue({
         el: "#list",
         data: {
-            members: members
+            members: members,
         }
     });
 }
@@ -343,6 +380,15 @@ function showError(message) {
     $("<div class=\'message\'></div>")
         .appendTo('#list')
         .text(message)
+}
+
+function showMember(member) {
+    clearList();
+    $('<app-details></app-details>').appendTo('#list');
+
+    new Vue({
+        el: "#list"
+    })
 }
 
 /*
