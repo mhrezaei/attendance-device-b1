@@ -128,6 +128,46 @@ Vue.component('app-navbar', {
     }
 });
 
+Vue.component('app-members-table',{
+    template:
+        `
+        <div id="table" class="table-responsive">
+            <table class="table table-bordered"> 
+                <thead> 
+                    <tr> 
+                    <th style="width: 60px;">ردیف</th> 
+                    <th>نام</th> 
+                    <th>نام‌ خانوادگی</th> 
+                    <th>کد‌ ملی</th> 
+                    <th>عملیات</th> 
+                    </tr> 
+                </thead> 
+                <app-row :rows="members"></app-row>
+            </table> 
+        </div>
+        `,
+    props:{
+        members: Array
+    }
+});
+
+Vue.component('app-row',{
+    template:
+        `
+        <tbody>
+            <tr v-for="(row , index) in rows">
+                <td>{{ index + 1 }}</td>
+                <td>{{ row.name }}</td>
+                <td>{{ row.lastName }}</td>
+                <td>{{ row.codeMelli }}</td>
+                <td><button class="btn btn-default actions">عملیات</button></td>
+            </tr>
+        </tbody>
+        `,
+    props: ['rows']
+});
+
+
 var Daytime = function () {
   persianDate.toLocale('en');
   this.hour = new persianDate().format('HH');
@@ -141,7 +181,7 @@ var Daytime = function () {
   };
 };
 
-new Vue({
+var vm = new Vue({
     el: "#app"
 });
 
@@ -258,6 +298,11 @@ function isNotAdmin() {
 }
 
 
+function clearList() {
+    $('#list').html("");
+}
+
+
 /**
  * Ajax - Gets Members List
  */
@@ -280,7 +325,16 @@ function getMembersList() {
 
 
 function renderMembers(members) {
-    console.log(members);
+    clearList();
+    $('<app-members-table :members="members"></app-members-table>')
+        .appendTo('#list');
+
+    new Vue({
+        el: "#list",
+        data: {
+            members: members
+        }
+    });
 }
 
 

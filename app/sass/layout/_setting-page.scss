@@ -35,6 +35,7 @@
     border-radius: 5px;
     @include transform(translateY(120%));
     overflow: auto;
+    padding: 30px 20px;
   }
 
   .back-to-home{
