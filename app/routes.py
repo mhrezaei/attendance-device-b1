@@ -96,4 +96,4 @@ def user_define():
 # -------------------------#
 @app.route('/user_enroll', methods=['POST', 'GET'])
 def user_enroll():  # TODO: Seems NOT enrolling new users when sensor memory is fresh - check again
-    render_template('user_enroll.html')
+    return render_template('user_enroll.html')
