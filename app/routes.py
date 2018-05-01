@@ -136,8 +136,7 @@ def user_enroll():  # TODO: Seems NOT enrolling new users when sensor memory is 
 
             # This id exists and the user is ready to be enrolled.
             if id_existence_clause != 0:
-                flash('Currently used templates: ' + str(fingerPrint.getTemplateCount()) + ' / ' + str(
-                    fingerPrint.getStorageCapacity()))
+                # flash('Currently used templates: ' + str(fingerPrint.getTemplateCount()) + ' / ' + str(fingerPrint.getStorageCapacity()))
                 our_result['status'] = 1
                 # Wait to read the finger
                 while fingerPrint.readImage() == 0:
@@ -151,16 +150,16 @@ def user_enroll():  # TODO: Seems NOT enrolling new users when sensor memory is 
                 position_number = result[0]
 
                 if position_number >= 0:
-                    flash('Template already exists at position #' + str(position_number))
+                    # flash('Template already exists at position #' + str(position_number))
                     our_result['status'] = 2
                     # exit(0)
                     return redirect(url_for('user_enroll'))
                     # TODO: Exits the program and closes the Attendance.py -- should find an alternative
 
-                flash('Remove finger...')
+                # flash('Remove finger...')
                 our_result['status'] = 3
                 time.sleep(3)
-                flash('Waiting for same finger again...')
+                # flash('Waiting for same finger again...')
                 our_result['status'] = 4
 
                 # Wait to read the finger again
@@ -172,24 +171,23 @@ def user_enroll():  # TODO: Seems NOT enrolling new users when sensor memory is 
 
                 # Compares the char buffers
                 if fingerPrint.compareCharacteristics() == 0:
-                    flash('Fingers do not match')
+                    # flash('Fingers do not match')
                     our_result['status'] = 5
                     return redirect(url_for('user_enroll'))
-                    # raise Exception('Fingers do not match')
 
                 # Creates a template
                 fingerPrint.createTemplate()
 
                 # Saves the template at new position number
                 position_number = fingerPrint.storeTemplate()
-                flash('Finger enrolled successfully!')
+                # flash('Finger enrolled successfully!')
                 our_result['status'] = 6
-                flash('New template position #' + str(position_number))
+                # flash('New template position #' + str(position_number))
                 our_result['status'] = 7
                 db.table('fingers').insert(user_id=the_id, template_position=position_number)
 
                 flash('This user has been enrolled successfully.')
-                our_result['status'] = 8
+                # our_result['status'] = 8
                 return render_template('user_enroll.html',
                                        form=form,
                                        the_id=the_id,
@@ -204,7 +202,7 @@ def user_enroll():  # TODO: Seems NOT enrolling new users when sensor memory is 
             # This id does not exist.
             elif id_existence_clause == 0:
                 flash('Please enter an existing ID number.')
-                our_result['status'] = 9
+                # our_result['status'] = 9
                 return render_template('user_enroll.html',
                                        form=form,
                                        the_id=the_id,
