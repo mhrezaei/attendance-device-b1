@@ -1,137 +1,28 @@
-<!doctype html>
-<html xmlns:font-weight="http://www.w3.org/1999/xhtml" xmlns:margin-left="http://www.w3.org/1999/xhtml">
+<!-- templates/index-temp.html -->
+<html>
 <head>
+    {#    <meta http-equiv="refresh" content="60; URL={{ url_for('index') }}">#} {# TODO: (ASK) Does it need to be refreshed? #}
+    <title>Attendance Machine</title>
     <link rel="stylesheet" href="/css/bootstrap.css">
-    <style>
-        table, th, td {
-            border: 1px solid black;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            padding: 5px;
-            text-align: left;
-        }
-    </style>
-    <meta charset="UTF-8">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <title>Result</title>
 </head>
 <body>
-<a href="{{ url_for('index') }}">
-    <button type="button" class="btn">Home</button>
-</a><br><br>
-<a href="{{ url_for('settings') }}">
-    <button type="button" class="btn">Settings</button>
-</a><br>
+<a href="{{ url_for('index') }}"><button type="button" class="btn">Home</button></a><br><br>
+<a href="{{ url_for('settings') }}"><button type="button" class="btn">Settings</button></a>
 
 
-<form action="{{ url_for('user_enroll') }}" method='post'>
-    <fieldset>
-        <legend>User Enroll Form</legend>
-        {{ form.hidden_tag() }}
-
-        <div style=font-size:20px; font-weight:bold; margin-left:150px;>
-            {{ form.id.label }}<br>
-            {{ form.id }}
-            <br>
-            {{ form.submit }}
-        </div>
-
-    </fieldset>
-</form>
-
-<br><br>
-
-{#------------------------#}
-{# Form validation errors #}
-{#------------------------#}
-{% for message in form.id.errors %}
-    <div>{{ message }}</div>
-{% endfor %}
-
-{#------------------------#}
-{# Flash messages         #}
-{#------------------------#}
-{% with messages = get_flashed_messages() %}
-    {% if messages %}
-        <ul class=flashes>
-            {% for message in messages %}
-                <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-{% endwith %}
-
-<div id="message"></div>
-
-You entered this ID: {{ the_id }}
-
-<table class="table table-hover">
-    <caption align="top">Users Table</caption>
-    {# TODO: The <caption> align attribute is not supported in HTML5. Use CSS instead. #}
-    <tr>
-        <th>ID</th>
-        <th>First Name</th>
-        <th>Last Name</th>
-        <th>Code Melli</th>
-        <th>Created at</th>
-        <th>Updated at</th>
-        <th>Enroll Finger</th>
-        <th>Enroll RFID Card</th>
-    </tr>
-    {% for i in range(users_table_records_count) %}
-        <tr>
-            <td>{{ id_list[i] }}</td>
-            <td>{{ first_name_list[i] }}</td>
-            <td>{{ last_name_list[i] }}</td>
-            <td>{{ code_melli_list[i] }}</td>
-            <td>{{ created_at_list[i] }}</td>
-            <td>{{ updated_at_list[i] }}</td>
-            <td>
-                <button value="{{ id_list[i] }}" class="enroll-{{ id_list[i] }}" type="button"
-                        onclick="findUserID('{{ id_list[i] }}');">Enroll Finger
-                </button>
-            </td>
-            <td>
-                <button value="{{ id_list[i] }}" class="enroll-{{ id_list[i] }}" type="button"
-                        onclick="findUserID('{{ id_list[i] }}');">Enroll RFID Card
-                </button>
-            </td>
-        </tr>
-    {% endfor %}
-</table>
 <script>
 
-//     Advisory messages which show each status on routes.py
-
-//    var zeroth_message = 'Fingerprint is not read yet';
-//    var first_message = 'Currently used templates: ' + str(fingerPrint.getTemplateCount()) + ' / ' + str(fingerPrint.getStorageCapacity());
-//    var second_message = 'Template already exists at position #' + str(position_number);
-//    var third_message = 'Remove finger...';
-//    var fourth_message = 'Waiting for same finger again...';
-//    var fifth_message = 'Fingers do not match';
-//    var sixth_message = 'Finger enrolled successfully!';
-//    var seventh_message = 'New template position #' + str(position_number);
-//    var eighth_message = 'This user has been enrolled successfully.';
-//    var ninth_message = 'Please enter an existing ID number.';
-
-
-    function findUserID(elm) {
-        var id = $('.enroll-' + elm).val();
-        //alert(id);
+    function draw_users_table() {
         $.ajax({
-            method: 'post',
-            type: 'json',
-            url: '{{ url_for('user_enroll') }}'
-        }).done(function (msg) {
-            if (msg.status >= 2) {
-                $('#message').text(second_message).fadeIn("slow", function() { $(this).delay(3000).fadeOut("slow"); });
-            }
-        })
+        url: {{ url_for('users_table_drawer') }},
+        method: 'post'
+    }).done()
     }
 
+    draw_users_table();
 
 </script>
+
+
 </body>
 </html>
