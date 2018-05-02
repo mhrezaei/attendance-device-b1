@@ -56,16 +56,16 @@
     function findUserID(elm) {
         var id = $('.enroll-' + elm).val();
         alert(id);
-        $.ajax({
-            method: 'post',
-            url: {{ url_for() }},
-            type: 'json',
-            data: {id: id}
-        }).done(function (msg) {
-            if (msg.status){
-
-            }
-        })
+//        $.ajax({
+//            method: 'post',
+//            url: ,
+//            type: 'json',
+//            data: {id: id}
+//        }).done(function (msg) {
+//            if (msg.status){
+//
+//            }
+//        })
     }
 </script>
 
