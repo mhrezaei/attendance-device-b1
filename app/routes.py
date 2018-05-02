@@ -94,6 +94,28 @@ def user_define():
 # -------------------------#
 #       User Enroll        #
 # -------------------------#
-@app.route('/user_enroll', methods=['POST', 'GET'])
+@app.route('/user_enroll', methods=['POST'])
 def user_enroll():  # TODO: Seems NOT enrolling new users when sensor memory is fresh - check again
     return render_template('user_enroll.html')
+
+@app.route('/users_table_drawer', methods=['POST'])
+def users_table_drawer():
+    users = db.table('users').get()
+    users_table_records_count = db.table('users').get().count()
+
+    id_list = []
+    first_name_list = []
+    last_name_list = []
+    code_melli_list = []
+    created_at_list = []
+    updated_at_list = []
+
+    for user in users:
+        id_list.append(str(user['id']))
+        first_name_list.append(str(user['first_name']))
+        last_name_list.append(str(user['last_name']))
+        code_melli_list.append(str(user['code_melli']))
+        created_at_list.append(str(user['created_at']))
+        updated_at_list.append(str(user['updated_at']))
+
+    return jsonify(id_list, first_name_list, last_name_list, code_melli_list, created_at_list, updated_at_list)
