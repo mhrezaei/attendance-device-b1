@@ -55,17 +55,18 @@
 <script>
     function findUserID(elm) {
         var id = $('.enroll-' + elm).val();
-        alert(id);
-//        $.ajax({
-//            method: 'post',
-//            url: ,
-//            type: 'json',
-//            data: {id: id}
-//        }).done(function (msg) {
-//            if (msg.status){
-//
-//            }
-//        })
+        //alert(id);
+        $.ajax({
+            type: 'post',
+            url: "{{ url_for('enroll_handle') }}",
+            contentType: 'application/json;charset=UTF-8',
+            data: {id: id}
+        }).done(function (msg) {
+            alert(msg);
+            if (msg.status === 2){
+
+            }
+        })
     }
 </script>
 
