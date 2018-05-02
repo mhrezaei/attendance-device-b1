@@ -42,14 +42,14 @@ def index_temp():
 def index_page():
     return render_template('index-page.html')
 
+
 @app.route('/')
 @app.route('/index')
 def index():
     return render_template('index.html')
 
 
-@app.route(
-    '/settings')  # TODO: If no action is done on this page for about one minute, leads to Broken Pipe Eroor on terminal but yet everything works fine
+@app.route('/settings')  # TODO: If no action is done on this page for about one minute, leads to Broken Pipe Eroor on terminal but yet everything works fine
 def settings():
     return render_template('settings.html')
 
@@ -94,12 +94,8 @@ def user_define():
 # -------------------------#
 #       User Enroll        #
 # -------------------------#
-@app.route('/user_enroll', methods=['POST'])
+@app.route('/user_enroll', methods=['GET', 'POST'])
 def user_enroll():  # TODO: Seems NOT enrolling new users when sensor memory is fresh - check again
-    return render_template('user_enroll.html')
-
-@app.route('/users_table_drawer', methods=['POST'])
-def users_table_drawer():
     users = db.table('users').get()
     users_table_records_count = db.table('users').get().count()
 
@@ -118,4 +114,20 @@ def users_table_drawer():
         created_at_list.append(str(user['created_at']))
         updated_at_list.append(str(user['updated_at']))
 
-    return jsonify(id_list, first_name_list, last_name_list, code_melli_list, created_at_list, updated_at_list)
+    return render_template('user_enroll.html',
+                           users_table_records_count=users_table_records_count,
+                           id_list=id_list,
+                           first_name_list=first_name_list,
+                           last_name_list=last_name_list,
+                           code_melli_list=code_melli_list,
+                           created_at_list=created_at_list,
+                           updated_at_list=updated_at_list
+                           )
+
+
+@app.route('/users_table_drawer', methods=['GET', 'POST'])
+def users_table_drawer():
+    a = {'status': 2}
+
+    # return jsonify(id_list, first_name_list, last_name_list, code_melli_list, created_at_list, updated_at_list)
+    return jsonify(a)
