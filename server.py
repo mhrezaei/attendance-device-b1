@@ -19,6 +19,7 @@ def flask_handler():
     print(' * SocketIO and Flask [ONLINE] ')
     worker.attach(receive)
     socket.run(app)
+    # socket.run(app, log_output=True, debug=True) TODO: NOT working when debug mode is True
 
 
 if __name__ == '__main__':
