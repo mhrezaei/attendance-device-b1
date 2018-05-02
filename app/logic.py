@@ -1,6 +1,6 @@
 from time import sleep, time
 from datetime import datetime, timedelta
-from config import store, socket, publish, fingerPrint, db, User, UserLog
+from config import store, socket, publish, fingerprint, db, User, UserLog
 import hashlib
 
 store['fingerPrintEnabled'] = False
@@ -16,10 +16,10 @@ def run():
     if store['fingerPrintEnabled']: #boolean
         # sleep(0.5) #TODO: 1 second or not
         our_result = {'status': 0, 'first_name': '', 'last_name': '', 'last_action': ''}
-        if fingerPrint.readImage() != 0:
-            fingerPrint.convertImage(0x01)
+        if fingerprint.readImage() != 0:
+            fingerprint.convertImage(0x01)
             # Searches template
-            result = fingerPrint.searchTemplate()
+            result = fingerprint.searchTemplate()
 
             position_number = result[0]
             accuracy_score = result[1]
@@ -52,10 +52,10 @@ def run():
                     # flash('Finger exists!')
                     our_result['status'] = 6
                     # Loads the found template to char buffer 1
-                    fingerPrint.loadTemplate(position_number, 0x01)
+                    fingerprint.loadTemplate(position_number, 0x01)
 
                     # Downloads the characteristics of template loaded in char buffer 1
-                    characterics = str(fingerPrint.downloadCharacteristics(0x01)).encode('utf-8')
+                    characterics = str(fingerprint.downloadCharacteristics(0x01)).encode('utf-8')
 
                     # Hashes characteristics of template
                     # flash('SHA-2 hash of template: ' + hashlib.sha256(characterics).hexdigest())
