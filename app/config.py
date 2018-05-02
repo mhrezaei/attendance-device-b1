@@ -4,7 +4,7 @@ from . import SocketWorker, Store
 import os
 from pyfingerprint.pyfingerprint import PyFingerprint
 
-fingerPrint = PyFingerprint('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
+fingerprint = PyFingerprint('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
