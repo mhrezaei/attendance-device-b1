@@ -1,4 +1,4 @@
-from config import app, publish, store, socket, fingerPrint
+from config import app, publish, store, socket, fingerprint
 from flask import render_template, request, flash, redirect, url_for, jsonify, json
 from models import *
 import time
@@ -125,9 +125,63 @@ def user_enroll():  # TODO: Seems NOT enrolling new users when sensor memory is 
                            )
 
 
-@app.route('/users_table_drawer', methods=['GET', 'POST'])
-def users_table_drawer():
-    a = {'status': 2}
+@app.route('/enroll_handle', methods=['GET', 'POST'])
+def enroll_handle():
+    our_result = {'status': 0}
 
-    # return jsonify(id_list, first_name_list, last_name_list, code_melli_list, created_at_list, updated_at_list)
-    return jsonify(a)
+    if request.method == 'POST':
+        the_id = request.json['id']
+
+        # flash('Currently used templates: ' + str(fingerprint.getTemplateCount()) + ' / ' + str(fingerprint.getStorageCapacity()))
+        our_result['status'] = 1
+        # Wait to read the finger
+        while fingerprint.readImage() == 0:
+            pass
+
+        # Converts read image to characteristics and stores it in char buffer 1
+        fingerprint.convertImage(0x01)
+
+        # Checks if finger is already enrolled
+        result = fingerprint.searchTemplate()
+        position_number = result[0]
+
+        if position_number >= 0:
+            # flash('Template already exists at position #' + str(position_number))
+            our_result['status'] = 2
+            return jsonify(our_result)
+
+        # flash('Remove finger...')
+        our_result['status'] = 3
+        time.sleep(3)
+        # flash('Waiting for same finger again...')
+        our_result['status'] = 4
+
+        # Wait to read the finger again
+        while fingerprint.readImage() == 0:
+            pass
+
+        # Converts read image to characteristics and stores it in char buffer 2
+        fingerprint.convertImage(0x02)
+
+        # Compares the char buffers
+        if fingerprint.compareCharacteristics() == 0:
+            # flash('Fingers do not match')
+            our_result['status'] = 5
+            return jsonify(our_result)
+            # raise Exception('Fingers do not match')
+
+        # Creates a template
+        fingerprint.createTemplate()
+
+        # Saves the template at new position number
+        position_number = fingerprint.storeTemplate()
+        # flash('Finger enrolled successfully!')
+        our_result['status'] = 6
+        # flash('New template position #' + str(position_number))
+        our_result['status'] = 7
+        db.table('fingers').insert(user_id=the_id, template_position=position_number)
+
+        # flash('This user has been enrolled successfully.')
+        our_result['status'] = 8
+
+        return jsonify(our_result)
