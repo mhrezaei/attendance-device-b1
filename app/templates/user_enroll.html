@@ -1,28 +1,73 @@
 <!-- templates/index-temp.html -->
 <html>
 <head>
-    {#    <meta http-equiv="refresh" content="60; URL={{ url_for('index') }}">#} {# TODO: (ASK) Does it need to be refreshed? #}
+    {#    <meta http-equiv="refresh" content="60; URL={{ url_for('index') }}">#}
+    {# TODO: (ASK) Does it need to be refreshed? #}
     <title>Attendance Machine</title>
     <link rel="stylesheet" href="/css/bootstrap.css">
 </head>
 <body>
-<a href="{{ url_for('index') }}"><button type="button" class="btn">Home</button></a><br><br>
-<a href="{{ url_for('settings') }}"><button type="button" class="btn">Settings</button></a>
+<a href="{{ url_for('index') }}">
+    <button type="button" class="btn">Home</button>
+</a><br><br>
+<a href="{{ url_for('settings') }}">
+    <button type="button" class="btn">Settings</button>
+</a>
 
+
+<table style="width:100%" class="table table-hover">
+    <caption>Users Table</caption>
+    <tr>
+        <th>ID</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Code Melli</th>
+        <th>Created at</th>
+        <th>Updated at</th>
+        <th>Enroll Finger</th>
+        <th>Enroll RFID Card</th>
+    </tr>
+    {% for i in range(users_table_records_count) %}
+        <tr>
+            <td>{{ id_list[i] }}</td>
+            <td>{{ first_name_list[i] }}</td>
+            <td>{{ last_name_list[i] }}</td>
+            <td>{{ code_melli_list[i] }}</td>
+            <td>{{ created_at_list[i] }}</td>
+            <td>{{ updated_at_list[i] }}</td>
+            <td>
+                <button value="{{ id_list[i] }}" class="enroll-{{ id_list[i] }} btn btn-primary" type="button"
+                        onclick="findUserID('{{ id_list[i] }}');">Enroll Finger
+                </button>
+            </td>
+            <td>
+                <button value="{{ id_list[i] }}" class="enroll-{{ id_list[i] }} btn btn-info" type="button"
+                        onclick="findUserID('{{ id_list[i] }}');">Enroll RFID Card
+                </button>
+            </td>
+        </tr>
+    {% endfor %}
+</table>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
 <script>
-
-    function draw_users_table() {
+    function findUserID(elm) {
+        var id = $('.enroll-' + elm).val();
+        alert(id);
         $.ajax({
-        url: {{ url_for('users_table_drawer') }},
-        method: 'post'
-    }).done()
+            method: 'post',
+            url: {{ url_for() }},
+            type: 'json',
+            data: {id: id}
+        }).done(function (msg) {
+            if (msg.status){
+
+            }
+        })
     }
-
-    draw_users_table();
-
 </script>
-
 
 </body>
 </html>
