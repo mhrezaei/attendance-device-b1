@@ -5,17 +5,22 @@
 	<title>Attendance</title>
 
 	<!-- Bootstrap -->
-	<link rel="stylesheet" href="/css/bootstrap.min.css">
-	<link rel="stylesheet" href="/css/bootstrap.rtl.min.css">
+{#    <link rel="stylesheet" href="/css/bootstrap.min.css">#}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+{#	<link rel="stylesheet" href="/css/bootstrap.rtl.min.css">#}
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.rtl.min.css') }}">
 	<!-- Bootstrap -->
 
 	<!-- Fonts -->
-	<link rel="stylesheet" href="/css/fontiran.css">
-	<link rel="stylesheet" href="/libs/font-awesome-5.0.6/css/fontawesome-all.min.css">
+{#	<link rel="stylesheet" href="/css/fontiran.css">#}
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/fontiran.css') }}">
+{#	<link rel="stylesheet" href="/libs/font-awesome-5.0.6/css/fontawesome-all.min.css">#}
+	<link rel="stylesheet" href="{{ url_for('static', filename='libs/font-awesome-5.0.6/css/fontawesome-all.min.css') }}">
 	<!-- Fonts -->
 
 	<!-- Style -->
-	<link rel="stylesheet" href="/css/style.min.css">
+{#	<link rel="stylesheet" href="/css/style.min.css">#}
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/style.min.css') }}">
 	<!-- Style -->
 </head>
 <body>
@@ -98,7 +103,8 @@
 	<div class="appOverlay" id="alertModal">
 		<div class="appModal">
 			<div class="icon">
-				<img src="/images/warning.svg" alt="icon">
+{#				<img src="/images/warning.svg" alt="icon">#}
+				<img src="{{ url_for('static', filename='images/warning.svg') }}" alt="icon">
 			</div>
 			<div class="message">
 			</div>
@@ -111,13 +117,20 @@
 
 </div>
 
-<script src="/libs/vue.js"></script>
-<script src="/libs/jquery-3.2.1.min.js"></script>
-<script src="/libs/bootstrap.min.js"></script>
-<script src="/libs/persian-date.min.js"></script>
-<script src="/js/custom.js"></script>
+{#<script src="/libs/vue.js"></script>#}
+<script src="{{ url_for('static', filename='libs/vue.js') }}"></script>
+{#<script src="/libs/jquery-3.2.1.min.js"></script>#}
+<script src="{{ url_for('static', filename='libs/jquery-3.2.1.min.js') }}"></script>
+{#<script src="/libs/bootstrap.min.js"></script>#}
+<script src="{{ url_for('static', filename='libs/bootstrap.min.js') }}"></script>
+{#<script src="/libs/persian-date.min.js"></script>#}
+<script src="{{ url_for('static', filename='libs/persian-date.min.js') }}"></script>
+{#<script src="/js/custom.js"></script>#}
+<script src="{{ url_for('static', filename='js/custom.js') }}"></script>
 
-<script src="/js/socket.js"></script>
-<script src="/js/index-handler.js"></script>
+{#<script src="/js/socket.js"></script>#}
+<script src="{{ url_for('static', filename='js/socket.js') }}"></script>
+{#<script src="/js/index-handler.js"></script>#}
+<script src="{{ url_for('static', filename='js/index-handler.js') }}"></script>
 </body>
 </html>
