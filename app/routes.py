@@ -195,10 +195,9 @@ def enroll_handle_temp():
         data = dict()
         data['id'] = request.json['id']
 
-
         # print(data, file=sys.stderr)
 
         return jsonify(data)
 
     else:
-        return redirect('user_enroll.html')
+        return render_template('user_enroll.html')
