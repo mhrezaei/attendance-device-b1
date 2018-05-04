@@ -3,6 +3,7 @@ from flask import render_template, request, flash, redirect, url_for, jsonify, j
 from models import *
 import time
 from forms import UserDefineForm, UserEnrollForm
+import sys
 
 store['clients'] = []
 
@@ -186,3 +187,18 @@ def enroll_handle():
         our_result['status'] = 8
 
         return jsonify(our_result)
+
+
+@app.route('/enroll_handle_temp', methods=['GET', 'POST'])
+def enroll_handle_temp():
+    if request.method == "POST":
+        data = dict()
+        data['id'] = request.json['id']
+
+
+        # print(data, file=sys.stderr)
+
+        return jsonify(data)
+
+    else:
+        return redirect('user_enroll.html')
