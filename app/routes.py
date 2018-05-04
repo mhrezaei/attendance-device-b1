@@ -33,6 +33,12 @@ def set_fingerprint_status(data):
 #               #
 # --------------#
 
+@app.route('/')
+@app.route('/index')
+def index():
+    return render_template('index.html')
+
+
 @app.route('/index-temp')
 def index_temp():
     return render_template('index-temp.html')
@@ -43,13 +49,8 @@ def index_page():
     return render_template('index-page.html')
 
 
-@app.route('/')
-@app.route('/index')
-def index():
-    return render_template('index.html')
-
-
-@app.route('/settings')  # TODO: If no action is done on this page for about one minute, leads to Broken Pipe Eroor on terminal but yet everything works fine
+@app.route(
+    '/settings')  # TODO: If no action is done on this page for about one minute, leads to Broken Pipe Eroor on terminal but yet everything works fine
 def settings():
     return render_template('settings.html')
 
