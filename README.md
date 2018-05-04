@@ -1,25 +1,11 @@
-# Flask and SocketIO integration
+# Attendance Machine
 
-Compatible with Python2.7
-
+## Install Requirements
 ```
-    > pip install -r requirements.txt
-    > ./run.py
-
-    app > config.py > app:
-        app.publish to publish events from child processes
-
-    app > routes.py:
-        define static routes
-
-    app > realtime.py:
-        do non blocking algorithms here.
-
-    app > socketio.py
-        define socketio events here
-
-    app > subscribe.py
-        define publish routines here
-
-
+pip install -r requirements.txt
 ```
+## Run
+```
+python server.py
+```
+then open [localhost:5000](http://localhost:5000) on your browser.
