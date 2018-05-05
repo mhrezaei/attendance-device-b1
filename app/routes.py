@@ -147,7 +147,7 @@ def get_all_users():  # TODO: Seems NOT enrolling new users when sensor memory i
             'updated_at': user['updated_at'],
         })
 
-    # Count of all users
+    # Number of all users
     users_table_records_count = db.table('users').get().count()
     result['users_count'] = users_table_records_count
 
