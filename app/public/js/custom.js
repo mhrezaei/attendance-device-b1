@@ -265,7 +265,7 @@ Vue.component('app-details',{
                                     <td>{{ fingerPrint.id }}</td>
                                     <td>{{ fingerPrint.name }}</td>
                                     <td style="text-align: center;">
-                                        <button class="btn btn-lg btn-danger">حذف</button>
+                                        <button class="btn btn-lg btn-danger" @click="removeThisFingerPrint(fingerPrint.id)">حذف</button>
                                     </td>
                                 </tr>
                             </tbody>
@@ -293,6 +293,9 @@ Vue.component('app-details',{
     methods:{
         removeUser: function () {
             removeMember(this.member.id);
+        },
+        removeThisFingerPrint: function (id) {
+            removeFingerPrint(id, this.member);
         }
     }
 });
@@ -519,6 +522,28 @@ function removeMember(id){
         },
         success: function (response) {
             renderMembers(response.members);
+        },
+        error: function () {
+            showError('خطا در برقراری ارتباط','#list');
+        }
+    })
+}
+
+
+/**
+ * Ajax - Removes A Specific FingerPrint
+ * @param fingerId
+ * @param member
+ */
+function removeFingerPrint(fingerId, member) {
+    $.ajax({
+        url: '../public/js/data/member'+ member.id +'.json', //@TODO: This should get new member detail.
+        dataType: "json",
+        data:{
+            fingerId: fingerId
+        },
+        success: function (response) {
+            renderMemberDetails(member, response.reports);
         },
         error: function () {
             showError('خطا در برقراری ارتباط','#list');
