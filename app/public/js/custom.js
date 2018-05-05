@@ -175,7 +175,7 @@ Vue.component('app-row',{
     },
     methods: {
         showDetails: function (member) {
-            showMember(member)
+            getMemberReport(member)
         }
     }
 });
@@ -359,6 +359,9 @@ function isNotAdmin() {
 }
 
 
+/**
+ * Clear List Element
+ */
 function clearList() {
     $('#list').html("");
 }
@@ -384,19 +387,11 @@ function getMembersList() {
     })
 }
 
-function getMemberReport(id) {
-    $.ajax({
-        url: "../public/js/data/member1.json",
-        dataType: "json",
-        success: function (response) {
-            return response.reports;
-        },
-        error: function () {
-            showError('خطا در برقراری ارتباط','#member_attendance');
-        }
-    })
-}
 
+/**
+ * Renders Members List
+ * @param members
+ */
 function renderMembers(members) {
     clearList();
     $('<app-members-table :members="members"></app-members-table>')
@@ -411,6 +406,49 @@ function renderMembers(members) {
 }
 
 
+/**
+ * Ajax - Gets Member Detail
+ * @param member
+ */
+function getMemberReport(member) {
+    var id = member.id;
+    $.ajax({
+        url: "../public/js/data/member"+ id +".json",
+        dataType: "json",
+        success: function (response) {
+            renderMemberDetails(member, response.reports);
+        },
+        error: function () {
+            showError('خطا در برقراری ارتباط','#list');
+        }
+    })
+}
+
+
+/**
+ * Renders Member Details
+ * @param member
+ * @param reports
+ */
+function renderMemberDetails(member, reports) {
+    clearList();
+    $('<app-details :member="member" :reports="reports"></app-details>').appendTo('#list');
+
+    new Vue({
+        el: "#list",
+        data: {
+            member: member,
+            reports: reports
+        }
+    })
+}
+
+
+/**
+ * Shows Error Message
+ * @param message
+ * @param parent
+ */
 function showError(message,parent) {
 
     $("<div class=\'message\'></div>")
@@ -418,33 +456,7 @@ function showError(message,parent) {
         .text(message)
 }
 
-function showMember(member) {
-    clearList();
-    $('<app-details :member="member" :reports="reports"></app-details>').appendTo('#list');
 
-    new Vue({
-        el: "#list",
-        data:{
-            member: member,
-            reports: null
-        },
-        created: function () {
-            var id = this.member.id;
-            var reports = this.reports;
-
-            $.ajax({
-                url: "../public/js/data/member1.json",
-                dataType: "json",
-                success: function (response) {
-                    reports = response.reports;
-                },
-                error: function () {
-                    showError('خطا در برقراری ارتباط','#member_attendance');
-                }
-            })
-        }
-    })
-}
 
 /*
 *-------------------------------------------------------
