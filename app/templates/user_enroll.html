@@ -16,39 +16,73 @@
 </a>
 
 
-<table style="width:100%" class="table table-hover">
-    <caption>Users Table</caption>
-    <tr>
-        <th>ID</th>
-        <th>First Name</th>
-        <th>Last Name</th>
-        <th>Code Melli</th>
-        <th>Created at</th>
-        <th>Updated at</th>
-        <th>Enroll Finger</th>
-        <th>Enroll RFID Card</th>
-    </tr>
-    {% for i in range(users_table_records_count) %}
-        <tr>
-            <td>{{ id_list[i] }}</td>
-            <td>{{ first_name_list[i] }}</td>
-            <td>{{ last_name_list[i] }}</td>
-            <td>{{ code_melli_list[i] }}</td>
-            <td>{{ created_at_list[i] }}</td>
-            <td>{{ updated_at_list[i] }}</td>
-            <td>
-                <button value="{{ id_list[i] }}" class="enroll-{{ id_list[i] }} btn btn-primary" type="button"
-                        onclick="findUserID_Finger('{{ id_list[i] }}');">Enroll Finger
-                </button>
-            </td>
-            <td>
-                <button value="{{ id_list[i] }}" class="enroll-{{ id_list[i] }} btn btn-info" type="button"
-                        onclick="findUserID_RFID('{{ id_list[i] }}');">Enroll RFID Card
-                </button>
-            </td>
-        </tr>
-    {% endfor %}
-</table>
+{#<table style="width:100%" class="table table-hover">#}
+{#    <caption>Users Table</caption>#}
+{#    <tr>#}
+{#        <th>ID</th>#}
+{#        <th>First Name</th>#}
+{#        <th>Last Name</th>#}
+{#        <th>Code Melli</th>#}
+{#        <th>Created at</th>#}
+{#        <th>Updated at</th>#}
+{#        <th>Enroll Finger</th>#}
+{#        <th>Enroll RFID Card</th>#}
+{#    </tr>#}
+{#    {% for i in range(users_table_records_count) %}#}
+{#        <tr>#}
+{#            <td>{{ id_list[i] }}</td>#}
+{#            <td>{{ first_name_list[i] }}</td>#}
+{#            <td>{{ last_name_list[i] }}</td>#}
+{#            <td>{{ code_melli_list[i] }}</td>#}
+{#            <td>{{ created_at_list[i] }}</td>#}
+{#            <td>{{ updated_at_list[i] }}</td>#}
+{#            <td>#}
+{#                <button value="{{ id_list[i] }}" class="enroll-{{ id_list[i] }} btn btn-primary" type="button"#}
+{#                        onclick="findUserID_Finger('{{ id_list[i] }}');">Enroll Finger#}
+{#                </button>#}
+{#            </td>#}
+{#            <td>#}
+{#                <button value="{{ id_list[i] }}" class="enroll-{{ id_list[i] }} btn btn-info" type="button"#}
+{#                        onclick="findUserID_RFID('{{ id_list[i] }}');">Enroll RFID Card#}
+{#                </button>#}
+{#            </td>#}
+{#        </tr>#}
+{#    {% endfor %}#}
+{#</table>#}
+
+{#<table style="width:100%" class="table table-hover">#}
+{#    <caption>Users Table</caption>#}
+{#    <tr>#}
+{#        <th>ID</th>#}
+{#        <th>First Name</th>#}
+{#        <th>Last Name</th>#}
+{#        <th>Code Melli</th>#}
+{#        <th>Created at</th>#}
+{#        <th>Updated at</th>#}
+{#        <th>Enroll Finger</th>#}
+{#        <th>Enroll RFID Card</th>#}
+{#    </tr>#}
+{#    {% for i in range(users_table_records_count) %}#}
+{#        <tr>#}
+{#            <td>{{ id_list[i] }}</td>#}
+{#            <td>{{ first_name_list[i] }}</td>#}
+{#            <td>{{ last_name_list[i] }}</td>#}
+{#            <td>{{ code_melli_list[i] }}</td>#}
+{#            <td>{{ created_at_list[i] }}</td>#}
+{#            <td>{{ updated_at_list[i] }}</td>#}
+{#            <td>#}
+{#                <button value="{{ id_list[i] }}" class="enroll-{{ id_list[i] }} btn btn-primary" type="button"#}
+{#                        onclick="findUserID_Finger('{{ id_list[i] }}');">Enroll Finger#}
+{#                </button>#}
+{#            </td>#}
+{#            <td>#}
+{#                <button value="{{ id_list[i] }}" class="enroll-{{ id_list[i] }} btn btn-info" type="button"#}
+{#                        onclick="findUserID_RFID('{{ id_list[i] }}');">Enroll RFID Card#}
+{#                </button>#}
+{#            </td>#}
+{#        </tr>#}
+{#    {% endfor %}#}
+{#</table>#}
 
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -58,7 +92,15 @@
         $.ajax({
             type: 'GET',
             url: "{{ url_for('get_all_users') }}"
+        }).done(function (msg) {
+            if (msg.status == 1) {
+                console.log(msg.users[0].first_name);
+            }
+            {#console.log(msg);#}
+            {#$('#table-data').text(msg.status).fadeIn("slow", function() { $(this).delay(3000).fadeOut("slow"); });#}
+            {#$('#table-data').text(msg.status);#}
         })
+        //})
     }
 
     drawUsersTable();
