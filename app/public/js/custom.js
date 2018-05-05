@@ -218,16 +218,52 @@ Vue.component('app-details',{
                     </div>
                   </div>
                   <div id="memeber_card" class="tab-pane fade">
-                    <h3>نمایش کارت</h3>
-                    <p>Some content in menu 1.</p>
+                    <div class="row">
+                        <div class="col-xs-4">
+                            <i class="fa fa-id-card"></i>
+                        </div>
+                        <div class="col-xs-8">
+                            <div class="card-info">
+                            <span class="title">شماره کارت :</span>
+                            <span class="card-id">{{ member.card }}</span>
+                            </div>
+                        </div>
+                    </div>
                   </div>
                   <div id="member_fingerprint" class="tab-pane fade">
-                    <h3>اثر انگشت‌ها</h3>
-                    <p>Some content in menu 2.</p>
+                    <div class="controls">
+                        <button class="btn btn-success">افزودن اثر انگشت</button>  
+                        <button class="btn btn-danger">حذف همه انگشت‌‌ها</button>
+                    </div>
+                    <div class="finger-print-list">
+                        <h3 class="title">تمام اثر انگشت‌ها</h3>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th style='width: 60px;'>ردیف</th>
+                                    <th>شناسه</th>
+                                    <th>نام</th>
+                                    <th>عملیات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="( fingerPrint , index ) in member.fingerPrints">
+                                    <td>{{ index + 1 }}</td>
+                                    <td>{{ fingerPrint.id }}</td>
+                                    <td>{{ fingerPrint.name }}</td>
+                                    <td>
+                                        <button class="btn btn-danger">حذف</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                   </div>
                   <div id="member_setting" class="tab-pane fade">
-                    <h3>تنظیمات</h3>
-                    <p>Some content in menu 2.</p>
+                    <button class="btn btn-danger">
+                        <i class="fa fa-ban"></i>
+                        حذف کاربر
+                    </button>
                   </div>
                 </div>
             </div>
