@@ -4,7 +4,8 @@
     {#    <meta http-equiv="refresh" content="60; URL={{ url_for('index') }}">#}
     {# TODO: (ASK) Does it need to be refreshed? #}
     <title>Attendance Machine</title>
-    <link rel="stylesheet" href="/css/bootstrap.css">
+    {#    <link rel="stylesheet" href="/css/bootstrap.css">#}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
 </head>
 <body>
 <a href="{{ url_for('index') }}">
@@ -37,12 +38,12 @@
             <td>{{ updated_at_list[i] }}</td>
             <td>
                 <button value="{{ id_list[i] }}" class="enroll-{{ id_list[i] }} btn btn-primary" type="button"
-                        onclick="findUserID('{{ id_list[i] }}');">Enroll Finger
+                        onclick="findUserID_Finger('{{ id_list[i] }}');">Enroll Finger
                 </button>
             </td>
             <td>
                 <button value="{{ id_list[i] }}" class="enroll-{{ id_list[i] }} btn btn-info" type="button"
-                        onclick="findUserID('{{ id_list[i] }}');">Enroll RFID Card
+                        onclick="findUserID_RFID('{{ id_list[i] }}');">Enroll RFID Card
                 </button>
             </td>
         </tr>
@@ -53,22 +54,38 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
 <script>
-    function findUserID(elm) {
+    function drawUsersTable() {
+        $.ajax({
+            type: 'GET',
+            url: "{{ url_for('get_all_users') }}"
+        })
+    }
+
+    drawUsersTable();
+
+    function findUserID_Finger(elm) {
         var id = $('.enroll-' + elm).val();
-        //alert(id);
-        var user_id = {
-            'id': id
-        };
         $.ajax({
             type: 'POST',
-            url: "{{ url_for('enroll_handle_temp') }}",
-            data: JSON.stringify(user_id)
+            url: "{{ url_for('enroll_handle_finger_temp') }}",
+            dataType: "json",
+            data: {user_id: id}
         }).done(function (msg) {
             console.log(msg)
         })
     }
 
+    function findUserID_RFID(elm) {
+        var id = $('.enroll-' + elm).val();
+        $.ajax({
+            type: 'POST',
+            url: "{{ url_for('enroll_handle_rfid_temp') }}",
+            dataType: "json",
+            data: {user_id: id}
+        }).done(function (msg) {
+            console.log(msg)
+        })
+    }
 </script>
-
 </body>
 </html>

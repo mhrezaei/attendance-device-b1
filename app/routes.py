@@ -127,8 +127,62 @@ def user_enroll():  # TODO: Seems NOT enrolling new users when sensor memory is 
                            )
 
 
-@app.route('/enroll_handle', methods=['GET', 'POST'])
-def enroll_handle():
+@app.route('/get_all_users', methods=['GET'])
+def get_all_users():  # TODO: Seems NOT enrolling new users when sensor memory is fresh - check again
+    result = dict()
+    result['status'] = 0  # No data found
+    result['users'] = []
+
+    # Retrieve all users from database
+    users = db.table('users').get()
+
+    for user in users:
+        result['status'] = 1  # Data found
+        result['users'].append({
+            'id': user['id'],
+            'first_name': user['first_name'],
+            'last_name': user['last_name'],
+            'code_melli': user['code_melli'],
+            'created_at': user['created_at'],
+            'updated_at': user['updated_at'],
+        })
+
+    # Count of all users
+    users_table_records_count = db.table('users').get().count()
+    result['users_count'] = users_table_records_count
+
+    return jsonify(result)
+
+
+@app.route('/get_all_users_fingers', methods=['POST'])
+def get_all_users_fingers():  # TODO: Seems NOT enrolling new users when sensor memory is fresh - check again
+    result = dict()
+    result['status'] = 0  # No data found
+    result['users'] = []
+
+    # Find all users from database
+    users = db.table('users').get()
+
+    for user in users:
+        result['status'] = 1  # Data found
+        result['users'].append({
+            'id': user['id'],
+            'first_name': user['first_name'],
+            'last_name': user['last_name'],
+            'code_melli': user['code_melli'],
+            'created_at': user['created_at'],
+            'updated_at': user['updated_at'],
+        })
+
+    # count of all users
+    users_table_records_count = db.table('users').get().count()
+    result['users_count'] = users_table_records_count
+
+    return jsonify(result)
+
+
+@app.route('/enroll_handle_finger', methods=['POST'])
+def enroll_handle_finger():
     our_result = {'status': 0}
 
     if request.method == 'POST':
@@ -189,15 +243,20 @@ def enroll_handle():
         return jsonify(our_result)
 
 
-@app.route('/enroll_handle_temp', methods=['GET', 'POST'])
-def enroll_handle_temp():
-    if request.method == "POST":
-        data = dict()
-        data['id'] = request.json['id']
+@app.route('/enroll_handle_rfid', methods=['POST'])
+def enroll_handle_rfid():
+    return 'Hi'
 
-        # print(data, file=sys.stderr)
 
-        return jsonify(data)
+@app.route('/enroll_handle_finger_temp', methods=['POST'])
+def enroll_handle_finger_temp():
+    data = dict()
+    data['id'] = request.form['user_id']
+    return jsonify(data)
 
-    else:
-        return render_template('user_enroll.html')
+
+@app.route('/enroll_handle_rfid_temp', methods=['POST'])
+def enroll_handle_rfid_temp():
+    data = dict()
+    data['id'] = request.form['user_id']
+    return jsonify(data)
