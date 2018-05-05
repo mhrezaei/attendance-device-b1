@@ -281,7 +281,7 @@ Vue.component('app-details',{
                         </div>
                   </div>
                   <div id="member_setting" class="tab-pane fade">
-                    <button class="btn btn-lg btn-danger">
+                    <button class="btn btn-lg btn-danger" @click="removeUser">
                         <i class="fa fa-ban"></i>
                         حذف کاربر
                     </button>
@@ -290,6 +290,11 @@ Vue.component('app-details',{
             </div>
             `,
     props: ['member','reports'],
+    methods:{
+        removeUser: function () {
+            removeMember(this.member.id);
+        }
+    }
 });
 
 var Daytime = function () {
@@ -496,6 +501,27 @@ function renderMemberDetails(member, reports) {
         data: {
             member: member,
             reports: reports
+        }
+    })
+}
+
+
+/**
+ * Ajax - Removes Member From List
+ * @param id
+ */
+function removeMember(id){
+    $.ajax({
+        url: "../public/js/data/members-list.json",  //@TODO: This should get new members list.
+        dataType: "json",
+        data:{
+            id: id
+        },
+        success: function (response) {
+            renderMembers(response.members);
+        },
+        error: function () {
+            showError('خطا در برقراری ارتباط','#list');
         }
     })
 }
