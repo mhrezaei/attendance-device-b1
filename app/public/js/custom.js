@@ -276,8 +276,12 @@ Vue.component('app-details',{
                         </div>
                     </div>
                     <div class="controls">
-                            <button class="btn btn-lg btn-success">اثر انگشت جدید</button>  
-                            <button class="btn btn-lg btn-danger" v-if="member.fingerPrints.length">حذف همه</button>
+                            <button class="btn btn-lg btn-success" @click="addNewFingerPrint">اثر انگشت جدید</button>  
+                            <button class="btn btn-lg btn-danger" 
+                            v-if="member.fingerPrints.length"
+                            @click="removeAll">
+                            حذف همه
+                            </button>
                         </div>
                   </div>
                   <div id="member_setting" class="tab-pane fade">
@@ -296,6 +300,18 @@ Vue.component('app-details',{
         },
         removeThisFingerPrint: function (id) {
             removeFingerPrint(id, this.member);
+        },
+        removeAll: function () {
+            removeAllFingerPrints(this.member)
+        },
+        addNewFingerPrint: function () {
+            var member = this.member;
+            openModal("انگشت خود را اسکن کنید.","../public/images/fingerprint-scanning-in-half-view.svg");
+            setTimeout(function () {
+                addNewFingerPrint(member);
+            },2000);
+            
+            
         }
     }
 });
@@ -546,6 +562,52 @@ function removeFingerPrint(fingerId, member) {
             renderMemberDetails(member, response.reports);
         },
         error: function () {
+            showError('خطا در برقراری ارتباط','#list');
+        }
+    })
+}
+
+
+/**
+ * Ajax - Removes All FingerPrints Of A Specific Member
+ * @param member
+ */
+function removeAllFingerPrints(member) {
+    var id = member.id;
+    $.ajax({
+        url: '../public/js/data/member'+ id +'.json', //@TODO: This should get new member detail.
+        dataType: "json",
+        data:{
+            id: id
+        },
+        success: function (response) {
+            renderMemberDetails(member, response.reports);
+        },
+        error: function () {
+            showError('خطا در برقراری ارتباط','#list');
+        }
+    })
+}
+
+
+/**
+ * Ajax - Adds New FingerPrint For A Member
+ * @param member
+ */
+function addNewFingerPrint(member) {
+    var id = member.id;
+    $.ajax({
+        url: '../public/js/data/member'+ id +'.json', //@TODO: This should get new member detail.
+        dataType: "json",
+        data:{
+            id: id
+        },
+        success: function (response) {
+            closeModal();
+            renderMemberDetails(member, response.reports);
+        },
+        error: function () {
+            closeModal();
             showError('خطا در برقراری ارتباط','#list');
         }
     })
