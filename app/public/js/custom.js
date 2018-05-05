@@ -166,7 +166,9 @@ Vue.component('app-row',{
                 <td>{{ row.name }}</td>
                 <td>{{ row.lastName }}</td>
                 <td>{{ row.codeMelli }}</td>
-                <td class="table-action"><button class="btn btn-default actions" @click="showDetails(row)">عملیات</button></td>
+                <td class="table-action">
+                    <button class="btn btn-lg btn-default actions" @click="showDetails(row)">جزئیات</button>
+                </td>
             </tr>
         </tbody>
         `,
@@ -187,7 +189,7 @@ Vue.component('app-details',{
                 <h3 class="tabs-title">{{ member.name + " " + member.lastName}}</h3>
                 <ul class="nav nav-tabs">
                   <li class="active"><a data-toggle="tab" href="#member_attendance">لیست حضور و غیاب</a></li>
-                  <li><a data-toggle="tab" href="#memeber_card">کارت</a></li>
+                  <li><a data-toggle="tab" href="#member_card">کارت</a></li>
                   <li><a data-toggle="tab" href="#member_fingerprint">اثر انگشت‌ها</a></li>
                   <li><a data-toggle="tab" href="#member_setting">تنظیمات</a></li>
                 </ul>
@@ -217,10 +219,12 @@ Vue.component('app-details',{
                         </table> 
                     </div>
                   </div>
-                  <div id="memeber_card" class="tab-pane fade">
-                    <div class="row">
+                  <div id="member_card" class="tab-pane fade">
+                    <div class="row" v-if="member.card">
                         <div class="col-xs-4">
-                            <i class="fa fa-id-card"></i>
+                            <div class="id-card-image">
+                                <img src="../public/images/id-card.svg" alt="id card">                            
+                            </div>
                         </div>
                         <div class="col-xs-8">
                             <div class="card-info">
@@ -229,15 +233,24 @@ Vue.component('app-details',{
                             </div>
                         </div>
                     </div>
+                    <div class="row" v-else>
+                        <div class="col-xs-12">
+                            <div class="alert alert-info">
+                                <i class="fa fa-info-circle"></i>
+                                برای این کاربر کارتی ثبت نشده.
+                            </div>
+                            <div class="controls">
+                                <button class="btn btn-success btn-lg">ثبت کارت</button>
+                            </div>
+                        </div>
+                    </div>
                   </div>
                   <div id="member_fingerprint" class="tab-pane fade">
-                    <div class="controls">
-                        <button class="btn btn-success">افزودن اثر انگشت</button>  
-                        <button class="btn btn-danger">حذف همه انگشت‌‌ها</button>
+                    <div class="header">
+                        <h3 class="title">تمام اثر انگشت‌ها</h3>
                     </div>
                     <div class="finger-print-list">
-                        <h3 class="title">تمام اثر انگشت‌ها</h3>
-                        <table class="table">
+                        <table class="table table-bordered" v-if="member.fingerPrints.length">
                             <thead>
                                 <tr>
                                     <th style='width: 60px;'>ردیف</th>
@@ -251,16 +264,24 @@ Vue.component('app-details',{
                                     <td>{{ index + 1 }}</td>
                                     <td>{{ fingerPrint.id }}</td>
                                     <td>{{ fingerPrint.name }}</td>
-                                    <td>
-                                        <button class="btn btn-danger">حذف</button>
+                                    <td style="text-align: center;">
+                                        <button class="btn btn-lg btn-danger">حذف</button>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
+                        <div class="alert alert-info" v-else>
+                            <i class="fa fa-info-circle"></i>
+                            برای این کاربر اثر انگشتی ثبت نشده‌است.
+                        </div>
                     </div>
+                    <div class="controls">
+                            <button class="btn btn-lg btn-success">اثر انگشت جدید</button>  
+                            <button class="btn btn-lg btn-danger" v-if="member.fingerPrints.length">حذف همه</button>
+                        </div>
                   </div>
                   <div id="member_setting" class="tab-pane fade">
-                    <button class="btn btn-danger">
+                    <button class="btn btn-lg btn-danger">
                         <i class="fa fa-ban"></i>
                         حذف کاربر
                     </button>

@@ -37,8 +37,77 @@
     overflow: auto;
     padding: 30px 20px;
     .table{
+      font-size: em(18);
       .table-action{
         text-align: center;
+      }
+    }
+  }
+
+  .member-tabs{
+    .tabs-title{
+      margin-top: 0;
+      color: $text_secondry;
+      text-align: center;
+    }
+    .nav-tabs{
+      font-size: em(19);
+      border-bottom: 2px solid $color_orange;
+      margin-top: 20px;
+      li {
+        margin-bottom: -2px;
+        a{
+          padding: 10px 16px;
+        }
+        &.active {
+          a {
+            background: $color_orange;
+            color: $text_primary;
+            font-weight: 500;
+            border-radius: 3px 3px 0 0;
+            border: 0;
+          }
+        }
+      }
+    }
+    .tab-content{
+      font-size: em(18);
+      #member_card{
+        padding: 10px;
+        .card-info{
+          font-size: em(20);
+          display: flex;
+          align-items: center;
+          height: 200px;
+          .title{
+            font-weight: 500;
+            @include margin-end(10);
+            display: inline-block;
+            font-size: em(20);
+          }
+        }
+        .controls{
+          text-align: left;
+        }
+      }
+      #member_fingerprint{
+        .header{
+          margin: 20px 0;
+          display: flex;
+          .title{
+            margin: 0;
+            color: $text_secondry;
+          }
+        }
+        .controls{
+          text-align: $end;
+          button{
+            @include margin-start(10)
+          }
+        }
+      }
+      #member_setting{
+        padding: 20px 0;
       }
     }
   }
