@@ -232,7 +232,7 @@ Vue.component('app-details',{
                             <span class="card-id">{{ member.card }}</span>
                         </div>
                         <div class="controls">
-                            <button class="btn btn-danger btn-lg">حذف کارت</button>
+                            <button class="btn btn-danger btn-lg" @click="removeCard">حذف کارت</button>
                         </div>
                         </div>
                     </div>
@@ -243,7 +243,7 @@ Vue.component('app-details',{
                                 برای این کاربر کارتی ثبت نشده.
                             </div>
                             <div class="controls">
-                                <button class="btn btn-success btn-lg">ثبت کارت</button>
+                                <button class="btn btn-success btn-lg" @click="addNewCard">ثبت کارت</button>
                             </div>
                         </div>
                     </div>
@@ -313,8 +313,12 @@ Vue.component('app-details',{
             setTimeout(function () {
                 addNewFingerPrint(member);
             },2000);
-            
-            
+        },
+        removeCard: function () {
+            removeMemberCard(this.member);
+        },
+        addNewCard: function () {
+            addNewCard(this.member);
         }
     }
 });
@@ -616,6 +620,47 @@ function addNewFingerPrint(member) {
     })
 }
 
+
+/**
+ * Ajax - Remove Member Card
+ * @param member
+ */
+function removeMemberCard(member) {
+    var id = member.id;
+    $.ajax({
+        url: '../public/js/data/member'+ id +'.json', //@TODO: This should get new member detail.
+        dataType: "json",
+        data:{
+            id: id
+        },
+        success: function (response) {
+            renderMemberDetails(member, response.reports);
+        },
+        error: function () {
+            showError('خطا در برقراری ارتباط','#list');
+        }
+    })
+}
+
+
+
+function addNewCard(member) {
+    var id = member.id;
+
+    $.ajax({
+        url: '../public/js/data/member'+ id +'.json', //@TODO: This should get new member detail.
+        dataType: "json",
+        data:{
+            id: id
+        },
+        success: function (response) {
+            renderMemberDetails(member, response.reports);
+        },
+        error: function () {
+            showError('خطا در برقراری ارتباط','#list');
+        }
+    })
+}
 
 /**
  * Shows Error Message
