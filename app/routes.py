@@ -278,7 +278,7 @@ def enroll_handle_rfid():
 @app.route('/enroll_handle_finger_temp', methods=['POST'])
 def enroll_handle_finger_temp():
     data = dict()
-    data['id'] = request.form['user_id']
+    data['id'] = request.form['user_id'].encode("utf-8")
     pprint(data['id'])
     return jsonify(data)
 
@@ -286,6 +286,6 @@ def enroll_handle_finger_temp():
 @app.route('/enroll_handle_rfid_temp', methods=['POST'])
 def enroll_handle_rfid_temp():
     data = dict()
-    data['id'] = request.form['user_id']
+    data['id'] = request.form['user_id'].encode("utf-8")
     pprint(data['id'])
     return jsonify(data)
