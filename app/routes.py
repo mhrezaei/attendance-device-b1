@@ -3,7 +3,9 @@ from flask import render_template, request, flash, redirect, url_for, jsonify, j
 from models import *
 import time
 from forms import UserDefineForm, UserEnrollForm
-import sys
+from pprint import pprint
+
+
 
 store['clients'] = []
 
@@ -98,6 +100,7 @@ def user_define():
 # -------------------------#
 @app.route('/user_enroll', methods=['GET', 'POST'])
 def user_enroll():  # TODO: Seems NOT enrolling new users when sensor memory is fresh - check again
+    # return render_template('user_enroll.html')
     users = db.table('users').get()
     users_table_records_count = db.table('users').get().count()
 
@@ -131,25 +134,49 @@ def user_enroll():  # TODO: Seems NOT enrolling new users when sensor memory is 
 def get_all_users():  # TODO: Seems NOT enrolling new users when sensor memory is fresh - check again
     result = dict()
     result['status'] = 0  # No data found
-    result['users'] = []
+    result['members'] = []
 
     # Retrieve all users from database
     users = db.table('users').get()
 
     for user in users:
         result['status'] = 1  # Data found
-        result['users'].append({
+
+        # pprint(user.id)
+
+        # Retrieve all fingers related to that specific user
+        this_user_related_fingers = db.table('fingers').where('user_id', user.id).get()
+
+        # pprint(fingers)
+
+        if this_user_related_fingers.count():
+            user_finger = []
+            for finger in this_user_related_fingers:
+                user_finger.append({
+                    'id': finger['id'],
+                    'position': finger['template_position'],
+                    'created_at': finger['created_at']
+                })
+
+        pprint('*** user_finger ***:')
+        pprint(user_finger)
+
+        result['members'].append({
             'id': user['id'],
             'first_name': user['first_name'],
             'last_name': user['last_name'],
             'code_melli': user['code_melli'],
             'created_at': user['created_at'],
             'updated_at': user['updated_at'],
+            'related_fingers': user_finger,
         })
 
     # Number of all users
     users_table_records_count = db.table('users').get().count()
-    result['users_count'] = users_table_records_count
+    result['members_count'] = users_table_records_count
+
+    pprint('*** result: ***')
+    pprint(result)
 
     return jsonify(result)
 
@@ -252,6 +279,7 @@ def enroll_handle_rfid():
 def enroll_handle_finger_temp():
     data = dict()
     data['id'] = request.form['user_id']
+    pprint(data['id'])
     return jsonify(data)
 
 
@@ -259,4 +287,5 @@ def enroll_handle_finger_temp():
 def enroll_handle_rfid_temp():
     data = dict()
     data['id'] = request.form['user_id']
+    pprint(data['id'])
     return jsonify(data)
