@@ -117,21 +117,14 @@
             dataType: "json",
             data: {user_id: id}
         }).done(function (msg) {
-            console.log(msg)
+            if (msg.status[0]) {console.log(msg.status[0].message);}
+            {#if (msg.status[1]) {console.log(msg.status[1].message);}#}
+            {#if (msg.status[2]) {console.log(msg.status[2].message);}#}
+            if (msg.status[3]) {console.log(msg.status[3].message);}
+
         })
     }
 
-    function findUserID_RFID(element) {
-        var id = $('.enroll-' + element).val();
-        $.ajax({
-            type: 'POST',
-            url: "{{ url_for('enroll_handle_rfid_temp') }}",
-            dataType: "json",
-            data: {user_id: id}
-        }).done(function (msg) {
-            console.log(msg)
-        })
-    }
 </script>
 </body>
 </html>
