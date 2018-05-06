@@ -4,6 +4,8 @@ from models import *
 import time
 from forms import UserDefineForm, UserEnrollForm
 from pprint import pprint
+import os
+
 
 store['clients'] = []
 
@@ -269,6 +271,11 @@ def enroll_handle_finger_step_2():
     })
 
     return jsonify(our_result)
+
+
+@app.route('/test', methods=['GET'])
+def test():
+    return os.path.dirname('/')
 
 
 @app.route('/enroll_handle_rfid_temp', methods=['POST'])
