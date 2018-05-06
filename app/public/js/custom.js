@@ -230,7 +230,10 @@ Vue.component('app-details',{
                             <div class="card-info">
                             <span class="title">شماره کارت :</span>
                             <span class="card-id">{{ member.card }}</span>
-                            </div>
+                        </div>
+                        <div class="controls">
+                            <button class="btn btn-danger btn-lg">حذف کارت</button>
+                        </div>
                         </div>
                     </div>
                     <div class="row" v-else>
