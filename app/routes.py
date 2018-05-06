@@ -172,15 +172,24 @@ def get_all_users():  # TODO: Seems NOT enrolling new users when sensor memory i
     return jsonify(result)
 
 
-@app.route('/enroll_handle_finger', methods=['POST'])
-def enroll_handle_finger():
-    our_result = {'status': 0}
+@app.route('/enroll_handle_rfid', methods=['POST'])
+def enroll_handle_rfid():
+    return 'Hi'
+
+
+@app.route('/enroll_handle_finger_step_1', methods=['POST'])
+def enroll_handle_finger_step_1():
+    our_result = dict()
+    our_result['status'] = []
+    our_result['id'] = request.form['user_id'].encode("utf-8")
 
     if request.method == 'POST':
-        the_id = request.json['id']
+        our_result['status'].append({
+            'code': 1,
+            'message': 'Currently used templates: ' + str(fingerprint.getTemplateCount()) + ' / ' + str(fingerprint.getStorageCapacity())
+        })
+        pprint(our_result)
 
-        # flash('Currently used templates: ' + str(fingerprint.getTemplateCount()) + ' / ' + str(fingerprint.getStorageCapacity()))
-        our_result['status'] = 1
         # Wait to read the finger
         while fingerprint.readImage() == 0:
             pass
@@ -193,58 +202,66 @@ def enroll_handle_finger():
         position_number = result[0]
 
         if position_number >= 0:
-            # flash('Template already exists at position #' + str(position_number))
-            our_result['status'] = 2
+            our_result['status'].append({
+                'code': 2,
+                'message': 'Template already exists at position #' + str(position_number)
+            })
+            pprint(our_result)
             return jsonify(our_result)
 
-        # flash('Remove finger...')
-        our_result['status'] = 3
-        time.sleep(3)
-        # flash('Waiting for same finger again...')
-        our_result['status'] = 4
-
-        # Wait to read the finger again
-        while fingerprint.readImage() == 0:
-            pass
-
-        # Converts read image to characteristics and stores it in char buffer 2
-        fingerprint.convertImage(0x02)
-
-        # Compares the char buffers
-        if fingerprint.compareCharacteristics() == 0:
-            # flash('Fingers do not match')
-            our_result['status'] = 5
-            return jsonify(our_result)
-            # raise Exception('Fingers do not match')
-
-        # Creates a template
-        fingerprint.createTemplate()
-
-        # Saves the template at new position number
-        position_number = fingerprint.storeTemplate()
-        # flash('Finger enrolled successfully!')
-        our_result['status'] = 6
-        # flash('New template position #' + str(position_number))
-        our_result['status'] = 7
-        db.table('fingers').insert(user_id=the_id, template_position=position_number)
-
-        # flash('This user has been enrolled successfully.')
-        our_result['status'] = 8
+        our_result['status'].append({
+            'code': 3,
+            'message': 'Remove finger...'
+        })
 
         return jsonify(our_result)
 
-
-@app.route('/enroll_handle_rfid', methods=['POST'])
-def enroll_handle_rfid():
-    return 'Hi'
-
-
-@app.route('/enroll_handle_finger_temp', methods=['POST'])
-def enroll_handle_finger_temp():
-    data = dict()
-    data['id'] = request.form['user_id'].encode("utf-8")
-    pprint(data['id'])
-    return jsonify(data)
+@app.route('/enroll_handle_finger_step_2', methods=['POST'])
+def enroll_handle_finger_step_2():
+    pass
+    # time.sleep(3)
+    #
+    # our_result['status'].append({
+    #     'code': 4,
+    #     'message': 'Waiting for same finger again...'
+    # })
+    #
+    # # Wait to read the finger again
+    # while fingerprint.readImage() == 0:
+    #     pass
+    #
+    # # Converts read image to characteristics and stores it in char buffer 2
+    # fingerprint.convertImage(0x02)
+    #
+    # # Compares the char buffers
+    # if fingerprint.compareCharacteristics() == 0:
+    #     our_result['status'].append({
+    #         'code': 5,
+    #         'message': 'Fingers do not match'
+    #     })
+    #     return jsonify(our_result)
+    #
+    # # Creates a template
+    # fingerprint.createTemplate()
+    #
+    # # Saves the template at new position number
+    # position_number = fingerprint.storeTemplate()
+    # our_result['status'].append({
+    #     'code': 6,
+    #     'message': 'Finger enrolled successfully!'
+    # })
+    # our_result['status'].append({
+    #     'code': 7,
+    #     'message': 'New template position #' + str(position_number)
+    # })
+    # db.table('fingers').insert(user_id=our_result['id'], template_position=position_number)
+    #
+    # our_result['status'].append({
+    #     'code': 8,
+    #     'message': 'This user has been enrolled successfully and inserted in the database.'
+    # })
+    #
+    # return jsonify(our_result)
 
 
 @app.route('/enroll_handle_rfid_temp', methods=['POST'])

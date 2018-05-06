@@ -113,7 +113,7 @@
         var id = $('.enroll-' + element).val();
         $.ajax({
             type: 'POST',
-            url: "{{ url_for('enroll_handle_finger_temp') }}",
+            url: "{{ url_for('enroll_handle_finger_step_1') }}",
             dataType: "json",
             data: {user_id: id}
         }).done(function (msg) {
