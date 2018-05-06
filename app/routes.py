@@ -5,8 +5,6 @@ import time
 from forms import UserDefineForm, UserEnrollForm
 from pprint import pprint
 
-
-
 store['clients'] = []
 
 
@@ -139,16 +137,14 @@ def get_all_users():  # TODO: Seems NOT enrolling new users when sensor memory i
     # Retrieve all users from database
     users = db.table('users').get()
 
+    # Loop in each user in users table
     for user in users:
         result['status'] = 1  # Data found
-
-        # pprint(user.id)
 
         # Retrieve all fingers related to that specific user
         this_user_related_fingers = db.table('fingers').where('user_id', user.id).get()
 
-        # pprint(fingers)
-
+        # Add some information about that related finger of that specific user
         if this_user_related_fingers.count():
             user_finger = []
             for finger in this_user_related_fingers:
@@ -158,9 +154,7 @@ def get_all_users():  # TODO: Seems NOT enrolling new users when sensor memory i
                     'created_at': finger['created_at']
                 })
 
-        pprint('*** user_finger ***:')
-        pprint(user_finger)
-
+        # Update result['members']
         result['members'].append({
             'id': user['id'],
             'first_name': user['first_name'],
@@ -168,42 +162,12 @@ def get_all_users():  # TODO: Seems NOT enrolling new users when sensor memory i
             'code_melli': user['code_melli'],
             'created_at': user['created_at'],
             'updated_at': user['updated_at'],
-            'related_fingers': user_finger,
+            'related_fingers': user_finger
         })
 
     # Number of all users
     users_table_records_count = db.table('users').get().count()
     result['members_count'] = users_table_records_count
-
-    pprint('*** result: ***')
-    pprint(result)
-
-    return jsonify(result)
-
-
-@app.route('/get_all_users_fingers', methods=['POST'])
-def get_all_users_fingers():  # TODO: Seems NOT enrolling new users when sensor memory is fresh - check again
-    result = dict()
-    result['status'] = 0  # No data found
-    result['users'] = []
-
-    # Find all users from database
-    users = db.table('users').get()
-
-    for user in users:
-        result['status'] = 1  # Data found
-        result['users'].append({
-            'id': user['id'],
-            'first_name': user['first_name'],
-            'last_name': user['last_name'],
-            'code_melli': user['code_melli'],
-            'created_at': user['created_at'],
-            'updated_at': user['updated_at'],
-        })
-
-    # count of all users
-    users_table_records_count = db.table('users').get().count()
-    result['users_count'] = users_table_records_count
 
     return jsonify(result)
 
