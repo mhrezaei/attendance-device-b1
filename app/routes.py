@@ -6,7 +6,6 @@ from forms import UserDefineForm, UserEnrollForm
 from pprint import pprint
 import os
 
-
 store['clients'] = []
 
 
@@ -52,11 +51,48 @@ def index_page():
     return render_template('index-page.html')
 
 
-@app.route(
-    '/settings')  # TODO: If no action is done on this page for about one minute, leads to Broken Pipe Eroor on terminal but yet everything works fine
+@app.route('/settings')  # TODO: If no action is done on this page for about one minute, leads to Broken Pipe Error on terminal but yet everything works fine
 def settings():
     return render_template('settings.html')
 
+
+@app.route('/settings_process')
+def settings_process():
+    our_result = dict()
+
+    our_result['status'] = 200
+    our_result['message'] = 'Nothing done yet.'
+    time.sleep(0.5)
+    # Wait to read the finger
+    while fingerprint.readImage() == 0:
+        pass
+
+    # Converts read image to characteristics and stores it in char buffer 1
+    fingerprint.convertImage(0x01)
+
+    # Checks if finger is already enrolled
+    result = fingerprint.searchTemplate()
+    position_number = result[0]
+
+    if position_number >= 0:
+        our_result['status'] = 201
+        our_result['message'] = 'Template exists at position #' + str(position_number)
+
+        user_id_associated_with_this_finger = db.table('fingers').where('template_position', position_number).pluck('user_id')
+
+        admin_role_check_clause = db.table('users').where('id', user_id_associated_with_this_finger).pluck('is_admin')
+
+        our_result['is_admin'] = admin_role_check_clause
+
+        if admin_role_check_clause:
+            
+
+        return jsonify(our_result)
+
+    our_result['status'] = 202
+    our_result['message'] = 'No match found.'
+
+    return jsonify(our_result)
 
 # -------------------------#
 #       User Define        #
@@ -192,7 +228,8 @@ def enroll_handle_finger_step_1():
     if request.method == 'POST':
         our_result['status'].append({
             'code': 1,
-            'message': 'Currently used templates: ' + str(fingerprint.getTemplateCount()) + ' / ' + str(fingerprint.getStorageCapacity())
+            'message': 'Currently used templates: ' + str(fingerprint.getTemplateCount()) + ' / ' + str(
+                fingerprint.getStorageCapacity())
         })
         pprint(our_result)
 
@@ -221,6 +258,7 @@ def enroll_handle_finger_step_1():
         })
 
         return jsonify(our_result)
+
 
 @app.route('/enroll_handle_finger_step_2', methods=['POST'])
 def enroll_handle_finger_step_2():
@@ -271,11 +309,6 @@ def enroll_handle_finger_step_2():
     })
 
     return jsonify(our_result)
-
-
-@app.route('/test', methods=['GET'])
-def test():
-    return os.path.dirname('/')
 
 
 @app.route('/enroll_handle_rfid_temp', methods=['POST'])
