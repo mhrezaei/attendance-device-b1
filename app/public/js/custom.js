@@ -210,10 +210,10 @@ Vue.component('app-details',{
                             <tbody>
                                 <tr v-for="(report , index) in reports">
                                     <td>{{ index + 1 }}</td>
-                                    <td>{{ report.enter_date }}</td>
-                                    <td>{{ report.enter_time }}</td>
-                                    <td>{{ report.exit_date }}</td>
-                                    <td>{{ report.exit_time }}</td>
+                                    <td>{{ setDate(report.enter_date) }}</td>
+                                    <td>{{ setTime(report.enter_date) }}</td>
+                                    <td>{{ setDate(report.exit_date) }}</td>
+                                    <td>{{ setTime(report.exit_date) }}</td>
                                 </tr>
                             </tbody>
                         </table> 
@@ -298,6 +298,14 @@ Vue.component('app-details',{
             `,
     props: ['member','reports'],
     methods:{
+        setTime: function (date) {
+            var unix = new persianDate(new Date(date)).valueOf();
+            return new persianDate(unix).toLocale('fa').toCalendar('persian').format('HH:mm');
+        },
+        setDate: function (date) {
+            var unix = new persianDate(new Date(date)).valueOf();
+            return new persianDate(unix).toLocale('fa').toCalendar('persian').format('DD MMMM YYYY');
+        },
         removeUser: function () {
             removeMember(this.member.id);
         },
@@ -320,6 +328,7 @@ Vue.component('app-details',{
         addNewCard: function () {
             addNewCard(this.member);
         }
+
     }
 });
 
