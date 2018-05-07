@@ -24,7 +24,17 @@
                 additive = "";
             }
             var getUrl = window.location;
-            var baseUrl = getUrl .protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
+            var baseUrl = getUrl .protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1] + "/app";
+
+            return `${baseUrl}/${additive}`;
+        }
+
+        function asset(additive) {
+            if(!additive){
+                additive = "";
+            }
+            var getUrl = window.location;
+            var baseUrl = getUrl .protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1] + "/app/static";
 
             return `${baseUrl}/${additive}`;
         }
