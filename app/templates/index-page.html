@@ -17,6 +17,18 @@
 	<!-- Style -->
 	<link rel="stylesheet" href="../static/css/style.min.css">
 	<!-- Style -->
+
+	<script>
+        function url(additive) {
+            if(!additive){
+                additive = "";
+            }
+            var getUrl = window.location;
+            var baseUrl = getUrl .protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
+
+            return `${baseUrl}/${additive}`;
+        }
+	</script>
 </head>
 <body>
 
