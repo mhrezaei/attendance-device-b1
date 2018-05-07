@@ -75,7 +75,7 @@ def settings_process():
 
     if position_number >= 0:
         our_result['status'] = 201
-        our_result['message'] = 'Template exists at position #' + str(position_number)
+        our_result['message'] = 'Template found at position #' + str(position_number)
 
         user_id_associated_with_this_finger = db.table('fingers').where('template_position', position_number).pluck('user_id')
 
@@ -126,10 +126,12 @@ def settings_process():
 
         else: # The finger does NOT belong to an admin
             pprint('You are NOT ADMIN')
+            our_result['status'] = 203
+            our_result['message'] = 'Sorry, you are not allowed to enter settings.'
 
         return jsonify(our_result)
 
-    our_result['status'] = 203
+    our_result['status'] = 204
     our_result['message'] = 'No match found.'
 
     return jsonify(our_result)
