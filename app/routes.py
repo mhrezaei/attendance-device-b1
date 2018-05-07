@@ -58,11 +58,11 @@ def settings_process():
     our_result['status'] = 200
     our_result['message'] = 'Nothing done yet.'
     our_result['members'] = []
-    time.sleep(0.5)
+    time.sleep(0.5) # Makes sure to unset fingerprint sensor from index page in order not to submit log instead of settings approval on this endpoint
 
     check_time = time.time() + settings_timeout
 
-    # Wait to read the finger
+    # Wait to read the finger for a specific time (asl long as 'settings_timeout' variable)
     while (fingerprint.readImage()  == 0) and (time.time() < check_time):
         pass
 
@@ -91,7 +91,7 @@ def settings_process():
 
             # Loop in each user in users table
             for user in users:
-                our_result['status'] = 1  # Data found
+                our_result['status'] = 202  # Data found on users table
 
                 # Retrieve all fingers related to that specific user
                 this_user_related_fingers = db.table('fingers').where('user_id', user.id).get()
@@ -129,7 +129,7 @@ def settings_process():
 
         return jsonify(our_result)
 
-    our_result['status'] = 202
+    our_result['status'] = 203
     our_result['message'] = 'No match found.'
 
     return jsonify(our_result)
