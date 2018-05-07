@@ -1,0 +1,54 @@
+/*
+*-------------------------------------------------------
+* Layout / Navbar
+*-------------------------------------------------------
+*/
+
+nav#navbar{
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  .navbar_container{
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    padding: 10px 30px;
+    .logo{
+      flex: 1;
+      .logo_inner{
+        display: flex;
+        align-items: center;
+        .logo_image{
+          max-width: 35px;
+          overflow: hidden;
+          opacity: 0.9;
+          img{
+            max-height: 100%;
+            max-width: 100%;
+            object-fit: contain;
+          }
+          @include margin-end(10)
+        }
+        .logo_title{
+          font-size: em(35);
+          font-weight: 500;
+          color: $text_primary;
+        }
+      }
+    }
+    .time-and-date{
+      text-align: left;
+      flex: 1;
+      color: $text_primary;
+      .time{
+        font-size: em(22);
+        font-weight: 500;
+      }
+      .date{
+        font-size: em(17);
+      }
+    }
+  }
+}

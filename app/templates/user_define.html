@@ -1,12 +1,25 @@
 <!doctype html>
 <html xmlns:font-weight="http://www.w3.org/1999/xhtml" xmlns:margin-left="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/css/bootstrap.css">
+    <title>User Define</title>
+    <style>
+
+.form-container {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    }
+    </style>
+</head>
 <body>
-<a href="{{ url_for('settings') }}">Settings</a><br>
-<a href="{{ url_for('index') }}">Home</a><br>
-
-<h2 style="text-align: center;">User Define Form</h2>
+<a href="{{ url_for('index') }}"><button type="button" class="btn">Home</button></a><br><br>
+<a href="{{ url_for('settings') }}"><button type="button" class="btn">Settings</button></a>
 
 
+<div class="form-container">
 <form action="{{ url_for('user_define') }}" method='post'>
     <fieldset>
         <legend>User Define Form</legend>
@@ -21,13 +34,15 @@
             <br>
             {{ form.code_melli.label }}<br>
             {{ form.code_melli }}
-            <br>
-            {{ form.submit }}
+            <br><br>
+            {{ form.submit(class_="btn btn-success") }}
         </div>
 
     </fieldset>
 </form>
+</div>
 
+<br><br>
 
 {#------------------------#}
 {# Form validation errors #}

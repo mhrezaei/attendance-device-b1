@@ -1,44 +1,16 @@
-from config import app, publish, store, socket
+from config import app, publish, store, socket, fingerPrint
 from flask import render_template, request, flash, redirect, url_for
-from forms import UserDefineForm, UserEnrollForm, RfidWriteForm
-from orator import DatabaseManager, Model
-from pyfingerprint.pyfingerprint import PyFingerprint
-from time import time
+from models import *
+import time
+from forms import UserDefineForm, UserEnrollForm
 
 store['clients'] = []
 
-# Connect to our MySQL database
-config = {
-    'mysql': {
-        'driver': 'mysql',
-        'host': 'localhost',
-        'database': 'attendance',
-        'user': 'jafar',
-        'password': '12345678',
-        'prefix': ''
-    }
-}
 
-db = DatabaseManager(config)
-Model.set_connection_resolver(db)
-
-
-class User(Model):
-    __table__ = 'users'
-
-
-class Finger(Model):
-    __table__ = 'fingers'
-
-
-class UserLog(Model):
-    __table__ = 'user_logs'
-
-
-# Tries to initialize the sensor
-f = PyFingerprint('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
-
-
+# --------------#
+#   Sockets     #
+#               #
+# --------------#
 @socket.on('connect')
 def socket_connect():
     socket.emit('auth', request.sid)
@@ -47,36 +19,28 @@ def socket_connect():
 
 @socket.on('disconnect')
 def socket_disconnect():
+    store['fingerPrintEnabled'] = False
     store['clients'].remove(request.sid)
 
 
-@socket.on('temp')
-def temp(data):
-    socket.emit('message', str(data), room=request.sid)
+@socket.on('setFingerPrintStatus')
+def set_fingerprint_status(data):
+    store['fingerPrintEnabled'] = data
 
-
+# --------------#
+#   Endpoints   #
+#               #
+# --------------#
 @app.route('/')
 @app.route('/index')
 def index():
     return render_template('index.html')
 
 
-@app.route('/settings')
+@app.route('/settings') #TODO: If no action is done on this page for about one minute, leads to Broken Pipe Eroor on terminal but yet everything works fine
 def settings():
     return render_template('settings.html')
 
-
-@app.route('/send')
-def send():
-    for d in store['clients']:
-        publish('message', d)
-    return "ok"
-
-
-# --------------#
-#   Settings    #
-#   Actions     #
-# --------------#
 # -------------------------#
 #       User Define        #
 # -------------------------#
@@ -112,7 +76,6 @@ def user_define():
                 return render_template('user_define.html', form=form)
     elif request.method == 'GET':
         return render_template('user_define.html', form=form)
-
 
 # -------------------------#
 #       User Enroll        #
@@ -159,17 +122,17 @@ def user_enroll():  # TODO: Seems NOT enrolling new users when sensor memory is 
 
             # This id exists and the user is ready to be enrolled.
             if id_existence_clause != 0:
-                flash('Currently used templates: ' + str(f.getTemplateCount()) + ' / ' + str(f.getStorageCapacity()))
+                flash('Currently used templates: ' + str(fingerPrint.getTemplateCount()) + ' / ' + str(fingerPrint.getStorageCapacity()))
                 our_result['status'] = 1
                 # Wait to read the finger
-                while f.readImage() == 0:
+                while fingerPrint.readImage() == 0:
                     pass
 
                 # Converts read image to characteristics and stores it in char buffer 1
-                f.convertImage(0x01)
+                fingerPrint.convertImage(0x01)
 
                 # Checks if finger is already enrolled
-                result = f.searchTemplate()
+                result = fingerPrint.searchTemplate()
                 position_number = result[0]
 
                 if position_number >= 0:
@@ -186,24 +149,24 @@ def user_enroll():  # TODO: Seems NOT enrolling new users when sensor memory is 
                 our_result['status'] = 4
 
                 # Wait to read the finger again
-                while f.readImage() == 0:
+                while fingerPrint.readImage() == 0:
                     pass
 
                 # Converts read image to characteristics and stores it in char buffer 2
-                f.convertImage(0x02)
+                fingerPrint.convertImage(0x02)
 
                 # Compares the char buffers
-                if f.compareCharacteristics() == 0:
+                if fingerPrint.compareCharacteristics() == 0:
                     flash('Fingers do not match')
                     our_result['status'] = 5
                     return redirect(url_for('user_enroll'))
                     # raise Exception('Fingers do not match')
 
                 # Creates a template
-                f.createTemplate()
+                fingerPrint.createTemplate()
 
                 # Saves the template at new position number
-                position_number = f.storeTemplate()
+                position_number = fingerPrint.storeTemplate()
                 flash('Finger enrolled successfully!')
                 our_result['status'] = 6
                 flash('New template position #' + str(position_number))

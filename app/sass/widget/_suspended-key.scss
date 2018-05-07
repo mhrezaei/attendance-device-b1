@@ -1,0 +1,19 @@
+/*
+*-------------------------------------------------------
+* Widget / Suspended Key
+*-------------------------------------------------------
+*/
+
+.suspended-key{
+  position: absolute;
+  @include end(20px);
+  bottom: 15px;
+
+  button{
+    background: transparent;
+    border: none;
+    color: $text_primary;
+    font-size: em(35);
+    padding: 0;
+  }
+}

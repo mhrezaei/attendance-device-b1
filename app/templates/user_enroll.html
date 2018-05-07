@@ -1,6 +1,7 @@
 <!doctype html>
 <html xmlns:font-weight="http://www.w3.org/1999/xhtml" xmlns:margin-left="http://www.w3.org/1999/xhtml">
 <head>
+    <link rel="stylesheet" href="/css/bootstrap.css">
     <style>
         table, th, td {
             border: 1px solid black;
@@ -17,9 +18,8 @@
     <title>Result</title>
 </head>
 <body>
-<a href="{{ url_for('settings') }}">Settings</a><br>
-<a href="{{ url_for('index') }}">Home</a><br>
-<h2 style="text-align: center;">User Enroll Form</h2>
+<a href="{{ url_for('index') }}"><button type="button" class="btn">Home</button></a><br><br>
+<a href="{{ url_for('settings') }}"><button type="button" class="btn">Settings</button></a><br>
 
 
 <form action="{{ url_for('user_enroll') }}" method='post'>
@@ -61,8 +61,8 @@
 
 You entered this ID: {{ the_id }}
 
-<table style="width:100%">
-    <caption>Users Table</caption>
+<table class="table table-hover">
+    <caption align="top">Users Table</caption> {# TODO: The <caption> align attribute is not supported in HTML5. Use CSS instead. #}
     <tr>
         <th>ID</th>
         <th>First Name</th>
@@ -82,10 +82,14 @@ You entered this ID: {{ the_id }}
             <td>{{ created_at_list[i] }}</td>
             <td>{{ updated_at_list[i] }}</td>
             <td>
-                <button value="{{ id_list[i] }}" class="enroll-{{ id_list[i] }}" type="button" onclick="findUserID('{{ id_list[i] }}');">Enroll Finger</button>
+                <button value="{{ id_list[i] }}" class="enroll-{{ id_list[i] }}" type="button"
+                        onclick="findUserID('{{ id_list[i] }}');">Enroll Finger
+                </button>
             </td>
             <td>
-                <button value="{{ id_list[i] }}" class="enroll-{{ id_list[i] }}" type="button" onclick="">Enroll RFID Card</button>
+                <button value="{{ id_list[i] }}" class="enroll-{{ id_list[i] }}" type="button" onclick="">Enroll RFID
+                    Card
+                </button>
             </td>
         </tr>
     {% endfor %}
@@ -100,7 +104,7 @@ You entered this ID: {{ the_id }}
             type: 'json',
             url: '{{ url_for('user_enroll') }}'
         }).done(function (msg) {
-            if (msg.status){
+            if (msg.status) {
 
             }
         })
