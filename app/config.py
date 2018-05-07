@@ -5,6 +5,8 @@ import os
 
 from pyfingerprint.pyfingerprint import PyFingerprint
 
+fingerprint = PyFingerprint('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
+
 fingerPrint = PyFingerprint('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
 
 app = Flask(__name__)
@@ -15,10 +17,14 @@ worker = SocketWorker()
 publish = worker.publish
 store = Store()
 
+
+
 import routes
 
 import routes
 from models import *
+
+import routes
 
 
 @socket.on('update')

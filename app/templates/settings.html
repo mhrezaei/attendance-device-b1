@@ -2,13 +2,36 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="/css/bootstrap.css">
+    {#    <link rel="stylesheet" href="/css/bootstrap.css">#}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
     <title>Settings</title>
 </head>
 <body>
-<a href="{{ url_for('index') }}"><button type="button" class="btn">Home</button></a>
+<a href="{{ url_for('index') }}">
+    <button type="button" class="btn">Home</button>
+</a>
 <h1>Settings</h1>
-<a href="{{ url_for('user_define') }}"><button type="button" class="btn">Define a new user</button></a><br><br>
-<a href="{{ url_for('user_enroll') }}"><button type="button" class="btn">Enroll a new user</button></a>
+<a href="{{ url_for('user_define') }}">
+    <button type="button" class="btn">Define a new user</button>
+</a><br><br>
+<a href="{{ url_for('user_enroll') }}">
+    <button type="button" class="btn">Enroll a new user</button>
+</a>
+
+<script>
+    function checkAdminRole() {
+        $.ajax({
+            type: 'GET',
+            url: "{{ url_for('settings_process') }}"
+        }).done(function (msg) {
+            console.log(msg);
+        })
+    }
+
+    checkAdminRole();
+
+
+</script>
+
 </body>
 </html>

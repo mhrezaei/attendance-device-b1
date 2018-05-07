@@ -1,8 +1,10 @@
-from config import app, publish, store, socket, fingerPrint
-from flask import render_template, request, flash, redirect, url_for
+from config import app, publish, store, socket, fingerprint
+from flask import render_template, request, flash, redirect, url_for, jsonify, json
 from models import *
 import time
 from forms import UserDefineForm, UserEnrollForm
+from pprint import pprint
+import os
 
 store['clients'] = []
 
@@ -27,19 +29,107 @@ def socket_disconnect():
 def set_fingerprint_status(data):
     store['fingerPrintEnabled'] = data
 
+
 # --------------#
 #   Endpoints   #
 #               #
 # --------------#
+
 @app.route('/')
 @app.route('/index')
 def index():
     return render_template('index.html')
 
 
-@app.route('/settings') #TODO: If no action is done on this page for about one minute, leads to Broken Pipe Eroor on terminal but yet everything works fine
+@app.route('/index-page')
+def index_page():
+    return render_template('index-page.html')
+
+
+@app.route('/settings')
 def settings():
     return render_template('settings.html')
+
+
+@app.route('/settings_process')
+def settings_process():
+    our_result = dict()
+
+    our_result['status'] = 200
+    our_result['message'] = 'Nothing done yet.'
+    our_result['members'] = []
+    time.sleep(0.5)
+    # Wait to read the finger
+    while fingerprint.readImage() == 0:
+        pass
+
+    # Converts read image to characteristics and stores it in char buffer 1
+    fingerprint.convertImage(0x01)
+
+    # Checks if finger is already enrolled
+    result = fingerprint.searchTemplate()
+    position_number = result[0]
+
+    if position_number >= 0:
+        our_result['status'] = 201
+        our_result['message'] = 'Template exists at position #' + str(position_number)
+
+        user_id_associated_with_this_finger = db.table('fingers').where('template_position', position_number).pluck('user_id')
+
+        admin_role_check_clause = db.table('users').where('id', user_id_associated_with_this_finger).pluck('is_admin')
+
+        our_result['is_admin'] = admin_role_check_clause
+
+        if admin_role_check_clause: # The finger belongs to an admin
+            pprint("Hi ADMIN")
+
+            # Retrieve all users from database
+            users = db.table('users').get()
+
+            # Loop in each user in users table
+            for user in users:
+                our_result['status'] = 1  # Data found
+
+                # Retrieve all fingers related to that specific user
+                this_user_related_fingers = db.table('fingers').where('user_id', user.id).get()
+
+                # Add some information about that related finger of that specific user
+                if this_user_related_fingers.count():
+                    user_finger = []
+                    for finger in this_user_related_fingers:
+                        user_finger.append({
+                            'id': finger['id'],
+                            'position': finger['template_position'],
+                            'created_at': finger['created_at']
+                        })
+
+                # Update result['members']
+                our_result['members'].append({
+                    'id': user['id'],
+                    'first_name': user['first_name'],
+                    'last_name': user['last_name'],
+                    'code_melli': user['code_melli'],
+                    'created_at': user['created_at'],
+                    'updated_at': user['updated_at'],
+                    'related_fingers': user_finger
+                })
+
+            # Number of all users
+            users_table_records_count = db.table('users').get().count()
+            our_result['members_count'] = users_table_records_count
+
+            return jsonify(our_result)
+
+
+        else: # The finger does NOT belong to an admin
+            pprint('You are NOT ADMIN')
+
+        return jsonify(our_result)
+
+    our_result['status'] = 202
+    our_result['message'] = 'No match found.'
+
+    return jsonify(our_result)
 
 # -------------------------#
 #       User Define        #
@@ -77,18 +167,13 @@ def user_define():
     elif request.method == 'GET':
         return render_template('user_define.html', form=form)
 
+
 # -------------------------#
 #       User Enroll        #
 # -------------------------#
-@app.route('/user_enroll', methods=['POST', 'GET'])
+@app.route('/user_enroll', methods=['GET', 'POST'])
 def user_enroll():  # TODO: Seems NOT enrolling new users when sensor memory is fresh - check again
-
-    # f.readImage() #TODO: sensor should be off when on this page, unless it is needed
-
-    our_result = {'status': 0}
-
-    form = UserEnrollForm()
-
+    # return render_template('user_enroll.html')
     users = db.table('users').get()
     users_table_records_count = db.table('users').get().count()
 
@@ -106,111 +191,166 @@ def user_enroll():  # TODO: Seems NOT enrolling new users when sensor memory is 
         code_melli_list.append(str(user['code_melli']))
         created_at_list.append(str(user['created_at']))
         updated_at_list.append(str(user['updated_at']))
-    # TODO: Validation does NOT Work
+
+    return render_template('user_enroll.html',
+                           users_table_records_count=users_table_records_count,
+                           id_list=id_list,
+                           first_name_list=first_name_list,
+                           last_name_list=last_name_list,
+                           code_melli_list=code_melli_list,
+                           created_at_list=created_at_list,
+                           updated_at_list=updated_at_list
+                           )
+
+
+@app.route('/get_all_users', methods=['GET'])
+def get_all_users():  # TODO: Seems NOT enrolling new users when sensor memory is fresh - check again
+    our_result = dict()
+    our_result['status'] = 0  # No data found
+    our_result['members'] = []
+
+    # Retrieve all users from database
+    users = db.table('users').get()
+
+    # Loop in each user in users table
+    for user in users:
+        our_result['status'] = 1  # Data found
+
+        # Retrieve all fingers related to that specific user
+        this_user_related_fingers = db.table('fingers').where('user_id', user.id).get()
+
+        # Add some information about that related finger of that specific user
+        if this_user_related_fingers.count():
+            user_finger = []
+            for finger in this_user_related_fingers:
+                user_finger.append({
+                    'id': finger['id'],
+                    'position': finger['template_position'],
+                    'created_at': finger['created_at']
+                })
+
+        # Update result['members']
+        our_result['members'].append({
+            'id': user['id'],
+            'first_name': user['first_name'],
+            'last_name': user['last_name'],
+            'code_melli': user['code_melli'],
+            'created_at': user['created_at'],
+            'updated_at': user['updated_at'],
+            'related_fingers': user_finger
+        })
+
+    # Number of all users
+    users_table_records_count = db.table('users').get().count()
+    our_result['members_count'] = users_table_records_count
+
+    return jsonify(our_result)
+
+
+@app.route('/enroll_handle_rfid', methods=['POST'])
+def enroll_handle_rfid():
+    return 'Hi'
+
+
+@app.route('/enroll_handle_finger_step_1', methods=['POST'])
+def enroll_handle_finger_step_1():
+    our_result = dict()
+    our_result['status'] = []
+    our_result['status'].append({
+        'code': 0,
+        'message': 'Nothing done yet.'
+    })
+    our_result['id'] = request.form['user_id'].encode("utf-8")
+
     if request.method == 'POST':
-        # Form NOT validated
-        if form.validate() == 0:  # Form is not validated
-            return render_template('user_enroll.html', form=form)
-        # Form validated correctly
-        elif form.validate() != 0:  # Form is validated
-            the_id = request.form['id']
+        our_result['status'].append({
+            'code': 1,
+            'message': 'Currently used templates: ' + str(fingerprint.getTemplateCount()) + ' / ' + str(
+                fingerprint.getStorageCapacity())
+        })
+        pprint(our_result)
 
-            # TODO: (SOLVED) id existence query
-            # id_existence_clause = 'ID EXISTS'
-            id_existence_clause = db.table('users').where('id', the_id).count()
-            # id_existence_clause = db.table('users').where_exists(db.table('users').select(db.raw(1)).where_raw('users.id' == 23))
+        # Wait to read the finger
+        while fingerprint.readImage() == 0:
+            pass
 
-            # This id exists and the user is ready to be enrolled.
-            if id_existence_clause != 0:
-                flash('Currently used templates: ' + str(fingerPrint.getTemplateCount()) + ' / ' + str(fingerPrint.getStorageCapacity()))
-                our_result['status'] = 1
-                # Wait to read the finger
-                while fingerPrint.readImage() == 0:
-                    pass
+        # Converts read image to characteristics and stores it in char buffer 1
+        fingerprint.convertImage(0x01)
 
-                # Converts read image to characteristics and stores it in char buffer 1
-                fingerPrint.convertImage(0x01)
+        # Checks if finger is already enrolled
+        result = fingerprint.searchTemplate()
+        position_number = result[0]
 
-                # Checks if finger is already enrolled
-                result = fingerPrint.searchTemplate()
-                position_number = result[0]
+        if position_number >= 0:
+            our_result['status'].append({
+                'code': 2,
+                'message': 'Template already exists at position #' + str(position_number)
+            })
+            pprint(our_result)
+            return jsonify(our_result)
 
-                if position_number >= 0:
-                    flash('Template already exists at position #' + str(position_number))
-                    our_result['status'] = 2
-                    # exit(0)
-                    return redirect(url_for('user_enroll'))
-                    # TODO: Exits the program and closes the Attendance.py -- should find an alternative
+        our_result['status'].append({
+            'code': 3,
+            'message': 'Remove finger...'
+        })
 
-                flash('Remove finger...')
-                our_result['status'] = 3
-                time.sleep(3)
-                flash('Waiting for same finger again...')
-                our_result['status'] = 4
+        return jsonify(our_result)
 
-                # Wait to read the finger again
-                while fingerPrint.readImage() == 0:
-                    pass
 
-                # Converts read image to characteristics and stores it in char buffer 2
-                fingerPrint.convertImage(0x02)
+@app.route('/enroll_handle_finger_step_2', methods=['POST'])
+def enroll_handle_finger_step_2():
+    our_result = dict()
+    our_result['status'] = []
+    our_result['id'] = request.form['user_id'].encode("utf-8")
 
-                # Compares the char buffers
-                if fingerPrint.compareCharacteristics() == 0:
-                    flash('Fingers do not match')
-                    our_result['status'] = 5
-                    return redirect(url_for('user_enroll'))
-                    # raise Exception('Fingers do not match')
+    time.sleep(3)
 
-                # Creates a template
-                fingerPrint.createTemplate()
+    our_result['status'].append({
+        'code': 4,
+        'message': 'Waiting for same finger again...'
+    })
 
-                # Saves the template at new position number
-                position_number = fingerPrint.storeTemplate()
-                flash('Finger enrolled successfully!')
-                our_result['status'] = 6
-                flash('New template position #' + str(position_number))
-                our_result['status'] = 7
-                db.table('fingers').insert(user_id=the_id, template_position=position_number)
+    # Wait to read the finger again
+    while fingerprint.readImage() == 0:
+        pass
 
-                flash('This user has been enrolled successfully.')
-                our_result['status'] = 8
-                return render_template('user_enroll.html',
-                                       form=form,
-                                       the_id=the_id,
-                                       users_table_records_count=users_table_records_count,
-                                       id_list=id_list,
-                                       first_name_list=first_name_list,
-                                       last_name_list=last_name_list,
-                                       code_melli_list=code_melli_list,
-                                       created_at_list=created_at_list,
-                                       updated_at_list=updated_at_list
-                                       )
-            # This id does not exist.
-            elif id_existence_clause == 0:
-                flash('Please enter an existing ID number.')
-                our_result['status'] = 9
-                return render_template('user_enroll.html',
-                                       form=form,
-                                       the_id=the_id,
-                                       users_table_records_count=users_table_records_count,
-                                       id_list=id_list,
-                                       first_name_list=first_name_list,
-                                       last_name_list=last_name_list,
-                                       code_melli_list=code_melli_list,
-                                       created_at_list=created_at_list,
-                                       updated_at_list=updated_at_list
-                                       )
-    elif request.method == 'GET':
-        the_id = None
-        return render_template('user_enroll.html',
-                               form=form,
-                               the_id=the_id,
-                               users_table_records_count=users_table_records_count,
-                               id_list=id_list,
-                               first_name_list=first_name_list,
-                               last_name_list=last_name_list,
-                               code_melli_list=code_melli_list,
-                               created_at_list=created_at_list,
-                               updated_at_list=updated_at_list
-                               )
+    # Converts read image to characteristics and stores it in char buffer 2
+    fingerprint.convertImage(0x02)
+
+    # Compares the char buffers
+    if fingerprint.compareCharacteristics() == 0:
+        our_result['status'].append({
+            'code': 5,
+            'message': 'Fingers do not match'
+        })
+        return jsonify(our_result)
+
+    # Creates a template
+    fingerprint.createTemplate()
+
+    # Saves the template at new position number
+    position_number = fingerprint.storeTemplate()
+    our_result['status'].append({
+        'code': 6,
+        'message': 'Finger enrolled successfully!'
+    })
+    our_result['status'].append({
+        'code': 7,
+        'message': 'New template position #' + str(position_number)
+    })
+    db.table('fingers').insert(user_id=our_result['id'], template_position=position_number)
+
+    our_result['status'].append({
+        'code': 8,
+        'message': 'This user has been enrolled successfully and inserted in the database.'
+    })
+
+    return jsonify(our_result)
+
+
+@app.route('/enroll_handle_rfid_temp', methods=['POST'])
+def enroll_handle_rfid_temp():
+    data = dict()
+    data['id'] = request.form['user_id'].encode("utf-8")
+    pprint(data['id'])
+    return jsonify(data)
