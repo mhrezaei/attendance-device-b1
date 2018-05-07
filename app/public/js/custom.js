@@ -166,7 +166,7 @@ Vue.component('app-clock', {
         checkDayLight: function () {
             persianDate.toLocale('en');
             let dayHour = new persianDate().format('HH');
-            if (6 < dayHour < 19) {
+            if (6 <= dayHour && dayHour < 19 ) {
                 this.theme = "dayMode";
             } else {
                 this.theme = "nightMode";
@@ -423,12 +423,12 @@ var Daytime = function () {
   persianDate.toLocale('en');
   this.hour = new persianDate().format('HH');
 
-  this.isday = function () {
-      return 6 < this.hour && this.hour < 19;
+  this.isDay = function () {
+      return (6 <= this.hour && this.hour < 19);
   };
 
-  this.inNight = function () {
-      return this.hour < 6 && this.hour > 19;
+  this.isNight = function () {
+      return (this.hour < 6 || this.hour >= 19);
   };
 };
 
@@ -483,11 +483,11 @@ function closeModal() {
 function checkTheme() {
     var daytime = new Daytime();
 
-    if (daytime.isday()){
+    if (daytime.isDay()){
         $('#standby').removeClass('night').addClass('day');
     }
 
-    if (daytime.inNight()){
+    if (daytime.isNight()){
         $('#standby').removeClass('day').addClass('night');
     }
 }
