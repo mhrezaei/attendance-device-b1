@@ -41,11 +41,6 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/index-temp')
-def index_temp():
-    return render_template('index-temp.html')
-
-
 @app.route('/index-page')
 def index_page():
     return render_template('index-page.html')
