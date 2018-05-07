@@ -796,7 +796,7 @@ jQuery(function($){
     $('.js-accessSetting').on('click',function () {
         openModal('برای ورود به بخش تنظیمات مجددا انگشت‌ خود را اسکن کنید.', asset('images/fingerprint-with-keyhole.svg'));
         $.ajax({
-            url: "../public/js/data/isAdmin.json",
+            url: url("settings_process"),
             dataType: "json",
             success: function(response) {
                 if(response.isAdmin){

@@ -22,11 +22,27 @@
 {#	<link rel="stylesheet" href="/css/style.min.css">#}
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/style.min.css') }}">
 	<!-- Style -->
-    <script>
-        function url(endpoint) {
-            return '192.168.1.130:5000' + '/' + endpoint
+	<script>
+        function url(additive) {
+            if(!additive){
+                additive = "";
+            }
+            var getUrl = window.location;
+            var baseUrl = getUrl .protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1] + "/app";
+
+            return `${baseUrl}/${additive}`;
         }
-    </script>
+
+        function asset(additive) {
+            if(!additive){
+                additive = "";
+            }
+            var getUrl = window.location;
+            var baseUrl = getUrl .protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1] + "/app/static";
+
+            return `${baseUrl}/${additive}`;
+        }
+	</script>
 </head>
 <body>
 
@@ -137,20 +153,13 @@
 
 </div>
 
-{#<script src="/libs/vue.js"></script>#}
 <script src="{{ url_for('static', filename='libs/vue.js') }}"></script>
-{#<script src="/libs/jquery-3.2.1.min.js"></script>#}
 <script src="{{ url_for('static', filename='libs/jquery-3.2.1.min.js') }}"></script>
-{#<script src="/libs/bootstrap.min.js"></script>#}
 <script src="{{ url_for('static', filename='libs/bootstrap.min.js') }}"></script>
-{#<script src="/libs/persian-date.min.js"></script>#}
 <script src="{{ url_for('static', filename='libs/persian-date.min.js') }}"></script>
 
-{#<script src="/js/socket.js"></script>#}
 <script src="{{ url_for('static', filename='js/socket.js') }}"></script>
-{#<script src="/js/index-handler.js"></script>#}
 <script src="{{ url_for('static', filename='js/index-handler.js') }}"></script>
-{#<script src="/js/custom.js"></script>#}
 <script src="{{ url_for('static', filename='js/custom.js') }}"></script>
 
 </body>
