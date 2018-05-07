@@ -1,3 +1,84 @@
+String.prototype.replaceAll = function (search, replacement) {
+    var target = this;
+    return target.replace(new RegExp(search, 'g'), replacement);
+};
+
+function forms_pd($string) {
+    if (!$string) return;//safety!
+
+    $string = $string.replaceAll(/1/g, "۱");
+    $string = $string.replaceAll(/2/g, "۲");
+    $string = $string.replaceAll(/3/g, "۳");
+    $string = $string.replaceAll(/4/g, "۴");
+    $string = $string.replaceAll(/5/g, "۵");
+    $string = $string.replaceAll(/6/g, "۶");
+    $string = $string.replaceAll(/7/g, "۷");
+    $string = $string.replaceAll(/8/g, "۸");
+    $string = $string.replaceAll(/9/g, "۹");
+    $string = $string.replaceAll(/0/g, "۰");
+
+    return $string;
+}
+
+function forms_digit_en(perDigit) {
+    var newValue = "";
+    for (var i = 0; i < perDigit.length; i++) {
+        var ch = perDigit.charCodeAt(i);
+        if (ch >= 1776 && ch <= 1785) // For Persian digits.
+        {
+            var newChar = ch - 1728;
+            newValue = newValue + String.fromCharCode(newChar);
+        }
+        else if (ch >= 1632 && ch <= 1641) // For Arabic & Unix digits.
+        {
+            var newChar = ch - 1584;
+            newValue = newValue + String.fromCharCode(newChar);
+        }
+        else
+            newValue = newValue + String.fromCharCode(ch);
+    }
+    return newValue;
+}
+
+function pd(enDigit) {
+    return forms_digit_fa(enDigit);
+}
+
+function ed(faDigit) {
+    return forms_digit_en(faDigit);
+}
+
+function ad(digists) {
+    if (getLocale() == 'fa') {
+        return pd(digists);
+    }
+    return ed(digists);
+}
+
+function ad(string) {
+    if ($.inArray(getLocale(), ['fa', 'ar']) > -1) {
+        return pd(string);
+    }
+    return ed(string);
+}
+
+function forms_digit_fa(enDigit) {
+    return forms_pd(enDigit);
+
+    var newValue = "";
+    for (var i = 0; i < enDigit.length; i++) {
+        var ch = enDigit.charCodeAt(i);
+        if (ch >= 48 && ch <= 57) {
+            var newChar = ch + 1584;
+            newValue = newValue + String.fromCharCode(newChar);
+        }
+        else {
+            newValue = newValue + String.fromCharCode(ch);
+        }
+    }
+    return newValue;
+}
+
 /**
  * Global Variables
  */
@@ -162,10 +243,10 @@ Vue.component('app-row',{
         `
         <tbody>
             <tr v-for="(row , index) in rows">
-                <td>{{ index + 1 }}</td>
+                <td>{{ convertDigit(index + 1) }}</td>
                 <td>{{ row.name }}</td>
                 <td>{{ row.lastName }}</td>
-                <td>{{ row.codeMelli }}</td>
+                <td>{{ convertDigit(row.codeMelli) }}</td>
                 <td class="table-action">
                     <button class="btn btn-lg btn-default actions" @click="showDetails(row)">جزئیات</button>
                 </td>
@@ -178,6 +259,9 @@ Vue.component('app-row',{
     methods: {
         showDetails: function (member) {
             getMemberReport(member)
+        },
+        convertDigit(digit){
+            return pd(digit.toString())
         }
     }
 });
@@ -209,7 +293,7 @@ Vue.component('app-details',{
                             </thead> 
                             <tbody>
                                 <tr v-for="(report , index) in reports">
-                                    <td>{{ index + 1 }}</td>
+                                    <td>{{ convertDigit(index + 1) }}</td>
                                     <td>{{ setDate(report.enter_date) }}</td>
                                     <td>{{ setTime(report.enter_date) }}</td>
                                     <td>{{ setDate(report.exit_date) }}</td>
@@ -229,7 +313,7 @@ Vue.component('app-details',{
                         <div class="col-xs-8">
                             <div class="card-info">
                             <span class="title">شماره کارت :</span>
-                            <span class="card-id">{{ member.card }}</span>
+                            <span class="card-id">{{ convertDigit(member.card) }}</span>
                         </div>
                         <div class="controls">
                             <button class="btn btn-danger btn-lg" @click="removeCard">حذف کارت</button>
@@ -264,7 +348,7 @@ Vue.component('app-details',{
                             </thead>
                             <tbody>
                                 <tr v-for="( fingerPrint , index ) in member.fingerPrints">
-                                    <td>{{ index + 1 }}</td>
+                                    <td>{{ convertDigit(index + 1) }}</td>
                                     <td>{{ fingerPrint.id }}</td>
                                     <td>{{ fingerPrint.name }}</td>
                                     <td style="text-align: center;">
@@ -305,6 +389,9 @@ Vue.component('app-details',{
         setDate: function (date) {
             var unix = new persianDate(new Date(date)).valueOf();
             return new persianDate(unix).toLocale('fa').toCalendar('persian').format('DD MMMM YYYY');
+        },
+        convertDigit(digit){
+            return pd(digit.toString())
         },
         removeUser: function () {
             removeMember(this.member.id);
@@ -731,3 +818,4 @@ jQuery(function($){
 
 
 }); //End Of siaf!
+
