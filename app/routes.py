@@ -51,7 +51,7 @@ def index_page():
     return render_template('index-page.html')
 
 
-@app.route('/settings')  # TODO: If no action is done on this page for about one minute, leads to Broken Pipe Error on terminal but yet everything works fine
+@app.route('/settings')
 def settings():
     return render_template('settings.html')
 
@@ -85,7 +85,7 @@ def settings_process():
         our_result['is_admin'] = admin_role_check_clause
 
         if admin_role_check_clause:
-            
+            pass
 
         return jsonify(our_result)
 
