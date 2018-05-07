@@ -4,7 +4,7 @@ from models import *
 import time
 from forms import UserDefineForm, UserEnrollForm
 from pprint import pprint
-import os
+from globla_variables import settings_timeout
 
 store['clients'] = []
 
@@ -59,8 +59,11 @@ def settings_process():
     our_result['message'] = 'Nothing done yet.'
     our_result['members'] = []
     time.sleep(0.5)
+
+    check_time = time.time() + settings_timeout
+
     # Wait to read the finger
-    while fingerprint.readImage() == 0:
+    while (fingerprint.readImage()  == 0) and (time.time() < check_time):
         pass
 
     # Converts read image to characteristics and stores it in char buffer 1
