@@ -62,6 +62,7 @@ def settings_process():
 
     our_result['status'] = 200
     our_result['message'] = 'Nothing done yet.'
+    our_result['members'] = []
     time.sleep(0.5)
     # Wait to read the finger
     while fingerprint.readImage() == 0:
@@ -84,8 +85,49 @@ def settings_process():
 
         our_result['is_admin'] = admin_role_check_clause
 
-        if admin_role_check_clause:
-            pass
+        if admin_role_check_clause: # The finger belongs to an admin
+            pprint("Hi ADMIN")
+
+            # Retrieve all users from database
+            users = db.table('users').get()
+
+            # Loop in each user in users table
+            for user in users:
+                our_result['status'] = 1  # Data found
+
+                # Retrieve all fingers related to that specific user
+                this_user_related_fingers = db.table('fingers').where('user_id', user.id).get()
+
+                # Add some information about that related finger of that specific user
+                if this_user_related_fingers.count():
+                    user_finger = []
+                    for finger in this_user_related_fingers:
+                        user_finger.append({
+                            'id': finger['id'],
+                            'position': finger['template_position'],
+                            'created_at': finger['created_at']
+                        })
+
+                # Update result['members']
+                our_result['members'].append({
+                    'id': user['id'],
+                    'first_name': user['first_name'],
+                    'last_name': user['last_name'],
+                    'code_melli': user['code_melli'],
+                    'created_at': user['created_at'],
+                    'updated_at': user['updated_at'],
+                    'related_fingers': user_finger
+                })
+
+            # Number of all users
+            users_table_records_count = db.table('users').get().count()
+            our_result['members_count'] = users_table_records_count
+
+            return jsonify(our_result)
+
+
+        else: # The finger does NOT belong to an admin
+            pprint('You are NOT ADMIN')
 
         return jsonify(our_result)
 
@@ -168,16 +210,16 @@ def user_enroll():  # TODO: Seems NOT enrolling new users when sensor memory is 
 
 @app.route('/get_all_users', methods=['GET'])
 def get_all_users():  # TODO: Seems NOT enrolling new users when sensor memory is fresh - check again
-    result = dict()
-    result['status'] = 0  # No data found
-    result['members'] = []
+    our_result = dict()
+    our_result['status'] = 0  # No data found
+    our_result['members'] = []
 
     # Retrieve all users from database
     users = db.table('users').get()
 
     # Loop in each user in users table
     for user in users:
-        result['status'] = 1  # Data found
+        our_result['status'] = 1  # Data found
 
         # Retrieve all fingers related to that specific user
         this_user_related_fingers = db.table('fingers').where('user_id', user.id).get()
@@ -193,7 +235,7 @@ def get_all_users():  # TODO: Seems NOT enrolling new users when sensor memory i
                 })
 
         # Update result['members']
-        result['members'].append({
+        our_result['members'].append({
             'id': user['id'],
             'first_name': user['first_name'],
             'last_name': user['last_name'],
@@ -205,9 +247,9 @@ def get_all_users():  # TODO: Seems NOT enrolling new users when sensor memory i
 
     # Number of all users
     users_table_records_count = db.table('users').get().count()
-    result['members_count'] = users_table_records_count
+    our_result['members_count'] = users_table_records_count
 
-    return jsonify(result)
+    return jsonify(our_result)
 
 
 @app.route('/enroll_handle_rfid', methods=['POST'])
