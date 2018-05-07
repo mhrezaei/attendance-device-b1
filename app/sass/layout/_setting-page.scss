@@ -1,0 +1,148 @@
+/*
+*-------------------------------------------------------
+* Layout / Setting Page
+*-------------------------------------------------------
+*/
+
+
+.setting_page{
+  background: linear-gradient(#345582 60%, #2b476d 100%);
+  width: 100vw;
+  height: 100vh;
+  z-index: 3;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: none;
+  .heading{
+    height: 20vh;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    h1{
+      font-size: 35px;
+      color: $text_primary;
+      width: 100%;
+    }
+  }
+  .list{
+    height: 75vh;
+    width: 80%;
+    margin: auto;
+    background: white;
+    @include box-shadow(0 2px 5px rgba(0,0,0,0.4));
+    border-radius: 5px;
+    @include transform(translateY(120%));
+    overflow: auto;
+    padding: 30px 20px;
+    .table{
+      font-size: em(18);
+      .table-action{
+        text-align: center;
+      }
+    }
+  }
+
+  .member-tabs{
+    .tabs-title{
+      margin-top: 0;
+      color: $text_secondry;
+      text-align: center;
+    }
+    .nav-tabs{
+      font-size: em(19);
+      border-bottom: 2px solid $color_orange;
+      margin-top: 20px;
+      li {
+        margin-bottom: -2px;
+        a{
+          padding: 10px 16px;
+        }
+        &.active {
+          a {
+            background: $color_orange;
+            color: $text_primary;
+            font-weight: 500;
+            border-radius: 3px 3px 0 0;
+            border: 0;
+          }
+        }
+      }
+    }
+    .tab-content{
+      font-size: em(18);
+      #member_card{
+        padding: 10px;
+        .card-info{
+          font-size: em(20);
+          display: flex;
+          align-items: center;
+          height: 150px;
+          .title{
+            font-weight: 500;
+            @include margin-end(10);
+            display: inline-block;
+            font-size: em(20);
+          }
+        }
+        .controls{
+          text-align: left;
+        }
+      }
+      #member_fingerprint{
+        .header{
+          margin: 20px 0;
+          display: flex;
+          .title{
+            margin: 0;
+            color: $text_secondry;
+          }
+        }
+        .controls{
+          text-align: $end;
+          button{
+            @include margin-start(10)
+          }
+        }
+      }
+      #member_setting{
+        padding: 20px 0;
+      }
+    }
+  }
+
+  .back-to-home{
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    width: 30px;
+    height: 30px;
+    font-size: 30px;
+    background: transparent;
+    border: 0;
+    color: $text_primary;
+  }
+}
+
+
+.showSetting{
+  .setting_page{
+    display: block;
+    .list{
+      @include transform(translateY(0));
+      @include transition(1s ease-out);
+      transition-delay: 0.5s;
+    }
+  }
+}
+
+
+@include keyframes(slideIn) {
+  from{
+    @include transform(translateY(120%));
+  }
+  to{
+    @include transform(translateY(0));
+  }
+}

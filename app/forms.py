@@ -6,11 +6,16 @@ from wtforms import validators, ValidationError
 
 # User Define Form
 class UserDefineForm(FlaskForm):
-    first_name = StringField("First Name", [validators.DataRequired("Please enter the first name.")], render_kw={"placeholder": "First Name"})
-    last_name = StringField("Last Name", [validators.DataRequired("Please enter the last name.")], render_kw={"placeholder": "Last Name"})
-    code_melli = IntegerField("Code Melli", [validators.DataRequired("Please enter the code melli.")], render_kw={"placeholder": "Code Melli"})
+
+    first_name = StringField("First Name", [validators.DataRequired("Please enter the first name.")],
+                             render_kw={"placeholder": "First Name"})
+    last_name = StringField("Last Name", [validators.DataRequired("Please enter the last name.")],
+                            render_kw={"placeholder": "Last Name"})
+    code_melli = IntegerField("Code Melli", [validators.DataRequired("Please enter the code melli.")],
+                              render_kw={"placeholder": "Code Melli"})
 
     submit = SubmitField("Define the user")
+
 
 # User Enroll Form
 class UserEnrollForm(FlaskForm):
@@ -23,5 +28,4 @@ class UserEnrollForm(FlaskForm):
 class RfidWriteForm(FlaskForm):
 
     submit = SubmitField("Enroll this user's RFID Card")
-
 
