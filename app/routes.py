@@ -127,6 +127,7 @@ def settings_process():
         else: # The finger does NOT belong to an admin
             pprint('You are NOT ADMIN')
             our_result['status'] = 203
+            our_result['is_admin'] = admin_role_check_clause
             our_result['message'] = 'Sorry, you are not allowed to enter settings.'
 
         return jsonify(our_result)
