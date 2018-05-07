@@ -404,7 +404,7 @@ Vue.component('app-details',{
         },
         addNewFingerPrint: function () {
             var member = this.member;
-            openModal("انگشت خود را اسکن کنید.","../static/images/fingerprint-scanning-in-half-view.svg");
+            openModal("انگشت خود را اسکن کنید.",asset("images/fingerprint-scanning-in-half-view.svg"));
             setTimeout(function () {
                 addNewFingerPrint(member);
             },2000);
@@ -450,7 +450,7 @@ var vm = new Vue({
  */
 function openModal(message, iconSrc) {
     var modal = $('#alertModal');
-    var src   = (iconSrc && iconSrc.length) ? iconSrc : "../static/images/warning.svg";
+    var src   = (iconSrc && iconSrc.length) ? iconSrc : asset("images/warning.svg");
     modal.find('img').attr('src', src);
     modal.find('.message').text(message);
     modal.addClass('show');
@@ -468,7 +468,7 @@ function closeModal() {
     }
 
     var modal = $('#alertModal');
-    var src   = "../static/images/warning.svg";
+    var src   = asset("images/warning.svg");
     modal.find('.icon img').attr('src', src);
     modal.find('.message').text("");
     modal.removeClass('show');
@@ -538,7 +538,7 @@ function isAdmin() {
  */
 function isNotAdmin() {
     setTimeout(function () {
-        openModal("شما اجازه ورود به این بخش را ندارید.","../static/images/fingerprint-outline-with-close-button.svg");
+        openModal("شما اجازه ورود به این بخش را ندارید.", asset('images/fingerprint-outline-with-close-button.svg'));
     },3000);
 }
 
@@ -806,7 +806,7 @@ jQuery(function($){
                 }
             },
             error: function () {
-                openModal('مجددا تلاش کنید.','../static/images/fingerprint-information-symbol.svg');
+                openModal('مجددا تلاش کنید.',asset("images/fingerprint-information-symbol.svg"));
             }
         });
     });
