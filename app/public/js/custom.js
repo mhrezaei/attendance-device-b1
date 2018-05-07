@@ -141,8 +141,8 @@ Vue.component('app-clock', {
     template: `
       <div class="clock-widget" :class="theme">
            <div class="clock_bg">
-               <img src="../static/images/day.svg" class="dayIcon" alt="day icon">
-               <img src="../static/images/night.svg" class="nightIcon" alt="night icon">
+               <img src="../public/images/day.svg" class="dayIcon" alt="day icon">
+               <img src="../public/images/night.svg" class="nightIcon" alt="night icon">
            </div>
            <div class="clock_body">
                <TimeAndDate></TimeAndDate>
@@ -209,7 +209,7 @@ Vue.component('app-navbar', {
     data    : function () {
         return {
             title   : "یسنا",
-            logoSrc : '../static/images/logo-white.png',
+            logoSrc : '../public/images/logo-white.png',
             showTime: !this.isIndex
         }
     }
@@ -307,7 +307,7 @@ Vue.component('app-details',{
                     <div class="row" v-if="member.card">
                         <div class="col-xs-4">
                             <div class="id-card-image">
-                                <img src="../static/images/id-card.svg" alt="id card">                            
+                                <img src="../public/images/id-card.svg" alt="id card">                            
                             </div>
                         </div>
                         <div class="col-xs-8">
@@ -404,7 +404,7 @@ Vue.component('app-details',{
         },
         addNewFingerPrint: function () {
             var member = this.member;
-            openModal("انگشت خود را اسکن کنید.","../static/images/fingerprint-scanning-in-half-view.svg");
+            openModal("انگشت خود را اسکن کنید.","../public/images/fingerprint-scanning-in-half-view.svg");
             setTimeout(function () {
                 addNewFingerPrint(member);
             },2000);
@@ -450,7 +450,7 @@ var vm = new Vue({
  */
 function openModal(message, iconSrc) {
     var modal = $('#alertModal');
-    var src   = (iconSrc && iconSrc.length) ? iconSrc : "../static/images/warning.svg";
+    var src   = (iconSrc && iconSrc.length) ? iconSrc : "../public/images/warning.svg";
     modal.find('img').attr('src', src);
     modal.find('.message').text(message);
     modal.addClass('show');
@@ -468,7 +468,7 @@ function closeModal() {
     }
 
     var modal = $('#alertModal');
-    var src   = "../static/images/warning.svg";
+    var src   = "../public/images/warning.svg";
     modal.find('.icon img').attr('src', src);
     modal.find('.message').text("");
     modal.removeClass('show');
@@ -538,7 +538,7 @@ function isAdmin() {
  */
 function isNotAdmin() {
     setTimeout(function () {
-        openModal("شما اجازه ورود به این بخش را ندارید.","../static/images/fingerprint-outline-with-close-button.svg");
+        openModal("شما اجازه ورود به این بخش را ندارید.","../public/images/fingerprint-outline-with-close-button.svg");
     },3000);
 }
 
@@ -560,7 +560,7 @@ function getMembersList() {
     }
 
     $.ajax({
-        url: "../static/js/data/members-list.json",
+        url: "../public/js/data/members-list.json",
         dataType: "json",
         success: function (response) {
             renderMembers(response.members);
@@ -597,7 +597,7 @@ function renderMembers(members) {
 function getMemberReport(member) {
     var id = member.id;
     $.ajax({
-        url: "../static/js/data/member"+ id +".json",
+        url: "../public/js/data/member"+ id +".json",
         dataType: "json",
         success: function (response) {
             renderMemberDetails(member, response.reports);
@@ -634,7 +634,7 @@ function renderMemberDetails(member, reports) {
  */
 function removeMember(id){
     $.ajax({
-        url: "../static/js/data/members-list.json",  //@TODO: This should get new members list.
+        url: "../public/js/data/members-list.json",  //@TODO: This should get new members list.
         dataType: "json",
         data:{
             id: id
@@ -656,7 +656,7 @@ function removeMember(id){
  */
 function removeFingerPrint(fingerId, member) {
     $.ajax({
-        url: '../static/js/data/member'+ member.id +'.json', //@TODO: This should get new member detail.
+        url: '../public/js/data/member'+ member.id +'.json', //@TODO: This should get new member detail.
         dataType: "json",
         data:{
             fingerId: fingerId
@@ -678,7 +678,7 @@ function removeFingerPrint(fingerId, member) {
 function removeAllFingerPrints(member) {
     var id = member.id;
     $.ajax({
-        url: '../static/js/data/member'+ id +'.json', //@TODO: This should get new member detail.
+        url: '../public/js/data/member'+ id +'.json', //@TODO: This should get new member detail.
         dataType: "json",
         data:{
             id: id
@@ -700,7 +700,7 @@ function removeAllFingerPrints(member) {
 function addNewFingerPrint(member) {
     var id = member.id;
     $.ajax({
-        url: '../static/js/data/member'+ id +'.json', //@TODO: This should get new member detail.
+        url: '../public/js/data/member'+ id +'.json', //@TODO: This should get new member detail.
         dataType: "json",
         data:{
             id: id
@@ -724,7 +724,7 @@ function addNewFingerPrint(member) {
 function removeMemberCard(member) {
     var id = member.id;
     $.ajax({
-        url: '../static/js/data/member'+ id +'.json', //@TODO: This should get new member detail.
+        url: '../public/js/data/member'+ id +'.json', //@TODO: This should get new member detail.
         dataType: "json",
         data:{
             id: id
@@ -744,7 +744,7 @@ function addNewCard(member) {
     var id = member.id;
 
     $.ajax({
-        url: '../static/js/data/member'+ id +'.json', //@TODO: This should get new member detail.
+        url: '../public/js/data/member'+ id +'.json', //@TODO: This should get new member detail.
         dataType: "json",
         data:{
             id: id
@@ -794,9 +794,9 @@ jQuery(function($){
 
     // Setting button clicked
     $('.js-accessSetting').on('click',function () {
-        openModal('برای ورود به بخش تنظیمات مجددا انگشت‌ خود را اسکن کنید.', '../static/images/fingerprint-with-keyhole.svg');
+        openModal('برای ورود به بخش تنظیمات مجددا انگشت‌ خود را اسکن کنید.', '../public/images/fingerprint-with-keyhole.svg');
         $.ajax({
-            url: "../static/js/data/isAdmin.json",
+            url: "../public/js/data/isAdmin.json",
             dataType: "json",
             success: function(response) {
                 if(response.isAdmin){
@@ -806,7 +806,7 @@ jQuery(function($){
                 }
             },
             error: function () {
-                openModal('مجددا تلاش کنید.','../static/images/fingerprint-information-symbol.svg');
+                openModal('مجددا تلاش کنید.','../public/images/fingerprint-information-symbol.svg');
             }
         });
     });

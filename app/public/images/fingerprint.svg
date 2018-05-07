@@ -1,43 +1,6 @@
-<!DOCTYPE html>
-<html lang="fa">
-<head>
-	<meta charset="UTF-8">
-	<title>Attendance</title>
-
-	<!-- Bootstrap -->
-	<link rel="stylesheet" href="../static/css/bootstrap.min.css">
-	<link rel="stylesheet" href="../static/css/bootstrap.rtl.min.css">
-	<!-- Bootstrap -->
-
-	<!-- Fonts -->
-	<link rel="stylesheet" href="../static/css/fontiran.css">
-	<link rel="stylesheet" href="../static/libs/font-awesome-5.0.6/css/fontawesome-all.min.css">
-	<!-- Fonts -->
-
-	<!-- Style -->
-	<link rel="stylesheet" href="../static/css/style.min.css">
-	<!-- Style -->
-</head>
-<body>
-
-<div class="wrapper" id="app">
-	<!-- Fixed Navbar -->
-	<app-navbar :is-index="true"></app-navbar>
-	<!-- !END Fixed Navbar -->
-
-	<!-- Standby page -->
-	<div id="standby" class="standby_page">
-		<div class="standby_clock">
-			<!-- Clock -->
-			<app-clock></app-clock>
-			<!-- !END Clock -->
-		</div>
-		<div class="standby_finger-print">
-			<div class="standby_finger-print_inner">
-				<!-- Finger Print -->
-				<div class="finger-print">
-					<div class="finger-print_image">
-						<svg version="1.1" id="finger-print" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- Generator: Adobe Illustrator 19.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 58.999 58.999" style="enable-background:new 0 0 58.999 58.999;" xml:space="preserve">
 <g>
 	<path d="M29.083,26.038c-0.53,0.154-0.836,0.708-0.683,1.239c0.027,0.093,2.697,9.591,1.962,30.687
@@ -75,59 +38,3 @@
 		c-0.141-6.106-0.726-14.375-2.72-19.093C35.475,20.917,32.583,19,29.362,19z"/>
 </g>
 </svg>
-					</div>
-				</div>
-				<!-- !END Finger Print -->
-			</div>
-		</div>
-	</div>
-	<!-- !END Standby page -->
-
-	<!-- Setting -->
-	<div id="setting" class="setting_page">
-		<div class="heading">
-			<h1>تنظیمات</h1>
-		</div>
-		<div class="list" id="list">
-
-		</div>
-
-		<button class="back-to-home">
-			<i class="fa fa-arrow-left"></i>
-		</button>
-	</div>
-	<!-- !END Setting -->
-
-	<!-- Suspended Key -->
-	<span class="suspended-key">
-		<button class="setting js-accessSetting">
-			<i class="fa fa-cog"></i>
-		</button>
-	</span>
-	<!-- !END Suspended Key -->
-
-	<!-- Modal -->
-	<div class="appOverlay" id="alertModal">
-		<div class="appModal">
-			<div class="icon">
-				<img src="../static/images/warning.svg" alt="icon">
-			</div>
-			<div class="message">
-			</div>
-			<span class="close">
-				x
-			</span>
-		</div>
-	</div>
-	<!-- !END Modal -->
-
-</div>
-
-<script src="../static/libs/vue.js"></script>
-<script src="../static/libs/jquery-3.2.1.min.js"></script>
-<script src="../static/libs/bootstrap.min.js"></script>
-<script src="../static/libs/persian-date.min.js"></script>
-<script src="../static/js/socket.js"></script>
-<script src="../static/js/custom.js"></script>
-</body>
-</html>

@@ -96,6 +96,21 @@
 	</div>
 	<!-- !END Standby page -->
 
+	<!-- Setting -->
+	<div id="setting" class="setting_page">
+		<div class="heading">
+			<h1>تنظیمات</h1>
+		</div>
+		<div class="list" id="list">
+
+		</div>
+
+		<button class="back-to-home">
+			<i class="fa fa-arrow-left"></i>
+		</button>
+	</div>
+	<!-- !END Setting -->
+
 	<!-- Suspended Key -->
 	<span class="suspended-key">
             <a href="{{ url_for('settings') }}"><button class="setting">
@@ -130,12 +145,13 @@
 <script src="{{ url_for('static', filename='libs/bootstrap.min.js') }}"></script>
 {#<script src="/libs/persian-date.min.js"></script>#}
 <script src="{{ url_for('static', filename='libs/persian-date.min.js') }}"></script>
-{#<script src="/js/custom.js"></script>#}
-<script src="{{ url_for('static', filename='js/custom.js') }}"></script>
 
 {#<script src="/js/socket.js"></script>#}
 <script src="{{ url_for('static', filename='js/socket.js') }}"></script>
 {#<script src="/js/index-handler.js"></script>#}
 <script src="{{ url_for('static', filename='js/index-handler.js') }}"></script>
+{#<script src="/js/custom.js"></script>#}
+<script src="{{ url_for('static', filename='js/custom.js') }}"></script>
+
 </body>
 </html>
