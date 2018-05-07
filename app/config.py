@@ -2,9 +2,11 @@ from flask import Flask, send_file
 from flask_socketio import SocketIO
 from . import SocketWorker, Store
 import os
+
 from pyfingerprint.pyfingerprint import PyFingerprint
 
 fingerprint = PyFingerprint('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -16,8 +18,12 @@ store = Store()
 
 
 
+
 import routes
 from models import *
+
+import routes
+
 
 @socket.on('update')
 def update():
