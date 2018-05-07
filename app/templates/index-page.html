@@ -24,7 +24,7 @@
                 additive = "";
             }
             var getUrl = window.location;
-            var baseUrl = getUrl .protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1] + "/app";
+            var baseUrl = getUrl .protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1] + "app";
 
             return `${baseUrl}/${additive}`;
         }
@@ -34,7 +34,7 @@
                 additive = "";
             }
             var getUrl = window.location;
-            var baseUrl = getUrl .protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1] + "/app/static";
+            var baseUrl = getUrl .protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1] + "app/static";
 
             return `${baseUrl}/${additive}`;
         }

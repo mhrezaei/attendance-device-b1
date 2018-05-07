@@ -141,8 +141,8 @@ Vue.component('app-clock', {
     template: `
       <div class="clock-widget" :class="theme">
            <div class="clock_bg">
-               <img src="../static/images/day.svg" class="dayIcon" alt="day icon">
-               <img src="../static/images/night.svg" class="nightIcon" alt="night icon">
+               <img src="static/images/day.svg" class="dayIcon" alt="day icon">
+               <img src="static/images/night.svg" class="nightIcon" alt="night icon">
            </div>
            <div class="clock_body">
                <TimeAndDate></TimeAndDate>
@@ -244,9 +244,9 @@ Vue.component('app-row',{
         <tbody>
             <tr v-for="(row , index) in rows">
                 <td>{{ convertDigit(index + 1) }}</td>
-                <td>{{ row.name }}</td>
-                <td>{{ row.lastName }}</td>
-                <td>{{ convertDigit(row.codeMelli) }}</td>
+                <td>{{ row.first_name }}</td>
+                <td>{{ row.last_name }}</td>
+                <td>{{ convertDigit(row.code_melli) }}</td>
                 <td class="table-action">
                     <button class="btn btn-lg btn-default actions" @click="showDetails(row)">جزئیات</button>
                 </td>
@@ -270,7 +270,7 @@ Vue.component('app-details',{
     template:
             `
             <div class="member-tabs">
-                <h3 class="tabs-title">{{ member.name + " " + member.lastName}}</h3>
+                <h3 class="tabs-title">{{ member.first_name + " " + member.last_name}}</h3>
                 <ul class="nav nav-tabs">
                   <li class="active"><a data-toggle="tab" href="#member_attendance">لیست حضور و غیاب</a></li>
                   <li><a data-toggle="tab" href="#member_card">کارت</a></li>
@@ -307,7 +307,7 @@ Vue.component('app-details',{
                     <div class="row" v-if="member.card">
                         <div class="col-xs-4">
                             <div class="id-card-image">
-                                <img src="../static/images/id-card.svg" alt="id card">                            
+                                <img src="static/images/id-card.svg" alt="id card">                            
                             </div>
                         </div>
                         <div class="col-xs-8">
@@ -347,10 +347,10 @@ Vue.component('app-details',{
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="( fingerPrint , index ) in member.fingerPrints">
+                                <tr v-for="( fingerPrint , index ) in member.related_fingers">
                                     <td>{{ convertDigit(index + 1) }}</td>
                                     <td>{{ fingerPrint.id }}</td>
-                                    <td>{{ fingerPrint.name }}</td>
+                                    <td>{{ fingerPrint.position }}</td>
                                     <td style="text-align: center;">
                                         <button class="btn btn-lg btn-danger" @click="removeThisFingerPrint(fingerPrint.id)">حذف</button>
                                     </td>
@@ -524,12 +524,10 @@ function closeSetting() {
 /**
  * Actions If Is Admin
  */
-function isAdmin() {
-    setTimeout(function () {
-        closeModal();
-        openSetting();
-        getMembersList();
-    },3000);
+function isAdmin(members) {
+    closeModal();
+    openSetting();
+    getMembersList(members);
 }
 
 
@@ -537,9 +535,7 @@ function isAdmin() {
  * Actions If Is Not Admin
  */
 function isNotAdmin() {
-    setTimeout(function () {
-        openModal("شما اجازه ورود به این بخش را ندارید.", asset('images/fingerprint-outline-with-close-button.svg'));
-    },3000);
+    openModal("شما اجازه ورود به این بخش را ندارید.", asset('images/fingerprint-outline-with-close-button.svg'));
 }
 
 
@@ -554,21 +550,22 @@ function clearList() {
 /**
  * Ajax - Gets Members List
  */
-function getMembersList() {
+function getMembersList(members) {
     if(App_router !== "setting"){
         return
     }
 
-    $.ajax({
-        url: "../static/js/data/members-list.json",
-        dataType: "json",
-        success: function (response) {
-            renderMembers(response.members);
-        },
-        error: function () {
-            showError('خطا در برقراری ارتباط','#list');
-        }
-    })
+    renderMembers(members);
+//    $.ajax({
+//        url: "../static/js/data/members-list.json",
+//        dataType: "json",
+//        success: function (response) {
+//            renderMembers(response.members);
+//        },
+//        error: function () {
+//            showError('خطا در برقراری ارتباط','#list');
+//        }
+//    })
 }
 
 
@@ -794,13 +791,13 @@ jQuery(function($){
 
     // Setting button clicked
     $('.js-accessSetting').on('click',function () {
-        openModal('برای ورود به بخش تنظیمات مجددا انگشت‌ خود را اسکن کنید.', asset('images/fingerprint-with-keyhole.svg'));
+        openModal('برای ورود به بخش تنظیمات انگشت‌ خود را اسکن کنید.', asset('images/fingerprint-with-keyhole.svg'));
         $.ajax({
             url: url("settings_process"),
             dataType: "json",
             success: function(response) {
-                if(response.isAdmin){
-                    isAdmin();
+                if(response.is_admin){
+                    isAdmin(response.members);
                 }else {
                     isNotAdmin();
                 }

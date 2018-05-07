@@ -28,7 +28,7 @@
                 additive = "";
             }
             var getUrl = window.location;
-            var baseUrl = getUrl .protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1] + "/app";
+            var baseUrl = getUrl .protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1];
 
             return `${baseUrl}/${additive}`;
         }
@@ -38,7 +38,7 @@
                 additive = "";
             }
             var getUrl = window.location;
-            var baseUrl = getUrl .protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1] + "/app/static";
+            var baseUrl = getUrl .protocol + "//" + getUrl.host + "/" + getUrl.pathname.split('/')[1] + "static";
 
             return `${baseUrl}/${additive}`;
         }
@@ -129,9 +129,9 @@
 
 	<!-- Suspended Key -->
 	<span class="suspended-key">
-            <a href="{{ url_for('settings') }}"><button class="setting">
+            <button class="setting js-accessSetting">
                 <i class="fa fa-cog"></i>
-            </button></a>
+            </button>
         </span>
 	<!-- !END Suspended Key -->
 
