@@ -1,2 +1,2 @@
 global settings_timeout
-settings_timeout = 5
+settings_timeout = 15
