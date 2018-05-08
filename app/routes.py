@@ -327,13 +327,13 @@ def enroll_handle_finger_step_1():
 
     if position_number >= 0:
         our_result['status'] = 401
-        our_result['message'] = 'Remove your finger.'
+        our_result['message'] = 'This finger already has been enrolled.'
 
         pprint(our_result)
         return jsonify(our_result)
 
     our_result['status'] = 402
-    our_result['message'] = 'No match found.'
+    our_result['message'] = 'Remove your finger.'
 
     return jsonify(our_result)
 
