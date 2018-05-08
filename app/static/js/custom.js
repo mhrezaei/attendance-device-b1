@@ -294,10 +294,10 @@ Vue.component('app-details',{
                             <tbody>
                                 <tr v-for="(report , index) in reports">
                                     <td>{{ convertDigit(index + 1) }}</td>
-                                    <td>{{ setDate(report.enter_date) }}</td>
-                                    <td>{{ setTime(report.enter_date) }}</td>
-                                    <td>{{ setDate(report.exit_date) }}</td>
-                                    <td>{{ setTime(report.exit_date) }}</td>
+                                    <td>{{ setDate(report.entered_at) }}</td>
+                                    <td>{{ setTime(report.entered_at) }}</td>
+                                    <td>{{ setDate(report.exited_at) }}</td>
+                                    <td>{{ setTime(report.exited_at) }}</td>
                                 </tr>
                             </tbody>
                         </table> 
@@ -383,10 +383,16 @@ Vue.component('app-details',{
     props: ['member','reports'],
     methods:{
         setTime: function (date) {
+            if(date === "None"){
+                return "ثبت نشده";
+            }
             var unix = new persianDate(new Date(date)).valueOf();
             return new persianDate(unix).toLocale('fa').toCalendar('persian').format('HH:mm');
         },
         setDate: function (date) {
+            if(date === "None"){
+                return "ثبت نشده";
+            }
             var unix = new persianDate(new Date(date)).valueOf();
             return new persianDate(unix).toLocale('fa').toCalendar('persian').format('DD MMMM YYYY');
         },
@@ -658,14 +664,30 @@ function renderMembers(members) {
  */
 function getMemberReport(member) {
     var id = member.id;
+
+    waitForIt();
+
     $.ajax({
-        url: "../static/js/data/member.json",
+        url: url('user_logs_process'),
         dataType: "json",
         data: {
             user_id: id
         },
         success: function (response) {
-            renderMemberDetails(member, response.reports);
+            closeModal();
+
+            // If User has no log
+            if(response.status === 302){
+                var reports = [];
+                renderMemberDetails(member,reports);
+                return;
+            }
+
+            // If user has logs
+            if(response.status === 301){
+                renderMemberDetails(member, response.reports);
+                return;
+            }
         },
         error: connectionError
     })
