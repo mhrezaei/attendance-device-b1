@@ -153,8 +153,8 @@ def user_logs_process():
     our_result['status'] = 300
     our_result['message'] = 'Nothing done yet.'
 
-    our_result['user_id'] = 32  # TODO: Delete this line when ajax is done.
-    # our_result['user_id'] = request.form['user_id'].encode("utf-8") TODO: uncomment this line when ajax is done.
+    # our_result['user_id'] = 32  # TODO: Delete this line when ajax is done.
+    our_result['user_id'] = request.form['user_id'].encode("utf-8") #TODO: uncomment this line when ajax is done.
 
     our_result['reports'] = ''
 
