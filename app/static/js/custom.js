@@ -670,6 +670,7 @@ function getMemberReport(member) {
     $.ajax({
         url: url('user_logs_process'),
         dataType: "json",
+        type: "POST",
         data: {
             user_id: id
         },
