@@ -62,7 +62,7 @@ def settings_process():
 
     check_time = time.time() + settings_timeout
 
-    # Wait to read the finger for a specific time (asl long as 'settings_timeout' variable)
+    # Wait to read the finger for a specific time (as long as 'settings_timeout' variable)
     while (fingerprint.readImage()  == 0) and (time.time() < check_time):
         pass
 
@@ -123,7 +123,8 @@ def settings_process():
                     'code_melli': user['code_melli'],
                     'created_at': user['created_at'],
                     'updated_at': user['updated_at'],
-                    'related_fingers': user_finger
+                    'related_fingers': user_finger,
+                    'rfid_unique_id': 'Nothing yet'
                 })
 
             # Number of all users
