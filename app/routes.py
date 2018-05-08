@@ -180,34 +180,6 @@ def user_logs_process():
 
         our_result['reports'] = user_report
 
-        # for user in users:
-        #     our_result['status'] = 202  # Data found on users table
-        #
-        #     # Retrieve all fingers related to that specific user
-        #     this_user_related_fingers = db.table('fingers').where('user_id', user.id).get()
-        #
-        #     # Add some information about that related finger of that specific user
-        #     if this_user_related_fingers.count():
-        #         user_finger = []
-        #         for finger in this_user_related_fingers:
-        #             user_finger.append({
-        #                 'id': finger['id'],
-        #                 'position': finger['template_position'],
-        #                 'created_at': finger['created_at']
-        #             })
-        #
-        #     # Update result['members']
-        #     our_result['members'].append({
-        #         'id': user['id'],
-        #         'first_name': user['first_name'],
-        #         'last_name': user['last_name'],
-        #         'code_melli': user['code_melli'],
-        #         'created_at': user['created_at'],
-        #         'updated_at': user['updated_at'],
-        #         'related_fingers': user_finger,
-        #         'rfid_unique_id': 'Nothing yet'
-        #     })
-
 
     else: # This user_id has no record in user_logs table
         our_result['status'] = 302
