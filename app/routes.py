@@ -124,7 +124,7 @@ def settings_process():
                     'created_at': user['created_at'],
                     'updated_at': user['updated_at'],
                     'related_fingers': user_finger,
-                    'rfid_card_unique_id': 'Nothing yet'
+                    'rfid_unique_id': 'Nothing yet'
                 })
 
             # Number of all users
