@@ -153,18 +153,18 @@ def user_logs_process():
     our_result['status'] = 300
     our_result['message'] = 'Nothing done yet.'
 
-    # our_result['user_id'] = 32  # TODO: Delete this line when ajax is done.
-    our_result['user_id'] = request.form['user_id'].encode("utf-8") #TODO: uncomment this line when ajax is done.
+    # our_result['id'] = 32  # TODO: Delete this line when ajax is done.
+    our_result['id'] = request.form['user_id'].encode("utf-8") #TODO: uncomment this line when ajax is done.
 
     our_result['reports'] = ''
 
-    log_associated_with_this_user_clause = db.table('user_logs').where('user_id', our_result['user_id']).get().count()
+    log_associated_with_this_user_clause = db.table('user_logs').where('user_id', our_result['id']).get().count()
 
     if log_associated_with_this_user_clause:  # This user_id has at least one record in user_logs table
         our_result['status'] = 301
         our_result['message'] = 'This user has at least one record.'
 
-        all_logs_associated_with_this_user = db.table('user_logs').where('user_id', our_result['user_id']).order_by(
+        all_logs_associated_with_this_user = db.table('user_logs').where('user_id', our_result['id']).order_by(
             'id', 'desc').get()
 
         # pprint(all_logs_associated_with_this_user)
