@@ -304,7 +304,7 @@ Vue.component('app-details',{
                     </div>
                   </div>
                   <div id="member_card" class="tab-pane fade">
-                    <div class="row" v-if="member.card">
+                    <div class="row" v-if="member.rfid_unique_id">
                         <div class="col-xs-4">
                             <div class="id-card-image">
                                 <img src="static/images/id-card.svg" alt="id card">                            
@@ -364,11 +364,11 @@ Vue.component('app-details',{
                     </div>
                     <div class="controls">
                             <button class="btn btn-lg btn-success" @click="addNewFingerPrint">اثر انگشت جدید</button>  
-                            <button class="btn btn-lg btn-danger" 
-                            v-if="member.fingerPrints.length"
-                            @click="removeAll">
-                            حذف همه
-                            </button>
+                            <!--<button class="btn btn-lg btn-danger" -->
+                            <!--v-if="member.fingerPrints.length"-->
+                            <!--@click="removeAll">-->
+                            <!--حذف همه-->
+                            <!--</button>-->
                         </div>
                   </div>
                   <div id="member_setting" class="tab-pane fade">
@@ -397,23 +397,21 @@ Vue.component('app-details',{
             removeMember(this.member.id);
         },
         removeThisFingerPrint: function (id) {
-            removeFingerPrint(id, this.member);
+            removeFingerPrint(id, this.reports);
         },
         removeAll: function () {
             removeAllFingerPrints(this.member)
         },
         addNewFingerPrint: function () {
             var member = this.member;
-            openModal("انگشت خود را اسکن کنید.",asset("images/fingerprint-scanning-in-half-view.svg"));
-            setTimeout(function () {
-                addNewFingerPrint(member);
-            },2000);
+            var reports = this.reports;
+            addNewFingerPrint(member,reports);
         },
         removeCard: function () {
-            removeMemberCard(this.member);
+            removeMemberCard(this.member, this.reports);
         },
         addNewCard: function () {
-            addNewCard(this.member);
+            addNewCard(this.member, this.reports);
         }
 
     }
@@ -666,7 +664,7 @@ function getMemberReport(member) {
         url: "../static/js/data/member.json",
         dataType: "json",
         data: {
-            id: id
+            user_id: id
         },
         success: function (response) {
             renderMemberDetails(member, response.reports);
@@ -721,19 +719,17 @@ function removeMember(id){
  * @param fingerId
  * @param member
  */
-function removeFingerPrint(fingerId, member) {
+function removeFingerPrint(fingerId, reports) {
     $.ajax({
-        url: '../static/js/data/member'+ member.id +'.json', //@TODO: This should get new member detail.
+        url: '../static/js/data/member.json', //@TODO: This should get new member detail.
         dataType: "json",
         data:{
             fingerId: fingerId
         },
         success: function (response) {
-            renderMemberDetails(member, response.reports);
+            renderMemberDetails(response.member, reports);
         },
-        error: function () {
-            showError('خطا در برقراری ارتباط','#list');
-        }
+        error: connectionError
     })
 }
 
@@ -764,22 +760,44 @@ function removeAllFingerPrints(member) {
  * Ajax - Adds New FingerPrint For A Member
  * @param member
  */
-function addNewFingerPrint(member) {
+function addNewFingerPrint(member,reports) {
     var id = member.id;
+
+    openModal("انگشت خود را روی دستگاه قرار دهید.",asset("images/fingerprint-scanning-in-half-view.svg"));
+
     $.ajax({
-        url: '../static/js/data/member'+ id +'.json', //@TODO: This should get new member detail.
+        url: '../static/js/data/member.json', //@TODO: This should get new member detail.
         dataType: "json",
         data:{
-            id: id
+            user_id: id
+        },
+        success: function (response) {
+            addNewFingerStep2(id, reports)
+        },
+        error: connectionError
+    })
+}
+
+
+/**
+ * Ajax - Adds New FingerPrint For A Member (Rendering)
+ * @param id
+ * @param reports
+ */
+function addNewFingerStep2(id, reports) {
+    openModal('انگشت خود را برداشته و مجددا روی دستگاه قرار دهید.', asset("images/fingerprint-scanning-in-half-view.svg"));
+
+    $.ajax({
+        url: '../static/js/data/member.json', //@TODO: This should get new member detail.
+        dataType: "json",
+        data:{
+            user_id: id
         },
         success: function (response) {
             closeModal();
-            renderMemberDetails(member, response.reports);
+            renderMemberDetails(response.member, reports);
         },
-        error: function () {
-            closeModal();
-            showError('خطا در برقراری ارتباط','#list');
-        }
+        error: connectionError
     })
 }
 
@@ -788,40 +806,36 @@ function addNewFingerPrint(member) {
  * Ajax - Remove Member Card
  * @param member
  */
-function removeMemberCard(member) {
+function removeMemberCard(member, reports) {
     var id = member.id;
     $.ajax({
-        url: '../static/js/data/member'+ id +'.json', //@TODO: This should get new member detail.
+        url: '../static/js/data/member.json', //@TODO: This should get new member detail.
         dataType: "json",
         data:{
-            id: id
+            user_id: id
         },
         success: function (response) {
-            renderMemberDetails(member, response.reports);
+            renderMemberDetails(response.member, reports);
         },
-        error: function () {
-            showError('خطا در برقراری ارتباط','#list');
-        }
+        error: connectionError
     })
 }
 
 
 
-function addNewCard(member) {
+function addNewCard(member,reports) {
     var id = member.id;
 
     $.ajax({
-        url: '../static/js/data/member'+ id +'.json', //@TODO: This should get new member detail.
+        url: '../static/js/data/member.json', //@TODO: This should get new member detail.
         dataType: "json",
         data:{
-            id: id
+            user_id: id
         },
         success: function (response) {
-            renderMemberDetails(member, response.reports);
+            renderMemberDetails(response.member, reports);
         },
-        error: function () {
-            showError('خطا در برقراری ارتباط','#list');
-        }
+        error: connectionError
     })
 }
 
