@@ -528,6 +528,14 @@ function clearList() {
 
 
 /**
+ * Loading Modal
+ */
+function waitForIt() {
+    openModal('لطفا منتظر باشید...', asset('images/sand-clock.svg'))
+}
+
+
+/**
  * Actions If Connection Has Error
  */
 function connectionError() {
@@ -623,16 +631,6 @@ function getMembersList(members) {
     }
 
     renderMembers(members);
-//    $.ajax({
-//        url: "../static/js/data/members-list.json",
-//        dataType: "json",
-//        success: function (response) {
-//            renderMembers(response.members);
-//        },
-//        error: function () {
-//            showError('خطا در برقراری ارتباط','#list');
-//        }
-//    })
 }
 
 
@@ -720,6 +718,8 @@ function removeMember(id){
  * @param member
  */
 function removeFingerPrint(fingerId, reports) {
+    waitForIt();
+
     $.ajax({
         url: '../static/js/data/member.json', //@TODO: This should get new member detail.
         dataType: "json",
@@ -727,6 +727,7 @@ function removeFingerPrint(fingerId, reports) {
             fingerId: fingerId
         },
         success: function (response) {
+            closeModal();
             renderMemberDetails(response.member, reports);
         },
         error: connectionError
@@ -808,6 +809,9 @@ function addNewFingerStep2(id, reports) {
  */
 function removeMemberCard(member, reports) {
     var id = member.id;
+
+    waitForIt();
+
     $.ajax({
         url: '../static/js/data/member.json', //@TODO: This should get new member detail.
         dataType: "json",
@@ -815,6 +819,7 @@ function removeMemberCard(member, reports) {
             user_id: id
         },
         success: function (response) {
+            closeModal();
             renderMemberDetails(response.member, reports);
         },
         error: connectionError
@@ -826,6 +831,8 @@ function removeMemberCard(member, reports) {
 function addNewCard(member,reports) {
     var id = member.id;
 
+    waitForIt();
+
     $.ajax({
         url: '../static/js/data/member.json', //@TODO: This should get new member detail.
         dataType: "json",
@@ -833,6 +840,7 @@ function addNewCard(member,reports) {
             user_id: id
         },
         success: function (response) {
+            closeModal();
             renderMemberDetails(response.member, reports);
         },
         error: connectionError
