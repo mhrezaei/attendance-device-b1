@@ -62,7 +62,7 @@ def settings_process():
 
     check_time = time.time() + settings_timeout
 
-    # Wait to read the finger for a specific time (asl long as 'settings_timeout' variable)
+    # Wait to read the finger for a specific time (as long as 'settings_timeout' variable)
     while (fingerprint.readImage()  == 0) and (time.time() < check_time):
         pass
 
