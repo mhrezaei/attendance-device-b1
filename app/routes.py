@@ -153,8 +153,7 @@ def user_logs_process():
     our_result['status'] = 300
     our_result['message'] = 'Nothing done yet.'
 
-    # our_result['id'] = 32  # TODO: Delete this line when ajax is done.
-    our_result['id'] = request.form['user_id'].encode("utf-8") #TODO: uncomment this line when ajax is done.
+    our_result['id'] = request.form['user_id'].encode("utf-8")
 
     our_result['reports'] = ''
 
@@ -167,18 +166,13 @@ def user_logs_process():
         all_logs_associated_with_this_user = db.table('user_logs').where('user_id', our_result['id']).order_by(
             'id', 'desc').get()
 
-        # pprint(all_logs_associated_with_this_user)
 
         user_report = []
         for user_log in all_logs_associated_with_this_user:
-            # pprint(str(user_log['entered_at']))
-
             user_report.append({
                 'entered_at': str(user_log['entered_at']),
                 'exited_at': str(user_log['exited_at'])
             })
-
-        pprint(user_report)
 
         our_result['reports'] = user_report
 
