@@ -66,6 +66,15 @@ def settings_process():
     while (fingerprint.readImage()  == 0) and (time.time() < check_time):
         pass
 
+    if time.time() > check_time:
+        our_result['status'] = 205
+        our_result['message'] = 'Timeout is over.'
+
+    else:
+        our_result['status'] = 204
+        our_result['message'] = 'No match found for this finger.'
+
+
     # Converts read image to characteristics and stores it in char buffer 1
     fingerprint.convertImage(0x01)
 
@@ -131,9 +140,6 @@ def settings_process():
             our_result['message'] = 'Sorry, you are not allowed to enter settings.'
 
         return jsonify(our_result)
-
-    our_result['status'] = 204
-    our_result['message'] = 'No match found.'
 
     return jsonify(our_result)
 
