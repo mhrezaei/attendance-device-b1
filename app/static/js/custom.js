@@ -629,7 +629,7 @@ function checkAdmin() {
 
 
 /**
- * Ajax - Gets Members List
+ * Gets Members List
  */
 function getMembersList(members) {
     if(App_router !== "setting"){
@@ -722,6 +722,7 @@ function removeMember(id){
     $.ajax({
         url: "../static/js/data/members-list.json",  //@TODO: This should get new members list.
         dataType: "json",
+        type: "POST",
         data:{
             id: id
         },
@@ -746,6 +747,7 @@ function removeFingerPrint(fingerId, reports) {
     $.ajax({
         url: '../static/js/data/member.json', //@TODO: This should get new member detail.
         dataType: "json",
+        type: "POST",
         data:{
             fingerId: fingerId
         },
@@ -767,6 +769,7 @@ function removeAllFingerPrints(member) {
     $.ajax({
         url: '../static/js/data/member'+ id +'.json', //@TODO: This should get new member detail.
         dataType: "json",
+        type: "POST",
         data:{
             id: id
         },
@@ -792,6 +795,7 @@ function addNewFingerPrint(member,reports) {
     $.ajax({
         url: '../static/js/data/member.json', //@TODO: This should get new member detail.
         dataType: "json",
+        type: "POST",
         data:{
             user_id: id
         },
@@ -814,6 +818,7 @@ function addNewFingerStep2(id, reports) {
     $.ajax({
         url: '../static/js/data/member.json', //@TODO: This should get new member detail.
         dataType: "json",
+        type: "POST",
         data:{
             user_id: id
         },
@@ -838,6 +843,7 @@ function removeMemberCard(member, reports) {
     $.ajax({
         url: '../static/js/data/member.json', //@TODO: This should get new member detail.
         dataType: "json",
+        type: "POST",
         data:{
             user_id: id
         },
@@ -859,6 +865,7 @@ function addNewCard(member,reports) {
     $.ajax({
         url: '../static/js/data/member.json', //@TODO: This should get new member detail.
         dataType: "json",
+        type: "POST",
         data:{
             user_id: id
         },
