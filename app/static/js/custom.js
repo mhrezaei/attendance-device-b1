@@ -337,7 +337,7 @@ Vue.component('app-details',{
                         <h3 class="title">تمام اثر انگشت‌ها</h3>
                     </div>
                     <div class="finger-print-list">
-                        <table class="table table-bordered" v-if="member.fingerPrints.length">
+                        <table class="table table-bordered" v-if="member.related_fingers.length">
                             <thead>
                                 <tr>
                                     <th style='width: 60px;'>ردیف</th>
