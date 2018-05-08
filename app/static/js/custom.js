@@ -522,6 +522,38 @@ function closeSetting() {
 
 
 /**
+ * Clear List Element
+ */
+function clearList() {
+    $('#list').html("");
+}
+
+
+/**
+ * Ajax - Check Accessibility
+ */
+function checkAdmin() {
+
+    $.ajax({
+        url: url("settings_process"),
+        dataType: "json",
+        success: function(response) {
+            
+            if(response.is_admin){
+                isAdmin(response.members);
+            }else {
+                isNotAdmin();
+            }
+        },
+        error: function () {
+            openModal('اختلال در شبکه',asset("images/fingerprint-information-symbol.svg"));
+        }
+    });
+
+}
+
+
+/**
  * Actions If Is Admin
  */
 function isAdmin(members) {
@@ -536,14 +568,6 @@ function isAdmin(members) {
  */
 function isNotAdmin() {
     openModal("شما اجازه ورود به این بخش را ندارید.", asset('images/fingerprint-outline-with-close-button.svg'));
-}
-
-
-/**
- * Clear List Element
- */
-function clearList() {
-    $('#list').html("");
 }
 
 
@@ -792,20 +816,8 @@ jQuery(function($){
     // Setting button clicked
     $('.js-accessSetting').on('click',function () {
         openModal('برای ورود به بخش تنظیمات انگشت‌ خود را اسکن کنید.', asset('images/fingerprint-with-keyhole.svg'));
-        $.ajax({
-            url: url("settings_process"),
-            dataType: "json",
-            success: function(response) {
-                if(response.is_admin){
-                    isAdmin(response.members);
-                }else {
-                    isNotAdmin();
-                }
-            },
-            error: function () {
-                openModal('مجددا تلاش کنید.',asset("images/fingerprint-information-symbol.svg"));
-            }
-        });
+
+        checkAdmin();
     });
 
 
