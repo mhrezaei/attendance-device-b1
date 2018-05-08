@@ -530,43 +530,10 @@ function clearList() {
 
 
 /**
- * Ajax - Check Accessibility
+ * Actions If Connection Has Error
  */
-function checkAdmin() {
-
-    $.ajax({
-        url: url("settings_process"),
-        dataType: "json",
-        success: function(response) {
-            // If Not admin
-            if(response.status === 203){
-                isNotAdmin();
-                return;
-            }
-
-            // If No Match Found
-            if(response.status === 204){
-                noMatchFound();
-                return;
-            }
-
-            // If Timeout
-            if(response.status === 205){
-                scanTimeout();
-                return;
-            }
-
-            // If Admin
-            if (response.status === 202){
-                isAdmin(response.members);
-                return;
-            }
-        },
-        error: function () {
-            openModal('اختلال در شبکه',asset("images/fingerprint-information-symbol.svg"));
-        }
-    });
-
+function connectionError() {
+    openModal('اختلال در شبکه',asset("images/fingerprint-information-symbol.svg"));
 }
 
 
@@ -607,6 +574,45 @@ function noMatchFound() {
  */
 function scanTimeout() {
     closeModal();
+}
+
+
+/**
+ * Ajax - Check Accessibility
+ */
+function checkAdmin() {
+
+    $.ajax({
+        url: url("settings_process"),
+        dataType: "json",
+        success: function(response) {
+            // If Not admin
+            if(response.status === 203){
+                isNotAdmin();
+                return;
+            }
+
+            // If No Match Found
+            if(response.status === 204){
+                noMatchFound();
+                return;
+            }
+
+            // If Timeout
+            if(response.status === 205){
+                scanTimeout();
+                return;
+            }
+
+            // If Admin
+            if (response.status === 202){
+                isAdmin(response.members);
+                return;
+            }
+        },
+        error: connectionError
+    });
+
 }
 
 
@@ -657,14 +663,15 @@ function renderMembers(members) {
 function getMemberReport(member) {
     var id = member.id;
     $.ajax({
-        url: "../static/js/data/member"+ id +".json",
+        url: "../static/js/data/member.json",
         dataType: "json",
+        data: {
+            id: id
+        },
         success: function (response) {
             renderMemberDetails(member, response.reports);
         },
-        error: function () {
-            showError('خطا در برقراری ارتباط','#list');
-        }
+        error: connectionError
     })
 }
 
