@@ -520,7 +520,8 @@ function closeSetting() {
     }
 
     $('body').removeClass('showSetting');
-
+    clearList();
+    
     App_router = "standby";
 }
 
