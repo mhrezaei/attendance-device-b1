@@ -144,6 +144,37 @@ def settings_process():
 
     return jsonify(our_result)
 
+
+@app.route('/user_logs_process', methods=['GET'])
+def user_logs_process():
+    our_result = dict()
+
+    our_result['status'] = 300
+    our_result['message'] = 'Nothing done yet.'
+
+    our_result['id'] = 32 #TODO: Delete this line when ajax is done.
+    # our_result['id'] = request.form['user_id'].encode("utf-8") TODO: uncomment when ajax is done.
+
+    our_result['reports'] = ''
+
+    user_log_associated_with_this_user_clause = db.table('user_logs').where('user_id', our_result['id']).get().count()
+
+    if user_log_associated_with_this_user_clause: # This user_id has at least one record in user_logs table
+        our_result['status'] = 301
+        our_result['message'] = 'This user has at least one record.'
+        pass
+
+    else: # This user_id has no record in user_logs table
+        our_result['status'] = 302
+        our_result['message'] = 'This user has no records yet.'
+
+
+
+
+    return jsonify(our_result)
+
+
+
 # -------------------------#
 #       User Define        #
 # -------------------------#
