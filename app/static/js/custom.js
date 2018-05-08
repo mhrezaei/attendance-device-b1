@@ -538,11 +538,28 @@ function checkAdmin() {
         url: url("settings_process"),
         dataType: "json",
         success: function(response) {
-            
-            if(response.is_admin){
-                isAdmin(response.members);
-            }else {
+            // If Not admin
+            if(response.status === 203){
                 isNotAdmin();
+                return;
+            }
+
+            // If No Match Found
+            if(response.status === 204){
+                noMatchFound();
+                return;
+            }
+
+            // If Timeout
+            if(response.status === 205){
+                scanTimeout();
+                return;
+            }
+
+            // If Admin
+            if (response.status === 202){
+                isAdmin(response.members);
+                return;
             }
         },
         error: function () {
@@ -567,7 +584,29 @@ function isAdmin(members) {
  * Actions If Is Not Admin
  */
 function isNotAdmin() {
-    openModal("شما اجازه ورود به این بخش را ندارید.", asset('images/fingerprint-outline-with-close-button.svg'));
+    openModal("شما اجازه دسترسی به این بخش را ندارید.", asset('images/fingerprint-outline-with-close-button.svg'));
+    setTimeout(function () {
+        closeModal()
+    },3000);
+}
+
+
+/**
+ * Actions If No Match Found
+ */
+function noMatchFound() {
+    openModal('اطلاعات شما در سیستم یافت نشد.', asset('images/fingerprint-with-question-mark.svg'));
+    setTimeout(function () {
+        closeModal()
+    },3000);
+}
+
+
+/**
+ * Actions If Time Out
+ */
+function scanTimeout() {
+    closeModal();
 }
 
 
