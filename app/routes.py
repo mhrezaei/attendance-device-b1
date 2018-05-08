@@ -305,49 +305,37 @@ def enroll_handle_rfid():
     return 'Hi'
 
 
-@app.route('/enroll_handle_finger_step_1', methods=['POST'])
+@app.route('/enroll_handle_finger_step_1', methods=['GET','POST'])
 def enroll_handle_finger_step_1():
     our_result = dict()
-    our_result['status'] = []
-    our_result['status'].append({
-        'code': 0,
-        'message': 'Nothing done yet.'
-    })
-    our_result['id'] = request.form['user_id'].encode("utf-8")
+    our_result['status'] = 400
+    our_result['message'] = 'Nothing done yet.'
 
-    if request.method == 'POST':
-        our_result['status'].append({
-            'code': 1,
-            'message': 'Currently used templates: ' + str(fingerprint.getTemplateCount()) + ' / ' + str(
-                fingerprint.getStorageCapacity())
-        })
+    our_result['id'] = 31 #TODO: Comment this line when ajax is ready
+    # our_result['id'] = request.form['user_id'].encode("utf-8") #TODO: Uncomment this line when ajax is ready
+
+    # Wait to read the finger
+    while fingerprint.readImage() == 0:
+        pass
+
+    # Converts read image to characteristics and stores it in char buffer 1
+    fingerprint.convertImage(0x01)
+
+    # Checks if finger is already enrolled
+    result = fingerprint.searchTemplate()
+    position_number = result[0]
+
+    if position_number >= 0:
+        our_result['status'] = 401
+        our_result['message'] = 'Remove your finger.'
+
         pprint(our_result)
-
-        # Wait to read the finger
-        while fingerprint.readImage() == 0:
-            pass
-
-        # Converts read image to characteristics and stores it in char buffer 1
-        fingerprint.convertImage(0x01)
-
-        # Checks if finger is already enrolled
-        result = fingerprint.searchTemplate()
-        position_number = result[0]
-
-        if position_number >= 0:
-            our_result['status'].append({
-                'code': 2,
-                'message': 'Template already exists at position #' + str(position_number)
-            })
-            pprint(our_result)
-            return jsonify(our_result)
-
-        our_result['status'].append({
-            'code': 3,
-            'message': 'Remove finger...'
-        })
-
         return jsonify(our_result)
+
+    our_result['status'] = 402
+    our_result['message'] = 'No match found.'
+
+    return jsonify(our_result)
 
 
 @app.route('/enroll_handle_finger_step_2', methods=['POST'])
