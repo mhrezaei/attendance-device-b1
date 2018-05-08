@@ -313,7 +313,7 @@ Vue.component('app-details',{
                         <div class="col-xs-8">
                             <div class="card-info">
                             <span class="title">شماره کارت :</span>
-                            <span class="card-id">{{ convertDigit(member.card) }}</span>
+                            <span class="card-id">{{ convertDigit(member.rfid_unique_id) }}</span>
                         </div>
                         <div class="controls">
                             <button class="btn btn-danger btn-lg" @click="removeCard">حذف کارت</button>
