@@ -311,8 +311,8 @@ def enroll_handle_finger_step_1():
     our_result['status'] = 400
     our_result['message'] = 'Nothing done yet.'
 
-    our_result['id'] = 31 #TODO: Comment this line when ajax is ready
-    # our_result['id'] = request.form['user_id'].encode("utf-8") #TODO: Uncomment this line when ajax is ready
+    # our_result['id'] = 31 #TODO: Comment this line when ajax is ready
+    our_result['id'] = request.form['user_id'].encode("utf-8") #TODO: Uncomment this line when ajax is ready
 
     # Wait to read the finger
     while fingerprint.readImage() == 0:
@@ -333,7 +333,7 @@ def enroll_handle_finger_step_1():
         return jsonify(our_result)
 
     our_result['status'] = 402
-    our_result['message'] = 'Remove your finger.'
+    our_result['message'] = 'Pick up your finger.'
 
     return jsonify(our_result)
 
