@@ -123,7 +123,8 @@ def settings_process():
                     'code_melli': user['code_melli'],
                     'created_at': user['created_at'],
                     'updated_at': user['updated_at'],
-                    'related_fingers': user_finger
+                    'related_fingers': user_finger,
+                    'rfid_card_unique_id': 'Nothing yet'
                 })
 
             # Number of all users
