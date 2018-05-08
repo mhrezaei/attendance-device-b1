@@ -146,7 +146,7 @@ def settings_process():
     return jsonify(our_result)
 
 
-@app.route('/user_logs_process', methods=['GET'])
+@app.route('/user_logs_process', methods=['GET', 'POST'])
 def user_logs_process():
     our_result = dict()
 
