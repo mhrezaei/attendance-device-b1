@@ -816,55 +816,55 @@ jQuery(function($){
 
     // Socket
     //------------------------------------------------------------------
-//    var connected = false;
-//    const socket = io('http://' + document.domain + ':' + location.port);
-//
-//
-//    // On Connect
-//    socket.on('connect', function () {
-//        connected = true;
-//        console.log("connected");
-//    });
-//
-//
-//    // On Auth
-//    socket.on('auth', function (data) {
-//        console.log(data);
-//        socket.emit('setFingerPrintStatus', true);
-//    });
-//
-//
-//    // On fingerPrintStatus
-//    socket.on('fingerPrintStatus', function (data) {
-//        if (data.status <= 2) {
-//            console.log(data.status);
-//            console.log(second_message);
-//        }
-//        if (data.status >= 3 && data.status <= 15) {
-//            console.log(data.status);
-//            console.log(fifteenth_message + data.first_name + ' ' + data.last_name + ', your last exit: ' + data.last_action);
-//        }
-//        if (data.status >= 16) {
-//            console.log(data.status);
-//            console.log(seventeenth_message + data.first_name + ' ' + data.last_name + ', your last enter: ' + data.last_action);
-//        }
-//
-//    });
-//
-//
-//    // On Disconnect
-//    socket.on('disconnect', function () {
-//        console.log('disconnected.');
-//        connected = false;
-//    });
-//
-//
-//    // Auto Update Socket
-//    setInterval(function () {
-//        if (connected){
-//            socket.emit('update');
-//        }
-//    }, 500);
+    var connected = false;
+    const socket = io('http://' + document.domain + ':' + location.port);
+
+
+    // On Connect
+    socket.on('connect', function () {
+        connected = true;
+        console.log("connected");
+    });
+
+
+    // On Auth
+    socket.on('auth', function (data) {
+        console.log(data);
+        socket.emit('setFingerPrintStatus', true);
+    });
+
+
+    // On fingerPrintStatus
+    socket.on('fingerPrintStatus', function (data) {
+        if (data.status <= 2) {
+            console.log(data.status);
+            console.log(second_message);
+        }
+        if (data.status >= 3 && data.status <= 15) {
+            console.log(data.status);
+            console.log(fifteenth_message + data.first_name + ' ' + data.last_name + ', your last exit: ' + data.last_action);
+        }
+        if (data.status >= 16) {
+            console.log(data.status);
+            console.log(seventeenth_message + data.first_name + ' ' + data.last_name + ', your last enter: ' + data.last_action);
+        }
+
+    });
+
+
+    // On Disconnect
+    socket.on('disconnect', function () {
+        console.log('disconnected.');
+        connected = false;
+    });
+
+
+    // Auto Update Socket
+    setInterval(function () {
+        if (connected){
+            socket.emit('update');
+        }
+    }, 500);
 
 }); //End Of siaf!
 
