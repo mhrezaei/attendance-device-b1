@@ -794,14 +794,27 @@ function addNewFingerPrint(member,reports) {
     openModal("انگشت خود را روی دستگاه قرار دهید.",asset("images/fingerprint-scanning-in-half-view.svg"));
 
     $.ajax({
-        url: '../static/js/data/member.json', //@TODO: This should get new member detail.
+        url: url('enroll_handle_finger_step_1'),
         dataType: "json",
         type: "POST",
         data:{
             user_id: id
         },
         success: function (response) {
-            addNewFingerStep2(id, reports)
+            if(response.status === 401){
+                openModal('این انگشت قبلا ثبت شده‌است.',asset('images/fingerprint-outline-with-close-button.svg'));
+                return
+            }
+
+            if(response.status === 402){
+                openModal('لطفا انگشت خود را بردارید.', asset("images/sand-clock.svg"));
+                setTimeout(function () {
+                    openModal('انگشت خود را مجددا روی دستگاه قرار دهید.', asset("images/fingerprint-scanning-in-half-view.svg"));
+                    addNewFingerStep2(id, reports)
+                },3000);
+                return;
+            }
+
         },
         error: connectionError
     })
@@ -814,7 +827,6 @@ function addNewFingerPrint(member,reports) {
  * @param reports
  */
 function addNewFingerStep2(id, reports) {
-    openModal('انگشت خود را برداشته و مجددا روی دستگاه قرار دهید.', asset("images/fingerprint-scanning-in-half-view.svg"));
 
     $.ajax({
         url: '../static/js/data/member.json', //@TODO: This should get new member detail.
