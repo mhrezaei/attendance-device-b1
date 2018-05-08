@@ -58,12 +58,13 @@ def settings_process():
     our_result['status'] = 200
     our_result['message'] = 'Nothing done yet.'
     our_result['members'] = []
-    time.sleep(0.5) # Makes sure to unset fingerprint sensor from index page in order not to submit log instead of settings approval on this endpoint
+    time.sleep(
+        0.5)  # Makes sure to unset fingerprint sensor from index page in order not to submit log instead of settings approval on this endpoint
 
     check_time = time.time() + settings_timeout
 
     # Wait to read the finger for a specific time (as long as 'settings_timeout' variable)
-    while (fingerprint.readImage()  == 0) and (time.time() < check_time):
+    while (fingerprint.readImage() == 0) and (time.time() < check_time):
         pass
 
     if time.time() > check_time:
@@ -73,7 +74,6 @@ def settings_process():
     else:
         our_result['status'] = 204
         our_result['message'] = 'No match found for this finger.'
-
 
     # Converts read image to characteristics and stores it in char buffer 1
     fingerprint.convertImage(0x01)
@@ -86,13 +86,14 @@ def settings_process():
         our_result['status'] = 201
         our_result['message'] = 'Template found at position #' + str(position_number)
 
-        user_id_associated_with_this_finger = db.table('fingers').where('template_position', position_number).pluck('user_id')
+        user_id_associated_with_this_finger = db.table('fingers').where('template_position', position_number).pluck(
+            'user_id')
 
         admin_role_check_clause = db.table('users').where('id', user_id_associated_with_this_finger).pluck('is_admin')
 
         our_result['is_admin'] = admin_role_check_clause
 
-        if admin_role_check_clause: # The finger belongs to an admin
+        if admin_role_check_clause:  # The finger belongs to an admin
             pprint("Hi ADMIN")
 
             # Retrieve all users from database
@@ -134,7 +135,7 @@ def settings_process():
             return jsonify(our_result)
 
 
-        else: # The finger does NOT belong to an admin
+        else:  # The finger does NOT belong to an admin
             pprint('You are NOT ADMIN')
             our_result['status'] = 203
             our_result['is_admin'] = admin_role_check_clause
@@ -152,18 +153,19 @@ def user_logs_process():
     our_result['status'] = 300
     our_result['message'] = 'Nothing done yet.'
 
-    our_result['user_id'] = 32 #TODO: Delete this line when ajax is done.
+    our_result['user_id'] = 32  # TODO: Delete this line when ajax is done.
     # our_result['user_id'] = request.form['user_id'].encode("utf-8") TODO: uncomment this line when ajax is done.
 
     our_result['reports'] = ''
 
     log_associated_with_this_user_clause = db.table('user_logs').where('user_id', our_result['user_id']).get().count()
 
-    if log_associated_with_this_user_clause: # This user_id has at least one record in user_logs table
+    if log_associated_with_this_user_clause:  # This user_id has at least one record in user_logs table
         our_result['status'] = 301
         our_result['message'] = 'This user has at least one record.'
 
-        all_logs_associated_with_this_user = db.table('user_logs').where('user_id', our_result['user_id']).order_by('id', 'desc').get()
+        all_logs_associated_with_this_user = db.table('user_logs').where('user_id', our_result['user_id']).order_by(
+            'id', 'desc').get()
 
         # pprint(all_logs_associated_with_this_user)
 
@@ -181,15 +183,11 @@ def user_logs_process():
         our_result['reports'] = user_report
 
 
-    else: # This user_id has no record in user_logs table
+    else:  # This user_id has no record in user_logs table
         our_result['status'] = 302
         our_result['message'] = 'This user has no records yet.'
 
-
-
-
     return jsonify(our_result)
-
 
 
 # -------------------------#
