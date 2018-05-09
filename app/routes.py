@@ -351,7 +351,7 @@ def enroll_handle_finger_step_1():
 def enroll_handle_finger_step_2():
     our_result = dict()
     our_result['status'] = 410
-    our_result['message'] = 'Waiting for the same finger again...'
+    our_result['message'] = 'Waiting for the same finger again.'
     # our_result['id'] = request.form['user_id'].encode("utf-8")
     our_result['id'] = session.pop('key', None)
 
