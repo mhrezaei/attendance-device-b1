@@ -620,7 +620,7 @@ function closeSetting() {
     $('body').removeClass('showSetting');
     clearList();
     App_router = "standby";
-    socket.emit('setFingerPrintStatus', false);
+    socket.emit('setFingerPrintStatus', true);
 }
 
 
@@ -655,7 +655,6 @@ function connectionError() {
 function isAdmin(members) {
     closeModal();
     openSetting();
-    socket.emit('setFingerPrintStatus', false);
     getMembersList(members);
 }
 
@@ -694,25 +693,28 @@ function scanTimeout() {
  * Ajax - Check Accessibility
  */
 function checkAdmin() {
-
+    socket.emit('setFingerPrintStatus', false);
     $.ajax({
         url: url("settings_process"),
         dataType: "json",
         success: function(response) {
             // If Not admin
             if(response.status === 203){
+                socket.emit('setFingerPrintStatus', true);
                 isNotAdmin();
                 return;
             }
 
             // If No Match Found
             if(response.status === 204){
+                socket.emit('setFingerPrintStatus', true);
                 noMatchFound();
                 return;
             }
 
             // If Timeout
             if(response.status === 205){
+                socket.emit('setFingerPrintStatus', true);
                 scanTimeout();
                 return;
             }
