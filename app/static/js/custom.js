@@ -841,8 +841,21 @@ function addNewFingerStep2(id, reports) {
             user_id: id
         },
         success: function (response) {
-            closeModal();
-            renderMemberDetails(response.member, reports);
+            // No Match
+            if(response.status === 411){
+                openModal('عدم مطابقت با اثر انگشت قبلی',asset('images/fingerprint-outline-with-close-button.svg'));
+                return
+            }
+
+            // Match and saved
+            if(response.status === 413){
+                openModal('اثر انگشت با موفقیت ثبت شد.',asset('images/fingerprint-outline-with-check-mark.svg'));
+                setTimeout(function () {
+                    closeModal();
+                    renderMemberDetails(response.member, reports);
+                },3000);
+            }
+
         },
         error: connectionError
     })
