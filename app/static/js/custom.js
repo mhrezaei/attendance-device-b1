@@ -834,7 +834,7 @@ function addNewFingerPrint(member,reports) {
 function addNewFingerStep2(id, reports) {
 
     $.ajax({
-        url: '../static/js/data/member.json', //@TODO: This should get new member detail.
+        url: url('enroll_handle_finger_step_2'),
         dataType: "json",
         type: "POST",
         data:{
