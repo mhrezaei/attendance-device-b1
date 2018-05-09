@@ -1,5 +1,8 @@
 from time import sleep, time
 from datetime import datetime, timedelta
+
+from serial import SerialException
+
 from config import store, socket, publish, fingerprint, db, User, UserLog
 import hashlib
 from globla_variables import working_hours
@@ -15,10 +18,21 @@ def receive(action, message):
 
 
 def run():
+    # print('Hello from true')
     if store['fingerPrintEnabled']: #boolean
         # sleep(0.5) #TODO: 1 second or not
         our_result = {'status': 0, 'first_name': '', 'last_name': '', 'last_action': ''}
-        if fingerprint.readImage() != 0:
+
+        read_image = None
+        try:
+            read_image = fingerprint.readImage()
+
+        except SerialException:
+            return 'zero'
+
+
+
+        if read_image != 0:
             fingerprint.convertImage(0x01)
             # Searches template
             result = fingerprint.searchTemplate()
@@ -194,3 +208,4 @@ def run():
                                 publish('fingerPrintStatus', our_result)
     else:
         sleep(1)
+        # print("Hello in sleep 1")

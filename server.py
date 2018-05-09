@@ -12,6 +12,7 @@ import os
 def service_handler(ev):
     print(' * Thread worker [ONLINE] ')
     while ev.is_set():
+        # print('Hello from service')
         run()
 
 
