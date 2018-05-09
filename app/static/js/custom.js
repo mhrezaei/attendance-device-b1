@@ -728,7 +728,7 @@ function removeMember(id){
             id: id
         },
         success: function (response) {
-            renderMembers(response.members);
+            renderMembers(response.member[0]);
         },
         error: function () {
             showError('خطا در برقراری ارتباط','#list');
@@ -754,7 +754,7 @@ function removeFingerPrint(fingerId, reports) {
         },
         success: function (response) {
             closeModal();
-            renderMemberDetails(response.member, reports);
+            renderMemberDetails(response.member[0], reports);
         },
         error: connectionError
     })
@@ -836,10 +836,6 @@ function addNewFingerStep2(id, reports) {
     $.ajax({
         url: url('enroll_handle_finger_step_2'),
         dataType: "json",
-        type: "POST",
-        data:{
-            user_id: id
-        },
         success: function (response) {
             // No Match
             if(response.status === 411){
@@ -852,7 +848,7 @@ function addNewFingerStep2(id, reports) {
                 openModal('اثر انگشت با موفقیت ثبت شد.',asset('images/fingerprint-outline-with-check-mark.svg'));
                 setTimeout(function () {
                     closeModal();
-                    renderMemberDetails(response.member, reports);
+                    renderMemberDetails(response.member[0], reports);
                 },3000);
             }
 
@@ -880,7 +876,7 @@ function removeMemberCard(member, reports) {
         },
         success: function (response) {
             closeModal();
-            renderMemberDetails(response.member, reports);
+            renderMemberDetails(response.member[0], reports);
         },
         error: connectionError
     })
@@ -902,7 +898,7 @@ function addNewCard(member,reports) {
         },
         success: function (response) {
             closeModal();
-            renderMemberDetails(response.member, reports);
+            renderMemberDetails(response.member[0], reports);
         },
         error: connectionError
     })
