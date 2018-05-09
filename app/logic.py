@@ -163,8 +163,7 @@ def run():
                                 the_hash = hashlib.sha256(characterics).hexdigest()
                                 the_accuracy = accuracy_score
 
-                                our_result[
-                                    'last_action'] = 'You forgot to attend exit on last time'  # TODO: what should be the last_action if we are in this clause?
+                                our_result['last_action'] = ''
 
                                 db.table('user_logs').insert(user_id=the_user_id,
                                                              template_position=the_template_position,
