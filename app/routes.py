@@ -387,7 +387,7 @@ def enroll_handle_finger_step_2():
     # Retrieve all fingers related to this specific user
     this_user_related_fingers = db.table('fingers').where('user_id', our_result['id']).get()
 
-    this_user = db.table('users').where('user_id', our_result['id']).get()
+    this_user = User.find(int(our_result['id']))
 
     user_finger = []
     # Add some information about that related finger of that specific user
@@ -401,12 +401,12 @@ def enroll_handle_finger_step_2():
 
     # Update result['members']
     our_result['member'].append({
-        'id': this_user['id'],
-        'first_name': this_user['first_name'],
-        'last_name': this_user['last_name'],
-        'code_melli': this_user['code_melli'],
-        'created_at': this_user['created_at'],
-        'updated_at': this_user['updated_at'],
+        'id': this_user.id,
+        'first_name': this_user.first_name,
+        'last_name': this_user.last_name,
+        'code_melli': this_user.code_melli,
+        'created_at': this_user.created_at,
+        'updated_at': this_user.updated_at,
         'related_fingers': user_finger,
         'rfid_unique_id': 'Nothing yet'
     })
