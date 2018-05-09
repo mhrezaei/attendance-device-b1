@@ -2,6 +2,8 @@ from time import sleep, time
 from datetime import datetime, timedelta
 from config import store, socket, publish, fingerprint, db, User, UserLog
 import hashlib
+from globla_variables import working_hours
+
 
 store['fingerPrintEnabled'] = False
 
@@ -146,7 +148,7 @@ def run():
                             # print(type(the_very_last_entered_at))
                             our_result['status'] = 13
                             temp_time = the_very_last_entered_at + timedelta(
-                                seconds=60)  # TODO: Make it a dynamic variable
+                                seconds=working_hours)
                             # pprint(temp_time)
                             # flash('temp_time: ' + str(temp_time))
                             the_new_entered_at = datetime.now()  # time right now
