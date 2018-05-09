@@ -15,7 +15,7 @@ store['clients'] = []
 # --------------#
 @socket.on('connect')
 def socket_connect():
-    store['fingerPrintEnabled'] = True
+    # store['fingerPrintEnabled'] = True
     socket.emit('auth', request.sid)
     store['clients'].append(request.sid)
 
