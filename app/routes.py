@@ -55,7 +55,7 @@ def settings():
 @app.route('/settings_process')
 def settings_process():
     our_result = dict()
-    store['fingerPrintEnabled'] = False
+    # store['fingerPrintEnabled'] = False
     time.sleep(0.05)
     our_result['status'] = 200
     our_result['message'] = 'Nothing done yet.'
