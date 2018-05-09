@@ -315,7 +315,7 @@ def enroll_handle_finger_step_1():
     our_result['id'] = request.form['user_id'].encode("utf-8")
 
     check_time = time.time() + enroll_finger_timeout
-
+    
     # Wait to read the finger
     while (fingerprint.readImage() == 0) and (time.time() < check_time):
         pass
