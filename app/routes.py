@@ -4,7 +4,7 @@ from models import *
 import time
 from forms import UserDefineForm, UserEnrollForm
 from pprint import pprint
-from globla_variables import settings_timeout
+from globla_variables import settings_timeout, enroll_finger_timeout
 
 store['clients'] = []
 
@@ -311,12 +311,19 @@ def enroll_handle_finger_step_1():
     our_result['status'] = 400
     our_result['message'] = 'Nothing done yet.'
 
-    # our_result['id'] = 31 #TODO: Comment this line when ajax is ready
-    our_result['id'] = request.form['user_id'].encode("utf-8") #TODO: Uncomment this line when ajax is ready
+    # our_result['id'] = 31 # Manual test without ajax
+    our_result['id'] = request.form['user_id'].encode("utf-8")
+
+    check_time = time.time() + enroll_finger_timeout
 
     # Wait to read the finger
-    while fingerprint.readImage() == 0:
+    while (fingerprint.readImage() == 0) and (time.time() < check_time):
         pass
+
+    if time.time() > check_time:
+        our_result['status'] = 403
+        our_result['message'] = 'Timeout is over.'
+        return jsonify(our_result)
 
     # Converts read image to characteristics and stores it in char buffer 1
     fingerprint.convertImage(0x01)
