@@ -85,104 +85,6 @@ function forms_digit_fa(enDigit) {
 var App_router = "standby";
 var App_modalState = "close";
 
-
-/*
-*-------------------------------------------------------
-* Self Invoking Anonymous Function
-*-------------------------------------------------------
-*/
-jQuery(function($){
-
-
-    // StandBy theme
-    checkTheme();
-    setInterval(function () {
-        checkTheme();
-    },30000);
-
-
-    //Modal close function
-    $('#alertModal .close').on('click',closeModal);
-
-
-    // Setting button clicked
-    $('.js-accessSetting').on('click',function () {
-        openModal('برای ورود به بخش تنظیمات انگشت‌ خود را اسکن کنید.', asset('images/fingerprint-with-keyhole.svg'));
-
-        checkAdmin();
-    });
-
-
-    // Back To Home
-    $('.back-to-home').on('click',closeSetting);
-
-
-
-    // Socket
-    //------------------------------------------------------------------
-
-    let connected = false;
-
-    const socket = io('http://' + document.domain + ':' + location.port);
-
-    window.socket = socket;
-    // On Connect
-    socket.on('connect', function () {
-        connected = true;
-        console.log("connected");
-    });
-
-
-    // On Auth
-    socket.on('auth', function (data) {
-        console.log(data);
-        socket.emit('setFingerPrintStatus', true);
-    });
-
-
-    // On fingerPrintStatus
-    socket.on('fingerPrintStatus', function (data) {
-        if (data.status <= 2) {
-            console.log(data.status);
-            noMatchFound();
-        }
-        if (data.status >= 3 && data.status <= 15) {
-            console.log(data.status);
-            console.log(data.last_action);
-            var msg = data.first_name + ' ' + data.last_name + 'خوش آمدید. آخرین خروج شما: ' + data.last_action;
-            openModal(msg, asset('images/welcome.svg'));
-            setTimeout(closeModal, 3000);
-        }
-
-        if (data.status >= 16) {
-            console.log(data.status);
-            var msg = data.first_name + ' ' + data.last_name + 'خدا نگهدار. آخرین ورود شما: ' + data.last_action;
-            openModal(msg, asset('images/exit.svg'));
-            setTimeout(closeModal, 3000);
-        }
-
-    });
-
-
-    // On Disconnect
-    socket.on('disconnect', function () {
-        console.log('disconnected.');
-        connected = false;
-    });
-
-
-    // Auto Update Socket
-    setInterval(function () {
-        if (connected){
-            socket.emit('update');
-        }
-    }, 500);
-
-//    socket.connect();
-
-}); //End Of siaf!
-
-
 /*
 *-------------------------------------------------------
 * Vue Related
@@ -239,8 +141,8 @@ Vue.component('app-clock', {
     template: `
       <div class="clock-widget" :class="theme">
            <div class="clock_bg">
-               <img src="static/images/day.svg" class="dayIcon" alt="day icon">
-               <img src="static/images/night.svg" class="nightIcon" alt="night icon">
+               <img src="../public/images/day.svg" class="dayIcon" alt="day icon">
+               <img src="../public/images/night.svg" class="nightIcon" alt="night icon">
            </div>
            <div class="clock_body">
                <TimeAndDate></TimeAndDate>
@@ -307,7 +209,7 @@ Vue.component('app-navbar', {
     data    : function () {
         return {
             title   : "یسنا",
-            logoSrc : '../static/images/logo-white.png',
+            logoSrc : '../public/images/logo-white.png',
             showTime: !this.isIndex
         }
     }
@@ -342,9 +244,9 @@ Vue.component('app-row',{
         <tbody>
             <tr v-for="(row , index) in rows">
                 <td>{{ convertDigit(index + 1) }}</td>
-                <td>{{ row.first_name }}</td>
-                <td>{{ row.last_name }}</td>
-                <td>{{ convertDigit(row.code_melli) }}</td>
+                <td>{{ row.name }}</td>
+                <td>{{ row.lastName }}</td>
+                <td>{{ convertDigit(row.codeMelli) }}</td>
                 <td class="table-action">
                     <button class="btn btn-lg btn-default actions" @click="showDetails(row)">جزئیات</button>
                 </td>
@@ -368,7 +270,7 @@ Vue.component('app-details',{
     template:
             `
             <div class="member-tabs">
-                <h3 class="tabs-title">{{ member.first_name + " " + member.last_name}}</h3>
+                <h3 class="tabs-title">{{ member.name + " " + member.lastName}}</h3>
                 <ul class="nav nav-tabs">
                   <li class="active"><a data-toggle="tab" href="#member_attendance">لیست حضور و غیاب</a></li>
                   <li><a data-toggle="tab" href="#member_card">کارت</a></li>
@@ -392,26 +294,26 @@ Vue.component('app-details',{
                             <tbody>
                                 <tr v-for="(report , index) in reports">
                                     <td>{{ convertDigit(index + 1) }}</td>
-                                    <td>{{ setDate(report.entered_at) }}</td>
-                                    <td>{{ setTime(report.entered_at) }}</td>
-                                    <td>{{ setDate(report.exited_at) }}</td>
-                                    <td>{{ setTime(report.exited_at) }}</td>
+                                    <td>{{ setDate(report.enter_date) }}</td>
+                                    <td>{{ setTime(report.enter_date) }}</td>
+                                    <td>{{ setDate(report.exit_date) }}</td>
+                                    <td>{{ setTime(report.exit_date) }}</td>
                                 </tr>
                             </tbody>
                         </table> 
                     </div>
                   </div>
                   <div id="member_card" class="tab-pane fade">
-                    <div class="row" v-if="member.rfid_unique_id">
+                    <div class="row" v-if="member.card">
                         <div class="col-xs-4">
                             <div class="id-card-image">
-                                <img src="static/images/id-card.svg" alt="id card">                            
+                                <img src="../public/images/id-card.svg" alt="id card">                            
                             </div>
                         </div>
                         <div class="col-xs-8">
                             <div class="card-info">
                             <span class="title">شماره کارت :</span>
-                            <span class="card-id">{{ convertDigit(member.rfid_unique_id) }}</span>
+                            <span class="card-id">{{ convertDigit(member.card) }}</span>
                         </div>
                         <div class="controls">
                             <button class="btn btn-danger btn-lg" @click="removeCard">حذف کارت</button>
@@ -435,7 +337,7 @@ Vue.component('app-details',{
                         <h3 class="title">تمام اثر انگشت‌ها</h3>
                     </div>
                     <div class="finger-print-list">
-                        <table class="table table-bordered" v-if="member.related_fingers.length">
+                        <table class="table table-bordered" v-if="member.fingerPrints.length">
                             <thead>
                                 <tr>
                                     <th style='width: 60px;'>ردیف</th>
@@ -445,10 +347,10 @@ Vue.component('app-details',{
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="( fingerPrint , index ) in member.related_fingers">
+                                <tr v-for="( fingerPrint , index ) in member.fingerPrints">
                                     <td>{{ convertDigit(index + 1) }}</td>
                                     <td>{{ fingerPrint.id }}</td>
-                                    <td>{{ fingerPrint.position }}</td>
+                                    <td>{{ fingerPrint.name }}</td>
                                     <td style="text-align: center;">
                                         <button class="btn btn-lg btn-danger" @click="removeThisFingerPrint(fingerPrint.id)">حذف</button>
                                     </td>
@@ -462,11 +364,11 @@ Vue.component('app-details',{
                     </div>
                     <div class="controls">
                             <button class="btn btn-lg btn-success" @click="addNewFingerPrint">اثر انگشت جدید</button>  
-                            <!--<button class="btn btn-lg btn-danger" -->
-                            <!--v-if="member.fingerPrints.length"-->
-                            <!--@click="removeAll">-->
-                            <!--حذف همه-->
-                            <!--</button>-->
+                            <button class="btn btn-lg btn-danger" 
+                            v-if="member.fingerPrints.length"
+                            @click="removeAll">
+                            حذف همه
+                            </button>
                         </div>
                   </div>
                   <div id="member_setting" class="tab-pane fade">
@@ -481,16 +383,10 @@ Vue.component('app-details',{
     props: ['member','reports'],
     methods:{
         setTime: function (date) {
-            if(date === "None"){
-                return "ثبت نشده";
-            }
             var unix = new persianDate(new Date(date)).valueOf();
             return new persianDate(unix).toLocale('fa').toCalendar('persian').format('HH:mm');
         },
         setDate: function (date) {
-            if(date === "None"){
-                return "ثبت نشده";
-            }
             var unix = new persianDate(new Date(date)).valueOf();
             return new persianDate(unix).toLocale('fa').toCalendar('persian').format('DD MMMM YYYY');
         },
@@ -501,21 +397,23 @@ Vue.component('app-details',{
             removeMember(this.member.id);
         },
         removeThisFingerPrint: function (id) {
-            removeFingerPrint(id, this.reports);
+            removeFingerPrint(id, this.member);
         },
         removeAll: function () {
             removeAllFingerPrints(this.member)
         },
         addNewFingerPrint: function () {
             var member = this.member;
-            var reports = this.reports;
-            addNewFingerPrint(member,reports);
+            openModal("انگشت خود را اسکن کنید.","../public/images/fingerprint-scanning-in-half-view.svg");
+            setTimeout(function () {
+                addNewFingerPrint(member);
+            },2000);
         },
         removeCard: function () {
-            removeMemberCard(this.member, this.reports);
+            removeMemberCard(this.member);
         },
         addNewCard: function () {
-            addNewCard(this.member, this.reports);
+            addNewCard(this.member);
         }
 
     }
@@ -552,7 +450,7 @@ var vm = new Vue({
  */
 function openModal(message, iconSrc) {
     var modal = $('#alertModal');
-    var src   = (iconSrc && iconSrc.length) ? iconSrc : asset("images/warning.svg");
+    var src   = (iconSrc && iconSrc.length) ? iconSrc : "../public/images/warning.svg";
     modal.find('img').attr('src', src);
     modal.find('.message').text(message);
     modal.addClass('show');
@@ -570,7 +468,7 @@ function closeModal() {
     }
 
     var modal = $('#alertModal');
-    var src   = asset("images/warning.svg");
+    var src   = "../public/images/warning.svg";
     modal.find('.icon img').attr('src', src);
     modal.find('.message').text("");
     modal.removeClass('show');
@@ -618,9 +516,30 @@ function closeSetting() {
     }
 
     $('body').removeClass('showSetting');
-    clearList();
+
     App_router = "standby";
-    socket.emit('setFingerPrintStatus', false);
+}
+
+
+/**
+ * Actions If Is Admin
+ */
+function isAdmin() {
+    setTimeout(function () {
+        closeModal();
+        openSetting();
+        getMembersList();
+    },3000);
+}
+
+
+/**
+ * Actions If Is Not Admin
+ */
+function isNotAdmin() {
+    setTimeout(function () {
+        openModal("شما اجازه ورود به این بخش را ندارید.","../public/images/fingerprint-outline-with-close-button.svg");
+    },3000);
 }
 
 
@@ -633,111 +552,23 @@ function clearList() {
 
 
 /**
- * Loading Modal
+ * Ajax - Gets Members List
  */
-function waitForIt() {
-    openModal('لطفا منتظر باشید...', asset('images/sand-clock.svg'))
-}
-
-
-/**
- * Actions If Connection Has Error
- */
-function connectionError() {
-    openModal('اختلال در شبکه',asset("images/fingerprint-information-symbol.svg"));
-
-}
-
-
-/**
- * Actions If Is Admin
- */
-function isAdmin(members) {
-    closeModal();
-    openSetting();
-    socket.emit('setFingerPrintStatus', false);
-    getMembersList(members);
-}
-
-
-/**
- * Actions If Is Not Admin
- */
-function isNotAdmin() {
-    openModal("شما اجازه دسترسی به این بخش را ندارید.", asset('images/fingerprint-outline-with-close-button.svg'));
-    setTimeout(function () {
-        closeModal()
-    },3000);
-}
-
-
-/**
- * Actions If No Match Found
- */
-function noMatchFound() {
-    openModal('اطلاعات شما در سیستم یافت نشد.', asset('images/fingerprint-with-question-mark.svg'));
-    setTimeout(function () {
-        closeModal()
-    },3000);
-}
-
-
-/**
- * Actions If Time Out
- */
-function scanTimeout() {
-    closeModal();
-}
-
-
-/**
- * Ajax - Check Accessibility
- */
-function checkAdmin() {
-
-    $.ajax({
-        url: url("settings_process"),
-        dataType: "json",
-        success: function(response) {
-            // If Not admin
-            if(response.status === 203){
-                isNotAdmin();
-                return;
-            }
-
-            // If No Match Found
-            if(response.status === 204){
-                noMatchFound();
-                return;
-            }
-
-            // If Timeout
-            if(response.status === 205){
-                scanTimeout();
-                return;
-            }
-
-            // If Admin
-            if (response.status === 202){
-                isAdmin(response.members);
-                return;
-            }
-        },
-        error: connectionError
-    });
-
-}
-
-
-/**
- * Gets Members List
- */
-function getMembersList(members) {
+function getMembersList() {
     if(App_router !== "setting"){
         return
     }
 
-    renderMembers(members);
+    $.ajax({
+        url: "../public/js/data/members-list.json",
+        dataType: "json",
+        success: function (response) {
+            renderMembers(response.members);
+        },
+        error: function () {
+            showError('خطا در برقراری ارتباط','#list');
+        }
+    })
 }
 
 
@@ -765,33 +596,15 @@ function renderMembers(members) {
  */
 function getMemberReport(member) {
     var id = member.id;
-
-    waitForIt();
-
     $.ajax({
-        url: url('user_logs_process'),
+        url: "../public/js/data/member"+ id +".json",
         dataType: "json",
-        type: "POST",
-        data: {
-            user_id: id
-        },
         success: function (response) {
-            closeModal();
-
-            // If User has no log
-            if(response.status === 302){
-                var reports = [];
-                renderMemberDetails(member,reports);
-                return;
-            }
-
-            // If user has logs
-            if(response.status === 301){
-                renderMemberDetails(member, response.reports);
-                return;
-            }
+            renderMemberDetails(member, response.reports);
         },
-        error: connectionError
+        error: function () {
+            showError('خطا در برقراری ارتباط','#list');
+        }
     })
 }
 
@@ -821,14 +634,13 @@ function renderMemberDetails(member, reports) {
  */
 function removeMember(id){
     $.ajax({
-        url: "../static/js/data/members-list.json",  //@TODO: This should get new members list.
+        url: "../public/js/data/members-list.json",  //@TODO: This should get new members list.
         dataType: "json",
-        type: "POST",
         data:{
             id: id
         },
         success: function (response) {
-            renderMembers(response.member[0]);
+            renderMembers(response.members);
         },
         error: function () {
             showError('خطا در برقراری ارتباط','#list');
@@ -842,21 +654,19 @@ function removeMember(id){
  * @param fingerId
  * @param member
  */
-function removeFingerPrint(fingerId, reports) {
-    waitForIt();
-
+function removeFingerPrint(fingerId, member) {
     $.ajax({
-        url: '../static/js/data/member.json', //@TODO: This should get new member detail.
+        url: '../public/js/data/member'+ member.id +'.json', //@TODO: This should get new member detail.
         dataType: "json",
-        type: "POST",
         data:{
             fingerId: fingerId
         },
         success: function (response) {
-            closeModal();
-            renderMemberDetails(response.member[0], reports);
+            renderMemberDetails(member, response.reports);
         },
-        error: connectionError
+        error: function () {
+            showError('خطا در برقراری ارتباط','#list');
+        }
     })
 }
 
@@ -868,9 +678,8 @@ function removeFingerPrint(fingerId, reports) {
 function removeAllFingerPrints(member) {
     var id = member.id;
     $.ajax({
-        url: '../static/js/data/member'+ id +'.json', //@TODO: This should get new member detail.
+        url: '../public/js/data/member'+ id +'.json', //@TODO: This should get new member detail.
         dataType: "json",
-        type: "POST",
         data:{
             id: id
         },
@@ -888,78 +697,22 @@ function removeAllFingerPrints(member) {
  * Ajax - Adds New FingerPrint For A Member
  * @param member
  */
-function addNewFingerPrint(member,reports) {
+function addNewFingerPrint(member) {
     var id = member.id;
-
-    openModal("انگشت خود را روی دستگاه قرار دهید.",asset("images/fingerprint-scanning-in-half-view.svg"));
-
     $.ajax({
-        url: url('enroll_handle_finger_step_1'),
+        url: '../public/js/data/member'+ id +'.json', //@TODO: This should get new member detail.
         dataType: "json",
-        type: "POST",
         data:{
-            user_id: id
+            id: id
         },
         success: function (response) {
-            if(response.status === 401){
-                openModal('این انگشت قبلا ثبت شده‌است.',asset('images/fingerprint-outline-with-close-button.svg'));
-                return
-            }
-
-            if(response.status === 403){
-                scanTimeout();
-                return
-            }
-
-            if(response.status === 402){
-                openModal('لطفا انگشت خود را بردارید.', asset("images/sand-clock.svg"));
-                setTimeout(function () {
-                    openModal('انگشت خود را مجددا روی دستگاه قرار دهید.', asset("images/fingerprint-scanning-in-half-view.svg"));
-                    addNewFingerStep2(id, reports)
-                },3000);
-                return;
-            }
-
+            closeModal();
+            renderMemberDetails(member, response.reports);
         },
-        error: connectionError
-    })
-}
-
-
-/**
- * Ajax - Adds New FingerPrint For A Member (Rendering)
- * @param id
- * @param reports
- */
-function addNewFingerStep2(id, reports) {
-
-    $.ajax({
-        url: url('enroll_handle_finger_step_2'),
-        dataType: "json",
-        success: function (response) {
-            // No Match
-            if(response.status === 411){
-                openModal('عدم مطابقت با اثر انگشت قبلی',asset('images/fingerprint-outline-with-close-button.svg'));
-                return
-            }
-
-            // Timeout
-            if(response.status === 414){
-                scanTimeout();
-                return
-            }
-
-            // Match and saved
-            if(response.status === 413){
-                openModal('اثر انگشت با موفقیت ثبت شد.',asset('images/fingerprint-outline-with-check-mark.svg'));
-                setTimeout(function () {
-                    closeModal();
-                    renderMemberDetails(response.member[0], reports);
-                },3000);
-            }
-
-        },
-        error: connectionError
+        error: function () {
+            closeModal();
+            showError('خطا در برقراری ارتباط','#list');
+        }
     })
 }
 
@@ -968,45 +721,40 @@ function addNewFingerStep2(id, reports) {
  * Ajax - Remove Member Card
  * @param member
  */
-function removeMemberCard(member, reports) {
+function removeMemberCard(member) {
     var id = member.id;
-
-    waitForIt();
-
     $.ajax({
-        url: '../static/js/data/member.json', //@TODO: This should get new member detail.
+        url: '../public/js/data/member'+ id +'.json', //@TODO: This should get new member detail.
         dataType: "json",
-        type: "POST",
         data:{
-            user_id: id
+            id: id
         },
         success: function (response) {
-            closeModal();
-            renderMemberDetails(response.member[0], reports);
+            renderMemberDetails(member, response.reports);
         },
-        error: connectionError
+        error: function () {
+            showError('خطا در برقراری ارتباط','#list');
+        }
     })
 }
 
 
 
-function addNewCard(member,reports) {
+function addNewCard(member) {
     var id = member.id;
 
-    waitForIt();
-
     $.ajax({
-        url: '../static/js/data/member.json', //@TODO: This should get new member detail.
+        url: '../public/js/data/member'+ id +'.json', //@TODO: This should get new member detail.
         dataType: "json",
-        type: "POST",
         data:{
-            user_id: id
+            id: id
         },
         success: function (response) {
-            closeModal();
-            renderMemberDetails(response.member[0], reports);
+            renderMemberDetails(member, response.reports);
         },
-        error: connectionError
+        error: function () {
+            showError('خطا در برقراری ارتباط','#list');
+        }
     })
 }
 
@@ -1022,4 +770,104 @@ function showError(message,parent) {
         .text(message)
 }
 
+
+
+/*
+*-------------------------------------------------------
+* Self Invoking Anonymous Function
+*-------------------------------------------------------
+*/
+
+jQuery(function($){
+
+
+    // StandBy theme
+    checkTheme();
+    setInterval(function () {
+        checkTheme();
+    },30000);
+
+
+    //Modal close function
+    $('#alertModal .close').on('click',closeModal);
+
+
+    // Setting button clicked
+    $('.js-accessSetting').on('click',function () {
+        openModal('برای ورود به بخش تنظیمات مجددا انگشت‌ خود را اسکن کنید.', '../public/images/fingerprint-with-keyhole.svg');
+        $.ajax({
+            url: "../public/js/data/isAdmin.json",
+            dataType: "json",
+            success: function(response) {
+                if(response.isAdmin){
+                    isAdmin();
+                }else {
+                    isNotAdmin();
+                }
+            },
+            error: function () {
+                openModal('مجددا تلاش کنید.','../public/images/fingerprint-information-symbol.svg');
+            }
+        });
+    });
+
+
+    // Back To Home
+    $('.back-to-home').on('click',closeSetting);
+
+
+
+    // Socket
+    //------------------------------------------------------------------
+//    var connected = false;
+//    const socket = io('http://' + document.domain + ':' + location.port);
+//
+//
+//    // On Connect
+//    socket.on('connect', function () {
+//        connected = true;
+//        console.log("connected");
+//    });
+//
+//
+//    // On Auth
+//    socket.on('auth', function (data) {
+//        console.log(data);
+//        socket.emit('setFingerPrintStatus', true);
+//    });
+//
+//
+//    // On fingerPrintStatus
+//    socket.on('fingerPrintStatus', function (data) {
+//        if (data.status <= 2) {
+//            console.log(data.status);
+//            console.log(second_message);
+//        }
+//        if (data.status >= 3 && data.status <= 15) {
+//            console.log(data.status);
+//            console.log(fifteenth_message + data.first_name + ' ' + data.last_name + ', your last exit: ' + data.last_action);
+//        }
+//        if (data.status >= 16) {
+//            console.log(data.status);
+//            console.log(seventeenth_message + data.first_name + ' ' + data.last_name + ', your last enter: ' + data.last_action);
+//        }
+//
+//    });
+//
+//
+//    // On Disconnect
+//    socket.on('disconnect', function () {
+//        console.log('disconnected.');
+//        connected = false;
+//    });
+//
+//
+//    // Auto Update Socket
+//    setInterval(function () {
+//        if (connected){
+//            socket.emit('update');
+//        }
+//    }, 500);
+
+}); //End Of siaf!
 
