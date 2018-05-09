@@ -132,6 +132,7 @@ def settings_process():
             users_table_records_count = db.table('users').get().count()
             our_result['members_count'] = users_table_records_count
 
+            store['fingerPrintEnabled'] = True
             return jsonify(our_result)
 
 
@@ -141,8 +142,10 @@ def settings_process():
             our_result['is_admin'] = admin_role_check_clause
             our_result['message'] = 'Sorry, you are not allowed to enter settings.'
 
+        store['fingerPrintEnabled'] = True
         return jsonify(our_result)
 
+    store['fingerPrintEnabled'] = True
     return jsonify(our_result)
 
 
