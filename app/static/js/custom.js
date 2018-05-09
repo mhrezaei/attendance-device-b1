@@ -84,7 +84,8 @@ function forms_digit_fa(enDigit) {
  */
 var App_router = "standby";
 var App_modalState = "close";
-var connected;
+var connected = false;
+const socket = io('http://' + document.domain + ':' + location.port);
 
 /*
 *-------------------------------------------------------
@@ -522,8 +523,9 @@ function closeSetting() {
 
     $('body').removeClass('showSetting');
     clearList();
-    connected = true;
     App_router = "standby";
+    socket.disconnect();
+    socket.connect();
 }
 
 
@@ -959,9 +961,6 @@ jQuery(function($){
 
     // Socket
     //------------------------------------------------------------------
-    var connected = false;
-    const socket = io('http://' + document.domain + ':' + location.port);
-
 
     // On Connect
     socket.on('connect', function () {
@@ -985,9 +984,15 @@ jQuery(function($){
         }
         if (data.status >= 3 && data.status <= 15) {
             console.log(data.status);
+            console.log(data.last_action);
             var msg = data.first_name + ' ' + data.last_name + 'خوش آمدید. آخرین خروج شما: ' + data.last_action;
             openModal(msg, asset('images/welcome.svg'));
             setTimeout(closeModal, 3000);
+
+//            socket.disconnect();
+//            setTimeout(function () {
+//                socket.connect();
+//            },5000);
         }
 
         if (data.status >= 16) {
@@ -995,6 +1000,11 @@ jQuery(function($){
             var msg = data.first_name + ' ' + data.last_name + 'خدا نگهدار. آخرین ورود شما: ' + data.last_action;
             openModal(msg, asset('images/exit.svg'));
             setTimeout(closeModal, 3000);
+
+//            socket.disconnect();
+//            setTimeout(function () {
+//                socket.connect();
+//            },5000);
         }
 
     });
@@ -1013,6 +1023,8 @@ jQuery(function($){
             socket.emit('update');
         }
     }, 500);
+
+    socket.connect();
 
 }); //End Of siaf!
 
