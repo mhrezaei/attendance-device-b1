@@ -6,7 +6,6 @@ from forms import UserDefineForm, UserEnrollForm
 from pprint import pprint
 from globla_variables import settings_timeout, enroll_finger_timeout
 
-
 store['clients'] = []
 
 
@@ -167,7 +166,6 @@ def user_logs_process():
         all_logs_associated_with_this_user = db.table('user_logs').where('user_id', our_result['id']).order_by(
             'id', 'desc').get()
 
-
         user_report = []
         for user_log in all_logs_associated_with_this_user:
             user_report.append({
@@ -306,7 +304,7 @@ def enroll_handle_rfid():
     return 'Hi'
 
 
-@app.route('/enroll_handle_finger_step_1', methods=['GET','POST'])
+@app.route('/enroll_handle_finger_step_1', methods=['GET', 'POST'])
 def enroll_handle_finger_step_1():
     our_result = dict()
     our_result['status'] = 400
@@ -347,7 +345,7 @@ def enroll_handle_finger_step_1():
     return jsonify(our_result)
 
 
-@app.route('/enroll_handle_finger_step_2', methods=['GET','POST'])
+@app.route('/enroll_handle_finger_step_2', methods=['GET', 'POST'])
 def enroll_handle_finger_step_2():
     our_result = dict()
     our_result['status'] = 410
@@ -355,12 +353,19 @@ def enroll_handle_finger_step_2():
     our_result['id'] = session.pop('key', None)
     # our_result['id'] = 31
 
-
     time.sleep(3)
 
+    check_time = time.time() + enroll_finger_timeout
+
     # Wait to read the finger again
-    while fingerprint.readImage() == 0:
+    while (fingerprint.readImage() == 0) and (time.time() < check_time):
         pass
+
+    if time.time() > check_time:
+        our_result['status'] = 414
+        our_result['message'] = 'Timeout is over.'
+        return jsonify(our_result)
+
 
     # Converts read image to characteristics and stores it in char buffer 2
     fingerprint.convertImage(0x02)
@@ -378,7 +383,8 @@ def enroll_handle_finger_step_2():
     position_number = fingerprint.storeTemplate()
 
     our_result['status'] = 412
-    our_result['message'] = 'Finger enrolled successfully in fingerprint sensor memory at template position #' + str(position_number)
+    our_result['message'] = 'Finger enrolled successfully in fingerprint sensor memory at template position #' + str(
+        position_number)
 
     db.table('fingers').insert(user_id=our_result['id'], template_position=position_number)
 
@@ -387,7 +393,8 @@ def enroll_handle_finger_step_2():
     # Retrieve all fingers related to this specific user
     this_user_related_fingers = db.table('fingers').where('user_id', our_result['id']).get()
 
-    this_user = db.table('users').where('user_id', our_result['id']).get()
+    # this_user = db.table('users').where('id', int(our_result['id'])).get()
+    this_user = User.find(int(our_result['id']))
 
     user_finger = []
     # Add some information about that related finger of that specific user
@@ -401,19 +408,19 @@ def enroll_handle_finger_step_2():
 
     # Update result['members']
     our_result['member'].append({
-        'id': this_user['id'],
-        'first_name': this_user['first_name'],
-        'last_name': this_user['last_name'],
-        'code_melli': this_user['code_melli'],
-        'created_at': this_user['created_at'],
-        'updated_at': this_user['updated_at'],
+        'id': this_user.id,
+        'first_name': this_user.first_name,
+        'last_name': this_user.last_name,
+        'code_melli': this_user.code_melli,
+        'created_at': this_user.created_at,
+        'updated_at': this_user.updated_at,
         'related_fingers': user_finger,
         'rfid_unique_id': 'Nothing yet'
     })
 
     our_result['status'] = 413
     our_result['message'] = 'This finger has been enrolled successfully and inserted in the database.'
-    
+
     return jsonify(our_result)
 
 
