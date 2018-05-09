@@ -806,6 +806,11 @@ function addNewFingerPrint(member,reports) {
                 return
             }
 
+            if(response.status === 403){
+                scanTimeout();
+                return
+            }
+
             if(response.status === 402){
                 openModal('لطفا انگشت خود را بردارید.', asset("images/sand-clock.svg"));
                 setTimeout(function () {
