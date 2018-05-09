@@ -84,6 +84,7 @@ function forms_digit_fa(enDigit) {
  */
 var App_router = "standby";
 var App_modalState = "close";
+var connected;
 
 /*
 *-------------------------------------------------------
@@ -521,7 +522,7 @@ function closeSetting() {
 
     $('body').removeClass('showSetting');
     clearList();
-    
+    connected = true;
     App_router = "standby";
 }
 
@@ -980,15 +981,20 @@ jQuery(function($){
     socket.on('fingerPrintStatus', function (data) {
         if (data.status <= 2) {
             console.log(data.status);
-            console.log(second_message);
+            noMatchFound();
         }
         if (data.status >= 3 && data.status <= 15) {
             console.log(data.status);
-            console.log(fifteenth_message + data.first_name + ' ' + data.last_name + ', your last exit: ' + data.last_action);
+            var msg = data.first_name + ' ' + data.last_name + 'خوش آمدید. آخرین خروج شما: ' + data.last_action;
+            openModal(msg, asset('images/welcome.svg'));
+            setTimeout(closeModal, 3000);
         }
+
         if (data.status >= 16) {
             console.log(data.status);
-            console.log(seventeenth_message + data.first_name + ' ' + data.last_name + ', your last enter: ' + data.last_action);
+            var msg = data.first_name + ' ' + data.last_name + 'خدا نگهدار. آخرین ورود شما: ' + data.last_action;
+            openModal(msg, asset('images/exit.svg'));
+            setTimeout(closeModal, 3000);
         }
 
     });
