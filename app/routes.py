@@ -15,6 +15,7 @@ store['clients'] = []
 # --------------#
 @socket.on('connect')
 def socket_connect():
+    store['fingerPrintEnabled'] = True
     socket.emit('auth', request.sid)
     store['clients'].append(request.sid)
 
@@ -54,7 +55,8 @@ def settings():
 @app.route('/settings_process')
 def settings_process():
     our_result = dict()
-
+    store['fingerPrintEnabled'] = False
+    time.sleep(0.05)
     our_result['status'] = 200
     our_result['message'] = 'Nothing done yet.'
     our_result['members'] = []
