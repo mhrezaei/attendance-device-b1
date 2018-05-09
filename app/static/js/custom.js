@@ -988,11 +988,6 @@ jQuery(function($){
             var msg = data.first_name + ' ' + data.last_name + 'خوش آمدید. آخرین خروج شما: ' + data.last_action;
             openModal(msg, asset('images/welcome.svg'));
             setTimeout(closeModal, 3000);
-
-//            socket.disconnect();
-//            setTimeout(function () {
-//                socket.connect();
-//            },5000);
         }
 
         if (data.status >= 16) {
@@ -1000,11 +995,6 @@ jQuery(function($){
             var msg = data.first_name + ' ' + data.last_name + 'خدا نگهدار. آخرین ورود شما: ' + data.last_action;
             openModal(msg, asset('images/exit.svg'));
             setTimeout(closeModal, 3000);
-
-//            socket.disconnect();
-//            setTimeout(function () {
-//                socket.connect();
-//            },5000);
         }
 
     });
