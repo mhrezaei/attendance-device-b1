@@ -1,10 +1,11 @@
 from config import app, publish, store, socket, fingerprint
-from flask import render_template, request, flash, redirect, url_for, jsonify, json
+from flask import render_template, request, flash, redirect, url_for, jsonify, json, session
 from models import *
 import time
 from forms import UserDefineForm, UserEnrollForm
 from pprint import pprint
 from globla_variables import settings_timeout, enroll_finger_timeout
+
 
 store['clients'] = []
 
@@ -313,9 +314,10 @@ def enroll_handle_finger_step_1():
 
     # our_result['id'] = 31 # Manual test without ajax
     our_result['id'] = request.form['user_id'].encode("utf-8")
+    session['key'] = str(our_result['id'])
 
     check_time = time.time() + enroll_finger_timeout
-    
+
     # Wait to read the finger
     while (fingerprint.readImage() == 0) and (time.time() < check_time):
         pass
@@ -348,15 +350,12 @@ def enroll_handle_finger_step_1():
 @app.route('/enroll_handle_finger_step_2', methods=['POST'])
 def enroll_handle_finger_step_2():
     our_result = dict()
-    our_result['status'] = []
-    our_result['id'] = request.form['user_id'].encode("utf-8")
+    our_result['status'] = 410
+    our_result['message'] = 'Waiting for the same finger again...'
+    # our_result['id'] = request.form['user_id'].encode("utf-8")
+    our_result['id'] = session.pop('key', None)
 
     time.sleep(3)
-
-    our_result['status'].append({
-        'code': 4,
-        'message': 'Waiting for same finger again...'
-    })
 
     # Wait to read the finger again
     while fingerprint.readImage() == 0:
@@ -367,10 +366,8 @@ def enroll_handle_finger_step_2():
 
     # Compares the char buffers
     if fingerprint.compareCharacteristics() == 0:
-        our_result['status'].append({
-            'code': 5,
-            'message': 'Fingers do not match'
-        })
+        our_result['status'] = 411
+        our_result['message'] = 'Fingers do not match'
         return jsonify(our_result)
 
     # Creates a template
@@ -378,20 +375,14 @@ def enroll_handle_finger_step_2():
 
     # Saves the template at new position number
     position_number = fingerprint.storeTemplate()
-    our_result['status'].append({
-        'code': 6,
-        'message': 'Finger enrolled successfully!'
-    })
-    our_result['status'].append({
-        'code': 7,
-        'message': 'New template position #' + str(position_number)
-    })
+
+    our_result['status'] = 412
+    our_result['message'] = 'Finger enrolled successfully in fingerprint sensor memory at template position #' + str(position_number)
+
     db.table('fingers').insert(user_id=our_result['id'], template_position=position_number)
 
-    our_result['status'].append({
-        'code': 8,
-        'message': 'This user has been enrolled successfully and inserted in the database.'
-    })
+    our_result['status'] = 413
+    our_result['message'] = 'This finger has been enrolled successfully and inserted in the database.'
 
     return jsonify(our_result)
 
