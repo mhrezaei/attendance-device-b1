@@ -347,13 +347,14 @@ def enroll_handle_finger_step_1():
     return jsonify(our_result)
 
 
-@app.route('/enroll_handle_finger_step_2', methods=['POST'])
+@app.route('/enroll_handle_finger_step_2', methods=['GET','POST'])
 def enroll_handle_finger_step_2():
     our_result = dict()
     our_result['status'] = 410
     our_result['message'] = 'Waiting for the same finger again.'
-    # our_result['id'] = request.form['user_id'].encode("utf-8")
     our_result['id'] = session.pop('key', None)
+    # our_result['id'] = 31
+
 
     time.sleep(3)
 
@@ -381,9 +382,38 @@ def enroll_handle_finger_step_2():
 
     db.table('fingers').insert(user_id=our_result['id'], template_position=position_number)
 
+    our_result['member'] = []
+
+    # Retrieve all fingers related to this specific user
+    this_user_related_fingers = db.table('fingers').where('user_id', our_result['id']).get()
+
+    this_user = db.table('users').where('user_id', our_result['id']).get()
+
+    user_finger = []
+    # Add some information about that related finger of that specific user
+    if this_user_related_fingers.count():
+        for finger in this_user_related_fingers:
+            user_finger.append({
+                'id': finger['id'],
+                'position': finger['template_position'],
+                'created_at': finger['created_at']
+            })
+
+    # Update result['members']
+    our_result['member'].append({
+        'id': this_user['id'],
+        'first_name': this_user['first_name'],
+        'last_name': this_user['last_name'],
+        'code_melli': this_user['code_melli'],
+        'created_at': this_user['created_at'],
+        'updated_at': this_user['updated_at'],
+        'related_fingers': user_finger,
+        'rfid_unique_id': 'Nothing yet'
+    })
+
     our_result['status'] = 413
     our_result['message'] = 'This finger has been enrolled successfully and inserted in the database.'
-
+    
     return jsonify(our_result)
 
 
