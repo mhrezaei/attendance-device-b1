@@ -18,12 +18,13 @@ def socket_connect():
     # store['fingerPrintEnabled'] = True
     socket.emit('auth', request.sid)
     store['clients'].append(request.sid)
-
+    print('Connect' + request.sid)
 
 @socket.on('disconnect')
 def socket_disconnect():
     store['fingerPrintEnabled'] = False
     store['clients'].remove(request.sid)
+    print('Disconnect' + request.sid)
 
 
 @socket.on('setFingerPrintStatus')
