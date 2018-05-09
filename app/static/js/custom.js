@@ -84,8 +84,104 @@ function forms_digit_fa(enDigit) {
  */
 var App_router = "standby";
 var App_modalState = "close";
-var connected = false;
-const socket = io('http://' + document.domain + ':' + location.port);
+
+
+/*
+*-------------------------------------------------------
+* Self Invoking Anonymous Function
+*-------------------------------------------------------
+*/
+jQuery(function($){
+
+
+    // StandBy theme
+    checkTheme();
+    setInterval(function () {
+        checkTheme();
+    },30000);
+
+
+    //Modal close function
+    $('#alertModal .close').on('click',closeModal);
+
+
+    // Setting button clicked
+    $('.js-accessSetting').on('click',function () {
+        openModal('برای ورود به بخش تنظیمات انگشت‌ خود را اسکن کنید.', asset('images/fingerprint-with-keyhole.svg'));
+
+        checkAdmin();
+    });
+
+
+    // Back To Home
+    $('.back-to-home').on('click',closeSetting);
+
+
+
+    // Socket
+    //------------------------------------------------------------------
+
+    let connected = false;
+
+    const socket = io('http://' + document.domain + ':' + location.port);
+
+    window.socket = socket;
+    // On Connect
+    socket.on('connect', function () {
+        connected = true;
+        console.log("connected");
+    });
+
+
+    // On Auth
+    socket.on('auth', function (data) {
+        console.log(data);
+        socket.emit('setFingerPrintStatus', true);
+    });
+
+
+    // On fingerPrintStatus
+    socket.on('fingerPrintStatus', function (data) {
+        if (data.status <= 2) {
+            console.log(data.status);
+            noMatchFound();
+        }
+        if (data.status >= 3 && data.status <= 15) {
+            console.log(data.status);
+            console.log(data.last_action);
+            var msg = data.first_name + ' ' + data.last_name + 'خوش آمدید. آخرین خروج شما: ' + data.last_action;
+            openModal(msg, asset('images/welcome.svg'));
+            setTimeout(closeModal, 3000);
+        }
+
+        if (data.status >= 16) {
+            console.log(data.status);
+            var msg = data.first_name + ' ' + data.last_name + 'خدا نگهدار. آخرین ورود شما: ' + data.last_action;
+            openModal(msg, asset('images/exit.svg'));
+            setTimeout(closeModal, 3000);
+        }
+
+    });
+
+
+    // On Disconnect
+    socket.on('disconnect', function () {
+        console.log('disconnected.');
+        connected = false;
+    });
+
+
+    // Auto Update Socket
+    setInterval(function () {
+        if (connected){
+            socket.emit('update');
+        }
+    }, 500);
+
+//    socket.connect();
+
+}); //End Of siaf!
+
 
 /*
 *-------------------------------------------------------
@@ -524,8 +620,7 @@ function closeSetting() {
     $('body').removeClass('showSetting');
     clearList();
     App_router = "standby";
-//    socket.disconnect();
-//    socket.connect();
+    socket.emit('setFingerPrintStatus', false);
 }
 
 
@@ -550,6 +645,7 @@ function waitForIt() {
  */
 function connectionError() {
     openModal('اختلال در شبکه',asset("images/fingerprint-information-symbol.svg"));
+
 }
 
 
@@ -559,6 +655,7 @@ function connectionError() {
 function isAdmin(members) {
     closeModal();
     openSetting();
+    socket.emit('setFingerPrintStatus', false);
     getMembersList(members);
 }
 
@@ -925,96 +1022,4 @@ function showError(message,parent) {
         .text(message)
 }
 
-
-/*
-*-------------------------------------------------------
-* Self Invoking Anonymous Function
-*-------------------------------------------------------
-*/
-
-jQuery(function($){
-
-
-    // StandBy theme
-    checkTheme();
-    setInterval(function () {
-        checkTheme();
-    },30000);
-
-
-    //Modal close function
-    $('#alertModal .close').on('click',closeModal);
-
-
-    // Setting button clicked
-    $('.js-accessSetting').on('click',function () {
-        openModal('برای ورود به بخش تنظیمات انگشت‌ خود را اسکن کنید.', asset('images/fingerprint-with-keyhole.svg'));
-
-        checkAdmin();
-    });
-
-
-    // Back To Home
-    $('.back-to-home').on('click',closeSetting);
-
-
-
-    // Socket
-    //------------------------------------------------------------------
-
-    // On Connect
-    socket.on('connect', function () {
-        connected = true;
-        console.log("connected");
-    });
-
-
-    // On Auth
-    socket.on('auth', function (data) {
-        console.log(data);
-        socket.emit('setFingerPrintStatus', true);
-    });
-
-
-    // On fingerPrintStatus
-    socket.on('fingerPrintStatus', function (data) {
-        if (data.status <= 2) {
-            console.log(data.status);
-            noMatchFound();
-        }
-        if (data.status >= 3 && data.status <= 15) {
-            console.log(data.status);
-            console.log(data.last_action);
-            var msg = data.first_name + ' ' + data.last_name + 'خوش آمدید. آخرین خروج شما: ' + data.last_action;
-            openModal(msg, asset('images/welcome.svg'));
-            setTimeout(closeModal, 3000);
-        }
-
-        if (data.status >= 16) {
-            console.log(data.status);
-            var msg = data.first_name + ' ' + data.last_name + 'خدا نگهدار. آخرین ورود شما: ' + data.last_action;
-            openModal(msg, asset('images/exit.svg'));
-            setTimeout(closeModal, 3000);
-        }
-
-    });
-
-
-    // On Disconnect
-    socket.on('disconnect', function () {
-        console.log('disconnected.');
-        connected = false;
-    });
-
-
-    // Auto Update Socket
-    setInterval(function () {
-        if (connected){
-            socket.emit('update');
-        }
-    }, 500);
-
-//    socket.connect();
-
-}); //End Of siaf!
 
