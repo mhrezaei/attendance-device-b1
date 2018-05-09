@@ -524,8 +524,8 @@ function closeSetting() {
     $('body').removeClass('showSetting');
     clearList();
     App_router = "standby";
-    socket.disconnect();
-    socket.connect();
+//    socket.disconnect();
+//    socket.connect();
 }
 
 
@@ -1014,7 +1014,7 @@ jQuery(function($){
         }
     }, 500);
 
-    socket.connect();
+//    socket.connect();
 
 }); //End Of siaf!
 
