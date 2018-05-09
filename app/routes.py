@@ -364,6 +364,7 @@ def enroll_handle_finger_step_2():
     if time.time() > check_time:
         our_result['status'] = 414
         our_result['message'] = 'Timeout is over.'
+        return jsonify(our_result)
 
 
     # Converts read image to characteristics and stores it in char buffer 2
