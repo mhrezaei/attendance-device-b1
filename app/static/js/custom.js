@@ -843,6 +843,12 @@ function addNewFingerStep2(id, reports) {
                 return
             }
 
+            // Timeout
+            if(response.status === 414){
+                scanTimeout();
+                return
+            }
+
             // Match and saved
             if(response.status === 413){
                 openModal('اثر انگشت با موفقیت ثبت شد.',asset('images/fingerprint-outline-with-check-mark.svg'));
@@ -915,7 +921,6 @@ function showError(message,parent) {
         .appendTo(parent)
         .text(message)
 }
-
 
 
 /*
