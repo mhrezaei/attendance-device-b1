@@ -297,7 +297,7 @@ def get_all_users():  # TODO: Seems NOT enrolling new users when sensor memory i
     our_result['members_count'] = users_table_records_count
 
     return jsonify(our_result)
-
+# Test for new commit to branch
 
 @app.route('/enroll_handle_rfid', methods=['POST'])
 def enroll_handle_rfid():
