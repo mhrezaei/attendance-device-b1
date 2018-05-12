@@ -481,18 +481,10 @@ Vue.component('app-details',{
     props: ['member','reports'],
     methods:{
         setTime: function (date) {
-            if(date === "None"){
-                return "ثبت نشده";
-            }
-            var unix = new persianDate(new Date(date)).valueOf();
-            return new persianDate(unix).toLocale('fa').toCalendar('persian').format('HH:mm');
+            return toPersianTime(date);
         },
         setDate: function (date) {
-            if(date === "None"){
-                return "ثبت نشده";
-            }
-            var unix = new persianDate(new Date(date)).valueOf();
-            return new persianDate(unix).toLocale('fa').toCalendar('persian').format('DD MMMM YYYY');
+            return toPersianDate(date);
         },
         convertDigit(digit){
             return pd(digit.toString())
@@ -629,6 +621,36 @@ function closeSetting() {
  */
 function clearList() {
     $('#list').html("");
+}
+
+
+/**
+ * Converts TimeStamp To Persian Date
+ * @param timeStamp
+ * @returns {string}
+ */
+function toPersianDate(timestamp){
+    if(timestamp === "None"){
+        return "ثبت نشده";
+    }
+    var unix = new persianDate(new Date(timestamp)).valueOf();
+    return new persianDate(unix).toLocale('fa').toCalendar('persian').format('HH:mm');
+}
+
+
+/**
+ * Converts Timestamp To Persian Time
+ * @param timestamp
+ * @returns {string}
+ */
+function toPersianTime(timestamp) {
+    console.log(timestamp);
+    if(timestamp === "None"){
+        return "ثبت نشده";
+    }
+    var unix = new persianDate(new Date(timestamp)).valueOf();
+    console.log(unix);
+    return new persianDate(unix).toLocale('fa').toCalendar('persian').format('DD MMMM YYYY');
 }
 
 
