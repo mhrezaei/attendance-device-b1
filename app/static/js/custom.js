@@ -149,14 +149,38 @@ jQuery(function($){
         if (data.status >= 3 && data.status <= 15) {
             console.log(data.status);
             console.log(data.last_action);
-            var msg = data.first_name + ' ' + data.last_name + 'خوش آمدید. آخرین خروج شما: ' + data.last_action;
+
+            let lastAction = "";
+            console.log(data.last_action);
+            if(data.last_action === "None" && data.last_action === "None"){
+                lastAction = "ثبت نشده";
+            }else {
+                lastAction = toPersianDate(data.last_action) + " " + toPersianTime(data.last_action);
+            }
+
+            let msg = data.first_name + ' ' + data.last_name + 'خوش آمدید. آخرین خروج شما: ' + lastAction;
             openModal(msg, asset('images/welcome.svg'));
             setTimeout(closeModal, 3000);
         }
 
         if (data.status >= 16) {
             console.log(data.status);
-            var msg = data.first_name + ' ' + data.last_name + 'خدا نگهدار. آخرین ورود شما: ' + data.last_action;
+
+            let lastAction = "";
+            console.log(data.last_action);
+            if(data.last_action === "None" && data.last_action === "None"){
+                lastAction = "ثبت نشده";
+            }else {
+                lastAction = toPersianDate(data.last_action) + " ،" + toPersianTime(data.last_action);
+            }
+
+            if(data.last_action === "None" && data.last_action === "None"){
+                lastAction = "ثبت نشده";
+            }else {
+                lastAction = toPersianDate(data.last_action) + " ،" + toPersianTime(data.last_action);
+            }
+
+            let msg = data.first_name + ' ' + data.last_name + 'خدا نگهدار. آخرین ورود شما: ' + lastAction;
             openModal(msg, asset('images/exit.svg'));
             setTimeout(closeModal, 3000);
         }
