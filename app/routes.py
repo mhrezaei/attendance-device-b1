@@ -444,3 +444,11 @@ def enroll_handle_rfid_temp():
     return jsonify(data)
 
 
+@app.route('/update_recorded_fingers_count', methods=['GET']) #TODO: Temporal - use this as a function whenever needed
+def update_recorded_fingers_count():
+    users = db.table('users').get()
+    for user in users:
+        recorded_fingers_count = db.table('fingers').where('user_id', user.id).count()
+        db.table('users').where('id', user.id).update(recorded_fingers_count=recorded_fingers_count)
+
+    return 'Done'
