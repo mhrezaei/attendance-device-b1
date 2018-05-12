@@ -446,8 +446,8 @@ def enroll_handle_finger_step_2():
     return jsonify(our_result)
 
 
-@app.route('/enroll_handle_rfid_temp', methods=['POST'])
-def enroll_handle_rfid_temp():
+@app.route('/enroll_handle_rfid', methods=['POST'])
+def enroll_handle_rfid():
     data = dict()
     data['id'] = request.form['user_id'].encode("utf-8")
     pprint(data['id'])
