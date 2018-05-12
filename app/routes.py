@@ -448,10 +448,10 @@ def enroll_handle_finger_step_2():
 
 @app.route('/enroll_handle_rfid', methods=['POST'])
 def enroll_handle_rfid():
-    data = dict()
-    data['id'] = request.form['user_id'].encode("utf-8")
-    pprint(data['id'])
-    return jsonify(data)
+    our_result = dict()
+    our_result['id'] = request.form['user_id'].encode("utf-8")
+    pprint(our_result['id'])
+    return jsonify(our_result)
 
 
 @app.route('/update_recorded_fingers_count', methods=['GET']) #TODO: Temporal - use this as a function whenever needed
