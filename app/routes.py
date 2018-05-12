@@ -4,7 +4,7 @@ from models import *
 import time
 from forms import UserDefineForm, UserEnrollForm
 from pprint import pprint
-from globla_variables import settings_timeout, enroll_finger_timeout
+from globla_variables import settings_timeout, enroll_finger_timeout, enroll_rfid_timeout
 import RPi.GPIO as GPIO
 import SimpleMFRC522
 
@@ -451,18 +451,68 @@ def enroll_handle_rfid():
         our_result = dict()
         our_result['id'] = request.form['user_id'].encode("utf-8")
 
+
         rfid_owner_user_id = str(our_result['id'])
 
         our_result['status'] = 500
         our_result['message'] = 'Place your tag to be written please.'
 
-        reader.write(rfid_owner_user_id)
+        check_time = time.time() + enroll_rfid_timeout
 
-        our_result['status'] = 501
-        our_result['message'] = 'Tag has been written successfully.'
+        while time.time() < check_time:
+            reader.write(rfid_owner_user_id)
 
-        return jsonify(our_result)
+            our_result['status'] = 501
+            our_result['message'] = 'Tag has been written successfully on the card.'
 
+            unique_id, rfid_owner_user_id = reader.read()
+
+            unique_id_check_clause = db.table('rfid_cards').where('unique_id', unique_id).count()
+
+            if unique_id_check_clause:
+                db.table('rfid_cards').where('unique_id', unique_id).update(user_id=our_result['id'])
+
+            else:
+                db.table('rfid_cards').insert(user_id=our_result['id'], unique_id=unique_id)
+
+            our_result['status'] = 503
+            our_result['message'] = 'Tag has been written successfully on rfid_cards table.'
+
+            our_result['member'] = []
+
+            # Retrieve all fingers related to this specific user
+            this_user_related_fingers = db.table('fingers').where('user_id', our_result['id']).get()
+
+            this_user = User.find(int(our_result['id']))
+
+            user_finger = []
+            # Add some information about that related finger of that specific user
+            if this_user_related_fingers.count():
+                for finger in this_user_related_fingers:
+                    user_finger.append({
+                        'id': finger['id'],
+                        'position': finger['template_position'],
+                        'created_at': finger['created_at']
+                    })
+
+            # Update result['members']
+            our_result['member'].append({
+                'id': this_user.id,
+                'first_name': this_user.first_name,
+                'last_name': this_user.last_name,
+                'code_melli': this_user.code_melli,
+                'created_at': this_user.created_at,
+                'updated_at': this_user.updated_at,
+                'related_fingers': user_finger,
+                'rfid_unique_id': unique_id
+            })
+
+            return jsonify(our_result)
+
+        if time.time() > check_time:
+            our_result['status'] = 502
+            our_result['message'] = 'Timeout is over.'
+            return jsonify(our_result)
 
     finally:
         GPIO.cleanup()
