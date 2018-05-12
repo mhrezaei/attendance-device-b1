@@ -30,6 +30,12 @@ def run():
             return 'SerialException happened.'
 
         if read_image != 0:
+
+            finger_read_time = time()
+            check_time = finger_read_time + no_action_allowed
+
+            # while check_time < time():
+
             fingerprint.convertImage(0x01)
             # Searches template
             result = fingerprint.searchTemplate()
