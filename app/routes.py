@@ -127,6 +127,15 @@ def settings_process():
                             'created_at': finger['created_at']
                         })
 
+                unique_id_clause = db.table('rfid_cards').where('user_id', user['id']).count()
+
+                if unique_id_clause:
+                    unique_id = db.table('rfid_cards').where('user_id', user['id']).pluck('unique_id')
+                    unique_id = str(unique_id)
+                else:
+                    unique_id = ''
+
+
                 # Update result['members']
                 our_result['members'].append({
                     'id': user['id'],
@@ -136,7 +145,7 @@ def settings_process():
                     'created_at': user['created_at'],
                     'updated_at': user['updated_at'],
                     'related_fingers': user_finger,
-                    'rfid_unique_id': '',
+                    'rfid_unique_id': unique_id,
                     'recorded_fingers_count': recorded_fingers_count,
                     'maximum_allowed_fingers': maximum_allowed_fingers
                 })
@@ -417,6 +426,14 @@ def enroll_handle_finger_step_2():
                 'created_at': finger['created_at']
             })
 
+    unique_id_clause = db.table('rfid_cards').where('user_id', this_user.id).count()
+
+    if unique_id_clause:
+        unique_id = db.table('rfid_cards').where('user_id', this_user.id).pluck('unique_id')
+        unique_id = str(unique_id)
+    else:
+        unique_id = ''
+
     # Update result['members']
     our_result['member'].append({
         'id': this_user.id,
@@ -426,7 +443,7 @@ def enroll_handle_finger_step_2():
         'created_at': this_user.created_at,
         'updated_at': this_user.updated_at,
         'related_fingers': user_finger,
-        'rfid_unique_id': ''
+        'rfid_unique_id': unique_id
     })
 
     our_result['status'] = 413
