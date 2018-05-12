@@ -176,7 +176,7 @@ def run():
                                 the_hash = hashlib.sha256(characterics).hexdigest()
                                 the_accuracy = accuracy_score
 
-                                our_result['last_action'] = ''
+                                our_result['last_action'] = 'None' # The user has forgotten to attend exit on his or her last attendance
 
                                 db.table('user_logs').insert(user_id=the_user_id,
                                                              template_position=the_template_position,
