@@ -50,14 +50,11 @@ def run():
                 our_result['status'] = 4
                 # Executing Queries
                 template_position_existence_clause = db.table('fingers').where('template_position', position_number).count()
-                # Check if it is the Admin's Finger for going to Settings #TODO: add user role: admin and check it this way
 
                 # If the user_id does NOT exist in the fingers table
                 if template_position_existence_clause == 0:
                     # flash('Finger does NOT exist!')
                     our_result['status'] = 5
-                    # time.sleep(3)
-                    # return redirect('activate')
                     publish('fingerPrintStatus', our_result)
 
                 # If the user_id exists in the fingers table
@@ -84,13 +81,10 @@ def run():
 
                     our_result['first_name'] = the_first_name
                     our_result['last_name'] = the_last_name
-                    # print(our_result)
 
                     user_id_existence_clause_2 = db.table('user_logs').where('user_id', the_user_id).order_by('id',
                                                                                                               'desc').pluck(
                         'id')
-                    # b = cur.execute(
-                    #     """SELECT * FROM `user_logs` WHERE `user_id`='%d' ORDER BY id DESC LIMIT 1""" % (int(the_user_id)))
                     # The user_logs table does NOT have this user_id, inserting the first record of this user_id
                     if user_id_existence_clause_2 is None:
                         # flash('The user_logs table does NOT have this user_id. Inserting the record.')
@@ -98,16 +92,11 @@ def run():
                         the_entered_at = datetime.now()  # time right now
                         the_hash = hashlib.sha256(characterics).hexdigest()
                         the_accuracy = accuracy_score
-                        # cur.execute(
-                        #     """INSERT INTO `user_logs` (`user_id`, `template_position`, `entered_at`, `hash`, `accuracy`) VALUES ('%d', '%d', '%s', '%s', '%s')"""
-                        #     % (int(the_user_id), int(the_template_position), str(the_entered_at), str(the_hash), str(the_accuracy)))
                         db.table('user_logs').insert(user_id=the_user_id, template_position=the_template_position,
                                                      entered_at=the_entered_at, hash=the_hash,
                                                      accuracy=the_accuracy)
 
                         our_result['last_action'] = 'You have no records yet.'
-                        # time.sleep(3)
-                        # return redirect('activate')
                         publish('fingerPrintStatus', our_result)
 
 
@@ -141,8 +130,6 @@ def run():
                                                          template_position=the_template_position,
                                                          entered_at=the_entered_at, hash=the_hash,
                                                          accuracy=the_accuracy)
-                            # time.sleep(3)
-                            # return redirect('activate')
                             publish('fingerPrintStatus', our_result)
 
                         # exited_at field is empty
@@ -156,11 +143,9 @@ def run():
                                 'desc').pluck(
                                 'entered_at')
 
-                            # print(type(the_very_last_entered_at))
                             our_result['status'] = 13
                             temp_time = the_very_last_entered_at + timedelta(
                                 seconds=working_hours)
-                            # pprint(temp_time)
                             # flash('temp_time: ' + str(temp_time))
                             the_new_entered_at = datetime.now()  # time right now
 
@@ -171,7 +156,6 @@ def run():
                                 # flash('It is a NEW ENTER!')
                                 our_result['status'] = 15
 
-                                # time.sleep(3)
                                 the_template_position = position_number
                                 the_hash = hashlib.sha256(characterics).hexdigest()
                                 the_accuracy = accuracy_score
@@ -182,9 +166,6 @@ def run():
                                                              template_position=the_template_position,
                                                              entered_at=the_new_entered_at, hash=the_hash,
                                                              accuracy=the_accuracy)
-                                # our_result['last_action'] =
-                                # time.sleep(3)
-                                # return redirect('activate')
                                 publish('fingerPrintStatus', our_result)
 
                             # Less than specified times spent from this finger scan
@@ -200,9 +181,6 @@ def run():
                                     exited_at=the_exited_at)
 
                                 our_result['last_action'] = str(the_very_last_entered_at)
-                                # time.sleep(3)
-                                # return redirect('activate')
                                 publish('fingerPrintStatus', our_result)
     else:
         sleep(1)
-        # print("Hello in sleep 1")
