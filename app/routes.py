@@ -102,9 +102,13 @@ def settings_process():
             # Retrieve all users from database
             users = db.table('users').get()
 
+            user_finger = []
             # Loop in each user in users table
             for user in users:
                 our_result['status'] = 202  # Data found on users table
+
+                recorded_fingers_count = Finger.where('user_id', user.id).count()
+
 
                 # Retrieve all fingers related to that specific user
                 this_user_related_fingers = db.table('fingers').where('user_id', user.id).get()
@@ -128,7 +132,8 @@ def settings_process():
                     'created_at': user['created_at'],
                     'updated_at': user['updated_at'],
                     'related_fingers': user_finger,
-                    'rfid_unique_id': 'Nothing yet'
+                    'rfid_unique_id': 'Nothing yet',
+                    'recorded_fingers_count': recorded_fingers_count
                 })
 
             # Number of all users
