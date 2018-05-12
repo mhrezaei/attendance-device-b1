@@ -365,7 +365,6 @@ def enroll_handle_finger_step_2():
     our_result['status'] = 410
     our_result['message'] = 'Waiting for the same finger again.'
     our_result['id'] = session.pop('key', None)
-    # our_result['id'] = 31
 
     time.sleep(3)
 
@@ -433,7 +432,16 @@ def enroll_handle_finger_step_2():
     })
 
     our_result['status'] = 413
-    our_result['message'] = 'This finger has been enrolled successfully and inserted in the database.'
+    our_result['message'] = 'This finger has been enrolled successfully and inserted in the fingers table.'
+
+    maximum_allowed_fingers = db.table('users').where('id', our_result['id']).pluck('maximum_allowed_fingers')
+    our_result['maximum_allowed_fingers'] = maximum_allowed_fingers
+    recorded_fingers_count = Finger.where('user_id', our_result['id']).count()
+    updated_recorded_fingers_count = recorded_fingers_count + 1
+    db.table('users').where('id', our_result['id']).update(recorded_fingers_count=updated_recorded_fingers_count)
+    our_result['recorded_fingers_count'] = updated_recorded_fingers_count
+    our_result['status'] = 415
+    our_result['message'] = 'This finger has been added to recorded fingers count in users table.'
 
     return jsonify(our_result)
 
