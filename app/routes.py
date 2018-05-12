@@ -470,7 +470,7 @@ def enroll_handle_rfid():
             unique_id_check_clause = db.table('rfid_cards').where('unique_id', unique_id).count()
 
             if unique_id_check_clause:
-                db.table('rfid_cards').where('unique_id', unique_id).update(user_id=our_result['id'])
+                db.table('rfid_cards').where('unique_id', unique_id).update(user_id=our_result['id']) #TODO: update 'updated_at'
 
             else:
                 db.table('rfid_cards').insert(user_id=our_result['id'], unique_id=unique_id)
