@@ -6,7 +6,7 @@ from serial import SerialException
 from config import store, socket, publish, fingerprint, db, User, UserLog
 import hashlib
 from globla_variables import working_hours
-
+from globla_variables import no_action_allowed
 
 store['fingerPrintEnabled'] = False
 
