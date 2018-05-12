@@ -467,6 +467,8 @@ def enroll_handle_rfid():
 
             unique_id, rfid_owner_user_id = reader.read()
 
+            unique_id = str(unique_id)
+
             unique_id_check_clause = db.table('rfid_cards').where('unique_id', unique_id).count()
 
             if unique_id_check_clause:
