@@ -324,33 +324,37 @@ def enroll_handle_finger_step_1():
 
     check_time = time.time() + enroll_finger_timeout
 
-    # Wait to read the finger
-    while (fingerprint.readImage() == 0) and (time.time() < check_time):
-        pass
+    recorded_fingers_count = Finger.where('user_id', our_result['id']).count()
+    maximum_allowed_fingers = db.table('users').where('id', our_result['id']).pluck('maximum_allowed_fingers')
 
-    if time.time() > check_time:
-        our_result['status'] = 403
-        our_result['message'] = 'Timeout is over.'
+    if recorded_fingers_count < maximum_allowed_fingers:
+        # Wait to read the finger
+        while (fingerprint.readImage() == 0) and (time.time() < check_time):
+            pass
+
+        if time.time() > check_time:
+            our_result['status'] = 403
+            our_result['message'] = 'Timeout is over.'
+            return jsonify(our_result)
+
+        # Converts read image to characteristics and stores it in char buffer 1
+        fingerprint.convertImage(0x01)
+
+        # Checks if finger is already enrolled
+        result = fingerprint.searchTemplate()
+        position_number = result[0]
+
+        if position_number >= 0:
+            our_result['status'] = 401
+            our_result['message'] = 'This finger already has been enrolled.'
+
+            pprint(our_result)
+            return jsonify(our_result)
+
+        our_result['status'] = 402
+        our_result['message'] = 'Pick up your finger.'
+
         return jsonify(our_result)
-
-    # Converts read image to characteristics and stores it in char buffer 1
-    fingerprint.convertImage(0x01)
-
-    # Checks if finger is already enrolled
-    result = fingerprint.searchTemplate()
-    position_number = result[0]
-
-    if position_number >= 0:
-        our_result['status'] = 401
-        our_result['message'] = 'This finger already has been enrolled.'
-
-        pprint(our_result)
-        return jsonify(our_result)
-
-    our_result['status'] = 402
-    our_result['message'] = 'Pick up your finger.'
-
-    return jsonify(our_result)
 
 
 @app.route('/enroll_handle_finger_step_2', methods=['GET', 'POST'])
@@ -438,3 +442,5 @@ def enroll_handle_rfid_temp():
     data['id'] = request.form['user_id'].encode("utf-8")
     pprint(data['id'])
     return jsonify(data)
+
+
