@@ -514,7 +514,7 @@ def enroll_handle_rfid():
                         'created_at': finger['created_at']
                     })
 
-            # Update result['members']
+            # Update result['member']
             our_result['member'].append({
                 'id': this_user.id,
                 'first_name': this_user.first_name,
