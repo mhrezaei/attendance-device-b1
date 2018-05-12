@@ -505,9 +505,6 @@ Vue.component('app-details',{
             </div>
             `,
     props: ['member','reports'],
-    mounted:function () {
-        console.log(this.member);
-    },
     methods:{
         setTime: function (date) {
             return toPersianTime(date);
