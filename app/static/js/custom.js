@@ -426,7 +426,7 @@ Vue.component('app-details',{
                     </div>
                   </div>
                   <div id="member_card" class="tab-pane fade">
-                    <div class="row" v-if="member.rfid_unique_id">
+                    <div class="row" v-if="member.rfid_unique_id.toString().length">
                         <div class="col-xs-4">
                             <div class="id-card-image">
                                 <img src="static/images/id-card.svg" alt="id card">                            
@@ -1041,18 +1041,29 @@ function removeMemberCard(member, reports) {
 function addNewCard(member,reports) {
     var id = member.id;
 
-    waitForIt();
+    openModal('کارت را مقابل دستگاه قرار دهید.',asset('images/id-card.svg'));
 
     $.ajax({
-        url: '../static/js/data/member.json', //@TODO: This should get new member detail.
+        url: url('enroll_handle_rfid'),
         dataType: "json",
         type: "POST",
         data:{
             user_id: id
         },
         success: function (response) {
-            closeModal();
-            renderMemberDetails(response.member[0], reports);
+
+            if(response.status === 502){
+                scanTimeout();
+                return;
+            }
+
+            if(response.status === 503){
+                openModal('کارت با موفقیت ثبت شد.',asset('images/id-card.svg'));
+                setTimeout(function () {
+                    closeModal();
+                    renderMemberDetails(response.member[0], reports);
+                },3000);
+            }
         },
         error: connectionError
     })
