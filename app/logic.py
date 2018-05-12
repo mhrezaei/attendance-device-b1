@@ -18,7 +18,6 @@ def receive(action, message):
 
 
 def run():
-    # print('Hello from true')
     if store['fingerPrintEnabled']: #boolean
         # sleep(0.5) #TODO: 1 second or not
         our_result = {'status': 0, 'first_name': '', 'last_name': '', 'last_action': ''}
@@ -28,9 +27,7 @@ def run():
             read_image = fingerprint.readImage()
 
         except SerialException:
-            return 'zero'
-
-
+            return 'SerialException happened.'
 
         if read_image != 0:
             fingerprint.convertImage(0x01)
