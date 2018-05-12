@@ -426,7 +426,7 @@ Vue.component('app-details',{
                     </div>
                   </div>
                   <div id="member_card" class="tab-pane fade">
-                    <div class="row" v-if="member.rfid_unique_id">
+                    <div class="row" v-if="member.rfid_unique_id.toString().length">
                         <div class="col-xs-4">
                             <div class="id-card-image">
                                 <img src="static/images/id-card.svg" alt="id card">                            
@@ -505,6 +505,9 @@ Vue.component('app-details',{
             </div>
             `,
     props: ['member','reports'],
+    mounted:function () {
+        console.log(this.member);
+    },
     methods:{
         setTime: function (date) {
             return toPersianTime(date);
