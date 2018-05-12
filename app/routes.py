@@ -136,7 +136,7 @@ def settings_process():
                     'created_at': user['created_at'],
                     'updated_at': user['updated_at'],
                     'related_fingers': user_finger,
-                    'rfid_unique_id': 'Nothing yet',
+                    'rfid_unique_id': '',
                     'recorded_fingers_count': recorded_fingers_count,
                     'maximum_allowed_fingers': maximum_allowed_fingers
                 })
@@ -426,7 +426,7 @@ def enroll_handle_finger_step_2():
         'created_at': this_user.created_at,
         'updated_at': this_user.updated_at,
         'related_fingers': user_finger,
-        'rfid_unique_id': 'Nothing yet'
+        'rfid_unique_id': ''
     })
 
     our_result['status'] = 413
