@@ -1051,7 +1051,13 @@ function addNewCard(member,reports) {
             user_id: id
         },
         success: function (response) {
-            if(response.status === 500){
+
+            if(response.status === 502){
+                scanTimeout();
+                return;
+            }
+
+            if(response.status === 503){
                 openModal('کارت با موفقیت ثبت شد.',asset('images/id-card.svg'));
                 setTimeout(function () {
                     closeModal();
