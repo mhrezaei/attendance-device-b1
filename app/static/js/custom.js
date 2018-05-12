@@ -485,7 +485,9 @@ Vue.component('app-details',{
                         </div>
                     </div>
                     <div class="controls">
-                            <button class="btn btn-lg btn-success" @click="addNewFingerPrint">اثر انگشت جدید</button>  
+                            <button class="btn btn-lg btn-success" 
+                            @click="addNewFingerPrint"
+                            v-if="member.recorded_fingers_count < member.maximum_allowed_fingers">اثر انگشت جدید</button>  
                             <!--<button class="btn btn-lg btn-danger" -->
                             <!--v-if="member.fingerPrints.length"-->
                             <!--@click="removeAll">-->
