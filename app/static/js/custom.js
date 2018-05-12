@@ -644,12 +644,10 @@ function toPersianDate(timestamp){
  * @returns {string}
  */
 function toPersianTime(timestamp) {
-    console.log(timestamp);
     if(timestamp === "None"){
         return "ثبت نشده";
     }
     var unix = new persianDate(new Date(timestamp)).valueOf();
-    console.log(unix);
     return new persianDate(unix).toLocale('fa').toCalendar('persian').format('DD MMMM YYYY');
 }
 
