@@ -5,6 +5,9 @@ import time
 from forms import UserDefineForm, UserEnrollForm
 from pprint import pprint
 from globla_variables import settings_timeout, enroll_finger_timeout
+import RPi.GPIO as GPIO
+import SimpleMFRC522
+
 
 store['clients'] = []
 
@@ -309,11 +312,6 @@ def get_all_users():  # TODO: Seems NOT enrolling new users when sensor memory i
     return jsonify(our_result)
 
 
-@app.route('/enroll_handle_rfid', methods=['POST'])
-def enroll_handle_rfid():
-    return 'Hi'
-
-
 @app.route('/enroll_handle_finger_step_1', methods=['GET', 'POST'])
 def enroll_handle_finger_step_1():
     our_result = dict()
@@ -446,12 +444,29 @@ def enroll_handle_finger_step_2():
     return jsonify(our_result)
 
 
-@app.route('/enroll_handle_rfid', methods=['POST'])
+@app.route('/enroll_handle_rfid', methods=['GET', 'POST'])
 def enroll_handle_rfid():
-    our_result = dict()
-    our_result['id'] = request.form['user_id'].encode("utf-8")
-    pprint(our_result['id'])
-    return jsonify(our_result)
+    reader = SimpleMFRC522.SimpleMFRC522()
+    try:
+        our_result = dict()
+        our_result['id'] = request.form['user_id'].encode("utf-8")
+
+        rfid_owner_user_id = str(our_result['id'])
+
+        our_result['status'] = 500
+        our_result['message'] = 'Place your tag to be written please.'
+
+        reader.write(rfid_owner_user_id)
+
+        our_result['status'] = 501
+        our_result['message'] = 'Tag has been written successfully.'
+
+        return jsonify(our_result)
+
+
+    finally:
+        GPIO.cleanup()
+
 
 
 @app.route('/update_recorded_fingers_count', methods=['GET']) #TODO: Temporal - use this as a function whenever needed
