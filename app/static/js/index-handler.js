@@ -18,6 +18,8 @@
     var fifteenth_message = 'Welcome ';
 //    var sixteenth_message = 'Less than 60 seconds spent from this finger scan!';
     var seventeenth_message = 'Goodbye ';
+    var eighteenth_message = 'no_action_allowed has not passed. NOT ready to apply user log.';
+//    var nineteenth_message = 'no_action_allowed has passed. Ready to apply user log.';
 
     $(document).ready(function () {
         var connected = false;
@@ -42,8 +44,11 @@
             if (data.status >= 3 && data.status <= 15) {
                 $('#message').text(fifteenth_message + data.first_name + ' ' + data.last_name + ', your last exit: ' + data.last_action).fadeIn("slow", function() { $(this).delay(3000).fadeOut("slow"); });
             }
-            if (data.status >= 16) {
+            if (data.status >= 16 && data.status <= 17) {
                 $('#message').text(seventeenth_message + data.first_name + ' ' + data.last_name + ', your last enter: ' + data.last_action).fadeIn("slow", function() { $(this).delay(3000).fadeOut("slow"); });
+            }
+            if (data.status == 18) {
+                $('#message').text(eighteenth_message).fadeIn("slow", function() { $(this).delay(3000).fadeOut("slow"); });
             }
 
         });
