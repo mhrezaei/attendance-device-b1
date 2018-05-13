@@ -163,7 +163,7 @@ jQuery(function($){
             setTimeout(closeModal, 3000);
         }
 
-        if (data.status === 16 || data.status === 17) {
+        if (data.status >= 16 && data.status <= 17) {
             console.log(data.status);
 
             let lastAction = "";
