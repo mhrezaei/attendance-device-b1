@@ -163,7 +163,7 @@ jQuery(function($){
             setTimeout(closeModal, 3000);
         }
 
-        if (data.status >= 16) {
+        if (data.status === 16 || data.status === 17) {
             console.log(data.status);
 
             let lastAction = "";
@@ -183,6 +183,14 @@ jQuery(function($){
             let msg = data.first_name + ' ' + data.last_name + 'خدا نگهدار. آخرین ورود شما: ' + lastAction;
             openModal(msg, asset('images/exit.svg'));
             setTimeout(closeModal, 3000);
+        }
+
+        if (data.status === 18) {
+            console.log(data.status);
+            openModal('فاصله بین دو تردد کافی نیست.');
+            setTimeout(function () {
+                closeModal();
+            },3000);
         }
 
     });
