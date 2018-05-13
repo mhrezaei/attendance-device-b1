@@ -6,7 +6,7 @@ from serial import SerialException
 from config import store, socket, publish, fingerprint, db, User, UserLog
 import hashlib
 from globla_variables import working_hours
-from globla_variables import no_action_allowed
+from globla_variables import attendance_not_allowed_timeout
 
 store['fingerPrintEnabled'] = False
 
@@ -30,9 +30,7 @@ def run():
             return 'SerialException happened.'
 
         if read_image != 0:
-
-            finger_read_time = time()
-            check_time = finger_read_time + no_action_allowed
+            finger_read_time = int(time())
 
             fingerprint.convertImage(0x01)
             # Searches template
@@ -48,19 +46,44 @@ def run():
                 publish('fingerPrintStatus', our_result)
             # If finger match was found
             elif position_number != -1:
+                print('Found Template')
                 # flash('Found template at position #' + str(position_number))
                 our_result['status'] = 3
                 # flash('The accuracy score is: ' + str(accuracy_score))
                 our_result['status'] = 4
 
-                if check_time > time(): # no_action_allowed has not passed. NOT ready to apply user log.
+                this_finger_last_attendance_action = 0
+
+                user_related_with_this_finger = db.table('fingers').where('template_position', position_number).pluck('user_id')
+
+                this_finger_last_enter = db.table('user_logs').where('user_id', user_related_with_this_finger).order_by('id', 'desc').pluck('entered_at')
+                if this_finger_last_enter is not None:
+                    this_finger_last_enter = int(this_finger_last_enter.strftime('%s')) # Converted to epoch
+                    this_finger_last_attendance_action = this_finger_last_enter
+                    # print('this_finger_last_attendance_action: ' + str(this_finger_last_attendance_action))
+
+
+                this_finger_last_exit = db.table('user_logs').where('user_id', user_related_with_this_finger).order_by('id', 'desc').pluck('exited_at')
+                if this_finger_last_exit is not None:
+                    this_finger_last_exit = int(this_finger_last_exit.strftime('%s')) # Converted to epoch
+                    if this_finger_last_exit > this_finger_last_enter:
+                        this_finger_last_attendance_action = this_finger_last_exit
+                        # print('this_finger_last_attendance_action: ' + str(this_finger_last_attendance_action))
+
+                check_time = int(this_finger_last_attendance_action + attendance_not_allowed_timeout)
+
+                print('finger_read_time: ' + str(finger_read_time))
+                print('this_finger_last_attendance_action: ' + str(this_finger_last_attendance_action))
+                print('check_time: ' + str(check_time))
+
+                if finger_read_time < check_time: # attendance_not_allowed_timeout has NOT passed. NOT ready to apply user log.
                     our_result['status'] = 18
-                    # flash('no_action_allowed has not passed. NOT ready to apply user log.')
+                    # flash('attendance_not_allowed_timeout has NOT passed.')
+                    # print('STATUS 18 - NOT allowed to apply user log.')
                     publish('fingerPrintStatus', our_result)
 
-                elif check_time <= time(): # no_action_allowed has passed. Ready to apply user log.
-                    our_result['status'] = 19
-                    # flash('no_action_allowed has not passed. Ready to apply user log.')
+                elif finger_read_time >= check_time: # attendance_not_allowed_timeout has passed. Ready to apply user log.
+                    # print('STATUS 19 - Allowed to apply user log.')
                     # Executing Queries
                     template_position_existence_clause = db.table('fingers').where('template_position', position_number).count()
 
