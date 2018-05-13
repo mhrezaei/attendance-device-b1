@@ -229,16 +229,28 @@ def run_rfid():
     sleep(1)
     print('Aleyk')
     sleep(1)
-    # reader = SimpleMFRC522.SimpleMFRC522()
+
+    GPIO.setwarnings(False)
+
+    reader = SimpleMFRC522.SimpleMFRC522()
+
+    # unique_id, rfid_owner_user_id = reader.read()  # TODO: waits for rfid_read and does nothing anymore
+
+
+    # unique_id = 0
+
     # # try:
-    # unique_id, rfid_owner_user_id = reader.read()
+    # while unique_id == 0:
+    #     unique_id, rfid_owner_user_id = reader.read() #TODO: waits for rfid_read and does nothing anymore
+
+
+
     # unique_id = str(unique_id)
     #
     # if len(unique_id) > 0:
     #     user_related_with_this_rfid = db.table('rfid_cards').where('unique_id', unique_id).pluck('user_id')
     #     db.table('user_logs').insert(user_id=user_related_with_this_rfid, template_position=unique_id)
     #     sleep(5)
-    #     GPIO.cleanup()
     #
-    # # finally:
-    # #     GPIO.cleanup()
+    # finally:
+    #     GPIO.cleanup()
