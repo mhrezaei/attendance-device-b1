@@ -7,6 +7,8 @@ from config import store, socket, publish, fingerprint, db, User, UserLog
 import hashlib
 from globla_variables import working_hours
 from globla_variables import attendance_not_allowed_timeout
+import RPi.GPIO as GPIO
+import SimpleMFRC522
 
 store['fingerPrintEnabled'] = False
 
@@ -17,7 +19,7 @@ def receive(action, message):
     pass
 
 
-def run():
+def run_fingerprint():
     if store['fingerPrintEnabled']: #boolean
         # sleep(0.5) #TODO: 1 second or not
         our_result = {'status': 0, 'first_name': '', 'last_name': '', 'last_action': ''}
@@ -220,3 +222,23 @@ def run():
                                     publish('fingerPrintStatus', our_result)
     else:
         sleep(1)
+
+
+def run_rfid():
+    print('Salam')
+    sleep(1)
+    print('Aleyk')
+    sleep(1)
+    # reader = SimpleMFRC522.SimpleMFRC522()
+    # # try:
+    # unique_id, rfid_owner_user_id = reader.read()
+    # unique_id = str(unique_id)
+    #
+    # if len(unique_id) > 0:
+    #     user_related_with_this_rfid = db.table('rfid_cards').where('unique_id', unique_id).pluck('user_id')
+    #     db.table('user_logs').insert(user_id=user_related_with_this_rfid, template_position=unique_id)
+    #     sleep(5)
+    #     GPIO.cleanup()
+    #
+    # # finally:
+    # #     GPIO.cleanup()
