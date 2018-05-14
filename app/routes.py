@@ -112,6 +112,7 @@ def settings_process():
 
                 recorded_fingers_count = Finger.where('user_id', user.id).count()
                 maximum_allowed_fingers = db.table('users').where('id', user.id).pluck('maximum_allowed_fingers')
+                is_active = db.table('users').where('id', user.id).pluck('is_active')
 
 
                 # Retrieve all fingers related to that specific user
@@ -147,7 +148,8 @@ def settings_process():
                     'related_fingers': user_finger,
                     'rfid_unique_id': unique_id,
                     'recorded_fingers_count': recorded_fingers_count,
-                    'maximum_allowed_fingers': maximum_allowed_fingers
+                    'maximum_allowed_fingers': maximum_allowed_fingers,
+                    'is_active': is_active
                 })
 
             # Number of all users
