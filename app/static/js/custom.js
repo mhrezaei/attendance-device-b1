@@ -193,6 +193,14 @@ jQuery(function($){
             },3000);
         }
 
+        if (data.status === 20) {
+            console.log(data.status);
+            openModal('حساب شما غیر فعال است.');
+            setTimeout(function () {
+                closeModal();
+            },3000)
+        }
+
     });
 
 
