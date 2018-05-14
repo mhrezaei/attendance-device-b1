@@ -234,6 +234,9 @@ def run_fingerprint():
 
 
 def run_rfid():
+    our_result = dict()
+    our_result['status'] = 30
+    our_result['message'] = 'Nothing done yet.'
     sleep(1)
     reader = SimpleMFRC522.SimpleMFRC522()
     try:
@@ -246,6 +249,9 @@ def run_rfid():
             print(rfid_owner_user_id)
             user_related_with_this_rfid_card = db.table('rfid_cards').where('unique_id', unique_id).pluck('user_id')
             db.table('user_logs').insert(user_id=user_related_with_this_rfid_card, template_position=unique_id, hash=None, accuracy=None)
+            our_result['status'] = 31
+            our_result['message'] = 'Successful log for this RFID card inserted in the database.'
+            publish('fingerPrintStatus', our_result)
             sleep(5)
 
     finally:
