@@ -201,6 +201,14 @@ jQuery(function($){
             },3000)
         }
 
+        if (data.status == 31) {
+            console.log(data.status);
+            openModal('تردد با کارت',asset('images/success.svg'));
+            setTimeout(function () {
+                    closeModal();
+                },3000)
+            }
+
     });
 
 
