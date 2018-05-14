@@ -295,6 +295,12 @@ def get_all_users():  # TODO: Seems NOT enrolling new users when sensor memory i
         # Retrieve all fingers related to that specific user
         this_user_related_fingers = db.table('fingers').where('user_id', user.id).get()
 
+
+
+        is_active = db.table('users').where('id', user['id']).pluck('is_active')
+
+
+
         # Add some information about that related finger of that specific user
         if this_user_related_fingers.count():
             user_finger = []
@@ -313,7 +319,8 @@ def get_all_users():  # TODO: Seems NOT enrolling new users when sensor memory i
             'code_melli': user['code_melli'],
             'created_at': user['created_at'],
             'updated_at': user['updated_at'],
-            'related_fingers': user_finger
+            'related_fingers': user_finger,
+            'is_active': is_active
         })
 
     # Number of all users
@@ -412,6 +419,8 @@ def enroll_handle_finger_step_2():
 
     our_result['member'] = []
 
+    is_active = db.table('users').where('id', our_result['id']).pluck('is_active')
+
     # Retrieve all fingers related to this specific user
     this_user_related_fingers = db.table('fingers').where('user_id', our_result['id']).get()
 
@@ -445,7 +454,8 @@ def enroll_handle_finger_step_2():
         'created_at': this_user.created_at,
         'updated_at': this_user.updated_at,
         'related_fingers': user_finger,
-        'rfid_unique_id': unique_id
+        'rfid_unique_id': unique_id,
+        'is_active': is_active
     })
 
     our_result['status'] = 413
@@ -501,6 +511,9 @@ def enroll_handle_rfid():
 
             our_result['member'] = []
 
+            is_active = db.table('users').where('id', our_result['id']).pluck('is_active')
+
+
             # Retrieve all fingers related to this specific user
             this_user_related_fingers = db.table('fingers').where('user_id', our_result['id']).get()
 
@@ -525,7 +538,8 @@ def enroll_handle_rfid():
                 'created_at': this_user.created_at,
                 'updated_at': this_user.updated_at,
                 'related_fingers': user_finger,
-                'rfid_unique_id': unique_id
+                'rfid_unique_id': unique_id,
+                'is_active': is_active
             })
 
             return jsonify(our_result)
@@ -554,6 +568,9 @@ def omit_rfid_card():
 
     our_result['member'] = []
 
+    is_active = db.table('users').where('id', our_result['id']).pluck('is_active')
+
+
     # Retrieve all fingers related to this specific user
     this_user_related_fingers = db.table('fingers').where('user_id', our_result['id']).get()
 
@@ -586,7 +603,8 @@ def omit_rfid_card():
         'created_at': this_user.created_at,
         'updated_at': this_user.updated_at,
         'related_fingers': user_finger,
-        'rfid_unique_id': unique_id
+        'rfid_unique_id': unique_id,
+        'is_active': is_active
     })
 
     return jsonify(our_result)
@@ -610,6 +628,8 @@ def omit_single_fingerprint_per_user():
 
     our_result['member'] = []
 
+    is_active = db.table('users').where('id', our_result['id']).pluck('is_active')
+
     # Retrieve all fingers related to this specific user
     this_user_related_fingers = db.table('fingers').where('user_id', our_result['id']).get()
 
@@ -642,7 +662,8 @@ def omit_single_fingerprint_per_user():
         'created_at': this_user.created_at,
         'updated_at': this_user.updated_at,
         'related_fingers': user_finger,
-        'rfid_unique_id': unique_id
+        'rfid_unique_id': unique_id,
+        'is_active': is_active
     })
 
     return jsonify(our_result)
