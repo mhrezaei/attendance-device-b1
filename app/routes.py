@@ -536,6 +536,21 @@ def enroll_handle_rfid():
     finally:
         GPIO.cleanup()
 
+@app.route('/omit_rfid_card', methods=['GET', 'POST'])
+def omit_rfid_card():
+    our_result = dict()
+    our_result['status'] = 600
+    our_result['message'] = 'Nothing is done yet.'
+
+    our_result['id'] = request.form['user_id'].encode("utf-8")
+    rfid_owner_user_id = str(our_result['id'])
+
+    db.table('rfid_cards').where('user_id', rfid_owner_user_id).delete()
+
+    our_result['status'] = 601
+    our_result['message'] = 'This rfid card does NOT belong to this user anymore.'
+
+    return jsonify(our_result)
 
 
 @app.route('/update_recorded_fingers_count', methods=['GET']) #TODO: Temporal - use this as a function whenever needed
