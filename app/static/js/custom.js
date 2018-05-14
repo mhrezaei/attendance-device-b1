@@ -906,7 +906,7 @@ function removeFingerPrint(fingerId, userId, reports) {
         dataType: "json",
         type: "POST",
         data:{
-            template_position: fingerId,
+            id_primary: fingerId,
             user_id: userId
         },
         success: function (response) {
