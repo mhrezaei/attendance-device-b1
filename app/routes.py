@@ -668,6 +668,39 @@ def omit_single_fingerprint_per_user():
 
     return jsonify(our_result)
 
+
+@app.route('/activate_user', methods=['GET', 'POST'])
+def activate_user():
+    our_result = dict()
+    our_result['status'] = 800
+    our_result['message'] = 'Nothing done yet.'
+
+    our_result['id'] = request.form['user_id'].encode("utf-8")
+
+    db.table('users').where('id', our_result['id']).update(is_active=1)
+
+    our_result['status'] = 801
+    our_result['message'] = 'This user has been activated.'
+
+    return jsonify(our_result)
+
+
+@app.route('/deactivate_user', methods=['GET', 'POST'])
+def deactivate_user():
+    our_result = dict()
+    our_result['status'] = 900
+    our_result['message'] = 'Nothing done yet.'
+
+    our_result['id'] = request.form['user_id'].encode("utf-8")
+
+    db.table('users').where('id', our_result['id']).update(is_active=0)
+
+    our_result['status'] = 901
+    our_result['message'] = 'This user has been activated.'
+
+    return jsonify(our_result)
+
+
 @app.route('/update_recorded_fingers_count', methods=['GET']) #TODO: Temporal - use this as a function whenever needed
 def update_recorded_fingers_count():
     users = db.table('users').get()
