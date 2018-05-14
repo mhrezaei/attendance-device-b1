@@ -521,12 +521,12 @@ Vue.component('app-details',{
                   </div>
                   <div id="member_setting" class="tab-pane fade">
                   
-                    <button class="btn btn-lg btn-danger" v-if="activation" @click="deactivateMember()">
+                    <button class="btn btn-lg btn-danger" v-if="activation" @click="deactivateMember">
                         <i class="fa fa-ban"></i>
                         غیر فعال کردن کاربر
                     </button>
                     
-                    <button class="btn btn-lg btn-success" v-else @click="activateMember()">
+                    <button class="btn btn-lg btn-success" v-else @click="activateMember">
                         <i class="fa fa-check"></i>
                         فعال کردن کاربر
                     </button>
@@ -571,10 +571,12 @@ Vue.component('app-details',{
             addNewCard(this.member, this.reports);
         },
         activateMember: function () {
-            this.activation = activateMember();
+            activateMember(this.member);
+
+
         },
         deactivateMember: function () {
-            this.activation = deactivateMember();
+            deactivateMember(this.member)
         }
 
     }
@@ -1132,17 +1134,25 @@ function addNewCard(member,reports) {
 /**
  * Ajax - Deactivate Member
  */
-function deactivateMember() {
+function deactivateMember(member) {
+    waitForIt();
 
     $.ajax({
-//        url: "../static/js/data/members-list.json",  //@TODO: This should get new members list.
+        url: url('deactivate_user'),
         dataType: "json",
         type: "POST",
-//        data:{
-//            id: id
-//        },
+        data:{
+            user_id: member.id
+        },
         success: function (response) {
-            return false;
+            if(response.status === 901){
+                openModal('کاربر غیر فعال شد.',asset('images/off.svg'));
+                setTimeout(function () {
+                    closeModal();
+                }, 3000);
+                member.is_active = false;
+                renderMemberDetails(member);
+            }
         },
         error: connectionError
     })
@@ -1152,16 +1162,25 @@ function deactivateMember() {
 /**
  * Ajax - Activate Member
  */
-function activateMember() {
+function activateMember(member) {
+    waitForIt();
+
     $.ajax({
-//        url: "../static/js/data/members-list.json",  //@TODO: This should get new members list.
+        url: url('activate_user'),
         dataType: "json",
         type: "POST",
-//        data:{
-//            id: id
-//        },
+        data:{
+            user_id: member.id
+        },
         success: function (response) {
-            return true;
+            if(response.status === 801){
+                openModal('کاربر فعال شد.',asset('images/on.svg'));
+                setTimeout(function () {
+                    closeModal();
+                }, 3000);
+                member.is_active = true;
+                renderMemberDetails(member);
+            }
         },
         error: connectionError()
     })
