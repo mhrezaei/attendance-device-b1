@@ -234,32 +234,25 @@ def run_fingerprint():
 
 
 def run_rfid():
-    print('Salam')
+    our_result = dict()
+    our_result['status'] = 30
+    our_result['message'] = 'Nothing done yet.'
     sleep(1)
-    print('Aleyk')
-    sleep(1)
-
-    GPIO.setwarnings(False)
-
     reader = SimpleMFRC522.SimpleMFRC522()
+    try:
+        unique_id, rfid_owner_user_id = reader.read_no_block()
 
-    # unique_id, rfid_owner_user_id = reader.read()  # TODO: waits for rfid_read and does nothing anymore
+        if unique_id is not None: # Detected RFID card.
+            print('RFID is read.')
+            unique_id = str(unique_id)
+            print(unique_id)
+            print(rfid_owner_user_id)
+            user_related_with_this_rfid_card = db.table('rfid_cards').where('unique_id', unique_id).pluck('user_id')
+            db.table('user_logs').insert(user_id=user_related_with_this_rfid_card, template_position=unique_id, hash=None, accuracy=None)
+            our_result['status'] = 31
+            our_result['message'] = 'Successful log for this RFID card inserted in the database.'
+            publish('fingerPrintStatus', our_result)
+            sleep(5)
 
-
-    # unique_id = 0
-
-    # # try:
-    # while unique_id == 0:
-    #     unique_id, rfid_owner_user_id = reader.read() #TODO: waits for rfid_read and does nothing anymore
-
-
-
-    # unique_id = str(unique_id)
-    #
-    # if len(unique_id) > 0:
-    #     user_related_with_this_rfid = db.table('rfid_cards').where('unique_id', unique_id).pluck('user_id')
-    #     db.table('user_logs').insert(user_id=user_related_with_this_rfid, template_position=unique_id)
-    #     sleep(5)
-    #
-    # finally:
-    #     GPIO.cleanup()
+    finally:
+        GPIO.cleanup()

@@ -21,6 +21,7 @@
     var eighteenth_message = 'no_action_allowed has not passed. NOT ready to apply user log.';
 //    var nineteenth_message = 'no_action_allowed has passed. Ready to apply user log.';
     var twentieth_message = 'This user is not active anymore.';
+    var thirty_one = 'Successful log for this RFID card inserted in the database.';
 
     $(document).ready(function () {
         var connected = false;
@@ -53,6 +54,9 @@
             }
             if (data.status == 20) {
                 $('#message').text(twentieth_message).fadeIn("slow", function() { $(this).delay(3000).fadeOut("slow"); });
+            }
+            if (data.status == 31) {
+                $('#message').text(thirty_one).fadeIn("slow", function() { $(this).delay(3000).fadeOut("slow"); });
             }
         });
 
