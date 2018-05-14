@@ -527,7 +527,7 @@ Vue.component('app-details',{
             removeMember(this.member.id);
         },
         removeThisFingerPrint: function (id) {
-            removeFingerPrint(id, this.reports);
+            removeFingerPrint(id, this.member.id, this.reports);
         },
         removeAll: function () {
             removeAllFingerPrints(this.member)
@@ -898,19 +898,26 @@ function removeMember(id){
  * @param fingerId
  * @param reports
  */
-function removeFingerPrint(fingerId, reports) {
+function removeFingerPrint(fingerId, userId, reports) {
     waitForIt();
 
     $.ajax({
-        url: '../static/js/data/member.json', //@TODO: This should get new member detail.
+        url: url('omit_single_fingerprint_per_user'),
         dataType: "json",
         type: "POST",
         data:{
-            fingerId: fingerId
+            id_primary: fingerId,
+            user_id: userId
         },
         success: function (response) {
-            closeModal();
-            renderMemberDetails(response.member[0], reports);
+            if(response.status === 701){
+                openModal('اثر انگشت با موفقیت حذف شد.',asset('images/success.svg'));
+
+                setTimeout(function () {
+                    closeModal();
+                    renderMemberDetails(response.member[0], reports);
+                },3000);
+            }
         },
         error: connectionError
     })
