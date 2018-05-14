@@ -896,7 +896,7 @@ function removeMember(id){
 /**
  * Ajax - Removes A Specific FingerPrint
  * @param fingerId
- * @param member
+ * @param reports
  */
 function removeFingerPrint(fingerId, reports) {
     waitForIt();
@@ -1030,15 +1030,22 @@ function removeMemberCard(member, reports) {
     waitForIt();
 
     $.ajax({
-        url: '../static/js/data/member.json', //@TODO: This should get new member detail.
+        url: url('omit_rfid_card'),
         dataType: "json",
         type: "POST",
         data:{
             user_id: id
         },
         success: function (response) {
-            closeModal();
-            renderMemberDetails(response.member[0], reports);
+            if(response.status === 601){
+                openModal('کارت با موفقیت حذف شد.',asset('images/success.svg'));
+
+                setTimeout(function () {
+                    closeModal();
+                    renderMemberDetails(response.member[0], reports);
+                },3000);
+            }
+
         },
         error: connectionError
     })
