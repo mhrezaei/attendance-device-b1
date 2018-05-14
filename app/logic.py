@@ -248,9 +248,14 @@ def run_rfid():
             print(unique_id)
             print(rfid_owner_user_id)
             user_related_with_this_rfid_card = db.table('rfid_cards').where('unique_id', unique_id).pluck('user_id')
+            the_first_name = db.table('users').where('id', user_related_with_this_rfid_card).pluck('first_name')
+            the_last_name = db.table('users').where('id', user_related_with_this_rfid_card).pluck('last_name')
+
             db.table('user_logs').insert(user_id=user_related_with_this_rfid_card, template_position=unique_id, hash=None, accuracy=None)
             our_result['status'] = 31
             our_result['message'] = 'Successful log for this RFID card inserted in the database.'
+            our_result['first_name'] = the_first_name
+            our_result['last_name'] = the_last_name
             publish('fingerPrintStatus', our_result)
             sleep(5)
 
