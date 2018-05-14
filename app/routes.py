@@ -550,6 +550,43 @@ def omit_rfid_card():
     our_result['status'] = 601
     our_result['message'] = 'This rfid card does NOT belong to this user anymore.'
 
+    our_result['member'] = []
+
+    # Retrieve all fingers related to this specific user
+    this_user_related_fingers = db.table('fingers').where('user_id', our_result['id']).get()
+
+    this_user = User.find(int(our_result['id']))
+
+    user_finger = []
+    # Add some information about that related finger of that specific user
+    if this_user_related_fingers.count():
+        for finger in this_user_related_fingers:
+            user_finger.append({
+                'id': finger['id'],
+                'position': finger['template_position'],
+                'created_at': finger['created_at']
+            })
+
+    unique_id_clause = db.table('rfid_cards').where('user_id', this_user.id).count()
+
+    if unique_id_clause:
+        unique_id = db.table('rfid_cards').where('user_id', this_user.id).pluck('unique_id')
+        unique_id = str(unique_id)
+    else:
+        unique_id = ''
+
+    # Update result['members']
+    our_result['member'].append({
+        'id': this_user.id,
+        'first_name': this_user.first_name,
+        'last_name': this_user.last_name,
+        'code_melli': this_user.code_melli,
+        'created_at': this_user.created_at,
+        'updated_at': this_user.updated_at,
+        'related_fingers': user_finger,
+        'rfid_unique_id': unique_id
+    })
+
     return jsonify(our_result)
 
 
