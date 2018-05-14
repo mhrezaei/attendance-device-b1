@@ -20,6 +20,7 @@
     var seventeenth_message = 'Goodbye ';
     var eighteenth_message = 'no_action_allowed has not passed. NOT ready to apply user log.';
 //    var nineteenth_message = 'no_action_allowed has passed. Ready to apply user log.';
+    var twentieth_message = 'This user is not active anymore.';
 
     $(document).ready(function () {
         var connected = false;
@@ -50,7 +51,9 @@
             if (data.status == 18) {
                 $('#message').text(eighteenth_message).fadeIn("slow", function() { $(this).delay(3000).fadeOut("slow"); });
             }
-
+            if (data.status == 20) {
+                $('#message').text(twentieth_message).fadeIn("slow", function() { $(this).delay(3000).fadeOut("slow"); });
+            }
         });
 
         socket.on('disconnect', function () {
