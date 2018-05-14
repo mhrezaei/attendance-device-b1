@@ -193,6 +193,22 @@ jQuery(function($){
             },3000);
         }
 
+        if (data.status === 20) {
+            console.log(data.status);
+            openModal('حساب شما غیر فعال است.');
+            setTimeout(function () {
+                closeModal();
+            },3000)
+        }
+
+        if (data.status == 31) {
+            console.log(data.status);
+            openModal('تردد با کارت',asset('images/success.svg'));
+            setTimeout(function () {
+                    closeModal();
+                },3000)
+            }
+
     });
 
 
@@ -504,15 +520,26 @@ Vue.component('app-details',{
                         </div>
                   </div>
                   <div id="member_setting" class="tab-pane fade">
-                    <button class="btn btn-lg btn-danger" @click="removeUser">
+                  
+                    <button class="btn btn-lg btn-danger" v-if="activation" @click="deactivateMember">
                         <i class="fa fa-ban"></i>
-                        حذف کاربر
+                        غیر فعال کردن کاربر
+                    </button>
+                    
+                    <button class="btn btn-lg btn-success" v-else @click="activateMember">
+                        <i class="fa fa-check"></i>
+                        فعال کردن کاربر
                     </button>
                   </div>
                 </div>
             </div>
             `,
     props: ['member','reports'],
+    data: function () {
+      return {
+          activation: this.member.is_active
+      }
+    },
     methods:{
         setTime: function (date) {
             return toPersianTime(date);
@@ -542,6 +569,14 @@ Vue.component('app-details',{
         },
         addNewCard: function () {
             addNewCard(this.member, this.reports);
+        },
+        activateMember: function () {
+            activateMember(this.member);
+
+
+        },
+        deactivateMember: function () {
+            deactivateMember(this.member)
         }
 
     }
@@ -1059,7 +1094,11 @@ function removeMemberCard(member, reports) {
 }
 
 
-
+/**
+ * Ajax - Add New Card
+ * @param member
+ * @param reports
+ */
 function addNewCard(member,reports) {
     var id = member.id;
 
@@ -1090,6 +1129,63 @@ function addNewCard(member,reports) {
         error: connectionError
     })
 }
+
+
+/**
+ * Ajax - Deactivate Member
+ */
+function deactivateMember(member) {
+    waitForIt();
+
+    $.ajax({
+        url: url('deactivate_user'),
+        dataType: "json",
+        type: "POST",
+        data:{
+            user_id: member.id
+        },
+        success: function (response) {
+            if(response.status === 901){
+                openModal('کاربر غیر فعال شد.',asset('images/off.svg'));
+                setTimeout(function () {
+                    closeModal();
+                }, 3000);
+                member.is_active = false;
+                renderMemberDetails(member);
+            }
+        },
+        error: connectionError
+    })
+}
+
+
+/**
+ * Ajax - Activate Member
+ */
+function activateMember(member) {
+    waitForIt();
+
+    $.ajax({
+        url: url('activate_user'),
+        dataType: "json",
+        type: "POST",
+        data:{
+            user_id: member.id
+        },
+        success: function (response) {
+            if(response.status === 801){
+                openModal('کاربر فعال شد.',asset('images/on.svg'));
+                setTimeout(function () {
+                    closeModal();
+                }, 3000);
+                member.is_active = true;
+                renderMemberDetails(member);
+            }
+        },
+        error: connectionError()
+    })
+}
+
 
 /**
  * Shows Error Message
