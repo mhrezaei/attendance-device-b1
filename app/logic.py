@@ -284,7 +284,7 @@ def run_rfid():
                 our_result['message'] = 'Successful log for this RFID card inserted in the database.'
                 our_result['first_name'] = the_first_name
                 our_result['last_name'] = the_last_name
-                
+
                 publish('fingerPrintStatus', our_result)
                 sleep(5)
 
