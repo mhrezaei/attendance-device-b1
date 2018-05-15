@@ -146,7 +146,7 @@ jQuery(function($){
             console.log(data.status);
             noMatchFound();
         }
-        if (data.status >= 3 && data.status <= 15) {
+        if ((data.status >= 3 && data.status <= 15) || data.status === 31 || data.status === 35) {
             console.log(data.status);
             console.log(data.last_action);
 
@@ -163,7 +163,7 @@ jQuery(function($){
             setTimeout(closeModal, 3000);
         }
 
-        if (data.status >= 16 && data.status <= 17) {
+        if ((data.status >= 16 && data.status <= 17) || data.status === 36 || data.status === 37) {
             console.log(data.status);
 
             let lastAction = "";
@@ -199,14 +199,6 @@ jQuery(function($){
             setTimeout(function () {
                 closeModal();
             },3000)
-        }
-
-        if (data.status == 31) {
-            console.log(data.status);
-            openModal('تردد با کارت',asset('images/success.svg'));
-            setTimeout(function () {
-                    closeModal();
-                },3000)
         }
 
         if (data.status === 33) {
