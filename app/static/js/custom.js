@@ -193,7 +193,7 @@ jQuery(function($){
             },3000);
         }
 
-        if (data.status === 20) {
+        if (data.status === 20 || data.status === 34) {
             console.log(data.status);
             openModal('حساب شما غیر فعال است.');
             setTimeout(function () {
@@ -207,7 +207,15 @@ jQuery(function($){
             setTimeout(function () {
                     closeModal();
                 },3000)
-            }
+        }
+
+        if (data.status === 33) {
+            console.log(data.status);
+            openModal('این کارت ثبت نشده.');
+            setTimeout(function () {
+                closeModal();
+            },3000)
+        }
 
     });
 
