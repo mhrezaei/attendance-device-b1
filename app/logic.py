@@ -244,15 +244,49 @@ def run_rfid():
 
         if unique_id is not None: # Detected RFID card.
             print('RFID is read.')
+            rfid_read_time = time()
             unique_id = str(unique_id)
             print(unique_id)
             print(rfid_owner_user_id)
             user_related_with_this_rfid_card = db.table('rfid_cards').where('unique_id', unique_id).pluck('user_id')
-            db.table('user_logs').insert(user_id=user_related_with_this_rfid_card, template_position=unique_id, hash=None, accuracy=None)
-            our_result['status'] = 31
-            our_result['message'] = 'Successful log for this RFID card inserted in the database.'
-            publish('fingerPrintStatus', our_result)
-            sleep(5)
+            the_first_name = db.table('users').where('id', user_related_with_this_rfid_card).pluck('first_name')
+            the_last_name = db.table('users').where('id', user_related_with_this_rfid_card).pluck('last_name')
+
+            this_rfid_last_attendance_action = 0
+
+            this_rfid_last_enter = db.table('user_logs').where('user_id', user_related_with_this_rfid_card).order_by('id', 'desc').pluck('entered_at')
+            if this_rfid_last_enter is not None:
+                this_rfid_last_enter = int(this_rfid_last_enter.strftime('%s'))  # Converted to epoch
+                this_rfid_last_attendance_action = this_rfid_last_enter
+
+            this_rfid_last_exit = db.table('user_logs').where('user_id', user_related_with_this_rfid_card).order_by('id','desc').pluck('exited_at')
+            if this_rfid_last_exit is not None:
+                this_rfid_last_exit = int(this_rfid_last_exit.strftime('%s'))  # Converted to epoch
+                if this_rfid_last_exit > this_rfid_last_enter:
+                    this_rfid_last_attendance_action = this_rfid_last_exit
+
+            check_time = int(this_rfid_last_attendance_action + attendance_not_allowed_timeout)
+
+            print('rfid_read_time: ' + str(rfid_read_time))
+            print('this_rfid_last_attendance_action: ' + str(this_rfid_last_attendance_action))
+            print('check_time: ' + str(check_time))
+
+            if rfid_read_time < check_time:  # attendance_not_allowed_timeout has NOT passed. NOT ready to apply user log.
+                our_result['status'] = 32
+                # flash('attendance_not_allowed_timeout has NOT passed.')
+                # print('STATUS 32 - NOT allowed to apply user log.')
+                publish('fingerPrintStatus', our_result)
+
+            elif rfid_read_time >= check_time:  # attendance_not_allowed_timeout has passed. Ready to apply user log.
+
+                db.table('user_logs').insert(user_id=user_related_with_this_rfid_card, template_position=unique_id, hash=None, accuracy=None)
+                our_result['status'] = 31
+                our_result['message'] = 'Successful log for this RFID card inserted in the database.'
+                our_result['first_name'] = the_first_name
+                our_result['last_name'] = the_last_name
+
+                publish('fingerPrintStatus', our_result)
+                sleep(5)
 
     finally:
         GPIO.cleanup()
