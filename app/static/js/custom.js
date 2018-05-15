@@ -185,7 +185,7 @@ jQuery(function($){
             setTimeout(closeModal, 3000);
         }
 
-        if (data.status === 18) {
+        if (data.status === 18 || data.status === 32) {
             console.log(data.status);
             openModal('فاصله بین دو تردد کافی نیست.');
             setTimeout(function () {
