@@ -292,18 +292,102 @@ def run_rfid():
                         publish('fingerPrintStatus', our_result)
 
                     elif rfid_read_time >= check_time:  # attendance_not_allowed_timeout has passed. Ready to apply user log.
-
-
-
-
-                        db.table('user_logs').insert(user_id=user_related_with_this_rfid_card, template_position=unique_id, hash=None, accuracy=None)
-                        our_result['status'] = 31
-                        our_result['message'] = 'Successful log for this RFID card inserted in the database.'
                         our_result['first_name'] = the_first_name
                         our_result['last_name'] = the_last_name
 
-                        publish('fingerPrintStatus', our_result)
-                        sleep(5)
+                        user_id_existence_clause = db.table('user_logs').where('user_id', user_related_with_this_rfid_card).order_by('id', 'desc').pluck('id')
+
+                        # The user_logs table does NOT have this user_id, inserting the first record of this user_id
+                        if user_id_existence_clause is None:
+                            the_entered_at = datetime.now()  # time right now
+                            db.table('user_logs').insert(user_id=user_related_with_this_rfid_card, template_position=unique_id,
+                                                         entered_at=the_entered_at, hash=None,
+                                                         accuracy=None)
+
+                            our_result['status'] = 31
+                            our_result['message'] = 'Successful log for this RFID card inserted in the database.'
+
+                            publish('fingerPrintStatus', our_result)
+                            sleep(5)
+
+                        # The user_logs table has this user_id
+                        if user_id_existence_clause is not None:
+                            # Retrieve the exited_at associated with the template_position from the fingers table
+                            the_exited_at = db.table('user_logs').where('user_id', user_related_with_this_rfid_card).order_by('id','desc').pluck('exited_at')
+
+                            # exited_at field is NOT empty
+                            if the_exited_at is not None:
+                                # flash('exited_at field is NOT empty!')
+                                # flash('Inserting NEW record.')
+                                # time.sleep(3)
+                                the_entered_at = datetime.now()  # time right now
+
+                                the_very_last_exited_at = db.table('user_logs').where('user_id', user_related_with_this_rfid_card).order_by(
+                                    'id',
+                                    'desc').pluck(
+                                    'exited_at')
+
+                                our_result['last_action'] = str(the_very_last_exited_at)
+
+                                db.table('user_logs').insert(user_id=user_related_with_this_rfid_card,
+                                                             template_position=unique_id,
+                                                             entered_at=the_entered_at, hash=None,
+                                                             accuracy=None)
+
+                                our_result['status'] = 35
+                                # flash('Successful log for this RFID card inserted in the database.')
+
+                                publish('fingerPrintStatus', our_result)
+
+                            # exited_at field is empty
+                            elif the_exited_at is None:
+                                # flash('exited_at field is empty!')
+
+                                # Retrieve the entered_at associated with the template_position from the fingers table
+                                the_very_last_entered_at = db.table('user_logs').where('user_id', user_related_with_this_rfid_card).order_by(
+                                    'id',
+                                    'desc').pluck(
+                                    'entered_at')
+
+                                temp_time = the_very_last_entered_at + timedelta(
+                                    seconds=working_hours)
+                                # flash('temp_time: ' + str(temp_time))
+                                the_new_entered_at = datetime.now()  # time right now
+
+                                # More than specified time spent from this finger scan
+                                if the_new_entered_at > temp_time:
+                                    # flash('More than 60 seconds spent from this finger scan!')
+                                    # flash('It is a NEW ENTER!')
+
+                                    our_result[
+                                        'last_action'] = 'None'  # The user has forgotten to attend exit on his or her last attendance
+
+                                    db.table('user_logs').insert(user_id=user_related_with_this_rfid_card,
+                                                                 template_position=unique_id,
+                                                                 entered_at=the_new_entered_at, hash=None,
+                                                                 accuracy=None)
+
+                                    our_result['status'] = 36
+                                    # flash('Successful log for this RFID card inserted in the database.')
+
+                                    publish('fingerPrintStatus', our_result)
+
+                                # Less than specified times spent from this finger scan
+                                else:
+                                    # flash('Less than 60 seconds spent from this finger scan!')
+                                    # flash('It is an EXIT!')
+                                    # time.sleep(3)
+                                    the_exited_at = datetime.now()  # time right now
+
+                                    db.table('user_logs').where('entered_at', the_very_last_entered_at).update(
+                                        exited_at=the_exited_at)
+
+                                    our_result['last_action'] = str(the_very_last_entered_at)
+
+                                    our_result['status'] = 37
+                                    # flash('Successful log for this RFID card inserted in the database.')
+
+                                    publish('fingerPrintStatus', our_result)
 
 
             else: # This RFID card is NOT registered in the rfid_cards table.

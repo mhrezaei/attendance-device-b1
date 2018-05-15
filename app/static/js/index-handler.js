@@ -26,6 +26,10 @@
     var thirty_three = 'This RFID card is not registered.';
     var thirty_four = 'This user is not active anymore.';
 
+    var thirty_five = 'Successful log for this RFID card inserted in the database.';
+    var thirty_six = 'Successful log for this RFID card inserted in the database.';
+    var thirty_seven = 'Successful log for this RFID card inserted in the database.';
+
 
     $(document).ready(function () {
         var connected = false;
@@ -70,6 +74,15 @@
             }
             if (data.status == 34) {
                 $('#message').text(thirty_four).fadeIn("slow", function() { $(this).delay(3000).fadeOut("slow"); });
+            }
+            if (data.status == 35) {
+                $('#message').text(thirty_five).fadeIn("slow", function() { $(this).delay(3000).fadeOut("slow"); });
+            }
+            if (data.status == 36) {
+                $('#message').text(thirty_six).fadeIn("slow", function() { $(this).delay(3000).fadeOut("slow"); });
+            }
+            if (data.status == 37) {
+                $('#message').text(thirty_seven).fadeIn("slow", function() { $(this).delay(3000).fadeOut("slow"); });
             }
         });
 
