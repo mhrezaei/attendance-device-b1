@@ -23,6 +23,9 @@
     var twentieth_message = 'This user is not active anymore.';
     var thirty_one = 'Successful log for this RFID card inserted in the database.';
     var thirty_two = 'attendance_not_allowed has not passed. NOT ready to apply user log.';
+    var thirty_three = 'This RFID card is not registered.';
+    var thirty_four = 'This user is not active anymore.';
+
 
     $(document).ready(function () {
         var connected = false;
@@ -61,6 +64,12 @@
             }
             if (data.status == 32) {
                 $('#message').text(thirty_two).fadeIn("slow", function() { $(this).delay(3000).fadeOut("slow"); });
+            }
+            if (data.status == 33) {
+                $('#message').text(thirty_three).fadeIn("slow", function() { $(this).delay(3000).fadeOut("slow"); });
+            }
+            if (data.status == 34) {
+                $('#message').text(thirty_four).fadeIn("slow", function() { $(this).delay(3000).fadeOut("slow"); });
             }
         });
 
