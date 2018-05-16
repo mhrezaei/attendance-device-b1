@@ -1007,7 +1007,7 @@ function addNewFingerPrint(member,reports) {
                 openModal('این انگشت قبلا ثبت شده‌است.',asset('images/fingerprint-outline-with-close-button.svg'));
                 setTimeout(function () {
                     closeModal();
-                });
+                },3000);
                 return
             }
 
@@ -1047,7 +1047,7 @@ function addNewFingerStep2(id, reports) {
                 openModal('عدم مطابقت با اثر انگشت قبلی',asset('images/fingerprint-outline-with-close-button.svg'));
                 setTimeout(function () {
                     closeModal();
-                });
+                },3000);
                 return
             }
 
