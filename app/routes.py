@@ -631,9 +631,11 @@ def omit_single_fingerprint_per_user():
     our_result['id'] = request.form['user_id'].encode("utf-8")
     our_result['id_primary_in_fingers_table'] = request.form['id_primary'].encode("utf-8")
 
-    this_template_position = db.table('fingers').where('id', our_result['id_primary_in_fingers_table']).delete()
+    this_template_position = db.table('fingers').where('id', our_result['id_primary_in_fingers_table']).pluck('template_position')
 
     db.table('fingers').where('template_position', this_template_position).delete()
+    fingerprint.deleteTemplate(this_template_position)
+
 
     our_result['status'] = 701
     our_result['message'] = 'This fingerprint is NOT valid anymore.'
