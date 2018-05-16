@@ -571,12 +571,12 @@ Vue.component('app-details',{
             addNewCard(this.member, this.reports);
         },
         activateMember: function () {
-            activateMember(this.member);
+            activateMember(this.member, this.reports);
 
 
         },
         deactivateMember: function () {
-            deactivateMember(this.member)
+            deactivateMember(this.member, this.reports)
         }
 
     }
@@ -1041,7 +1041,6 @@ function addNewFingerStep2(id, reports) {
         url: url('enroll_handle_finger_step_2'),
         dataType: "json",
         success: function (response) {
-            console.log(response.status);
 
             // No Match
             if(response.status === 411){
@@ -1059,7 +1058,7 @@ function addNewFingerStep2(id, reports) {
             }
 
             // Match and saved
-            if(response.status === 413){
+            if(response.status === 415){
                 openModal('اثر انگشت با موفقیت ثبت شد.',asset('images/fingerprint-outline-with-check-mark.svg'));
                 setTimeout(function () {
                     closeModal();
@@ -1173,7 +1172,7 @@ function deactivateMember(member) {
 /**
  * Ajax - Activate Member
  */
-function activateMember(member) {
+function activateMember(member, reports) {
     waitForIt();
 
     $.ajax({
@@ -1190,7 +1189,7 @@ function activateMember(member) {
                     closeModal();
                 }, 3000);
                 member.is_active = true;
-                renderMemberDetails(member);
+                renderMemberDetails(member, reports);
             }
         },
         error: connectionError
