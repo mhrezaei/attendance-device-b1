@@ -128,6 +128,9 @@ def settings_process():
                             'created_at': finger['created_at']
                         })
 
+                else: # This user has no registered finger.
+                    user_finger = []
+
                 unique_id_clause = db.table('rfid_cards').where('user_id', user['id']).count()
 
                 if unique_id_clause:
@@ -310,6 +313,9 @@ def get_all_users():  # TODO: Seems NOT enrolling new users when sensor memory i
                     'position': finger['template_position'],
                     'created_at': finger['created_at']
                 })
+
+        else:
+            user_finger = []
 
         # Update result['members']
         our_result['members'].append({
@@ -634,7 +640,7 @@ def omit_single_fingerprint_per_user():
     this_template_position = db.table('fingers').where('id', our_result['id_primary_in_fingers_table']).pluck('template_position')
 
     db.table('fingers').where('template_position', this_template_position).delete()
-    fingerprint.deleteTemplate(this_template_position) # Deletes fingerprint from fingerprint sensor memory
+    fingerprint.deleteTemplate(int(this_template_position)) # Deletes fingerprint from fingerprint sensor memory
 
 
     our_result['status'] = 701
