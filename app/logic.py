@@ -338,6 +338,7 @@ def run_rfid():
                                 # flash('Successful log for this RFID card inserted in the database.')
 
                                 publish('fingerPrintStatus', our_result)
+                                sleep(5)
 
                             # exited_at field is empty
                             elif the_exited_at is None:
@@ -371,6 +372,7 @@ def run_rfid():
                                     # flash('Successful log for this RFID card inserted in the database.')
 
                                     publish('fingerPrintStatus', our_result)
+                                    sleep(5)
 
                                 # Less than specified times spent from this finger scan
                                 else:
@@ -388,6 +390,7 @@ def run_rfid():
                                     # flash('Successful log for this RFID card inserted in the database.')
 
                                     publish('fingerPrintStatus', our_result)
+                                    sleep(5)
 
 
             else: # This RFID card is NOT registered in the rfid_cards table.
