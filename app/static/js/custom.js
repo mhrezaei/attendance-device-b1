@@ -1144,7 +1144,7 @@ function addNewCard(member,reports) {
 /**
  * Ajax - Deactivate Member
  */
-function deactivateMember(member) {
+function deactivateMember(member, reports) {
     waitForIt();
 
     $.ajax({
@@ -1161,7 +1161,7 @@ function deactivateMember(member) {
                     closeModal();
                 }, 3000);
                 member.is_active = false;
-                renderMemberDetails(member);
+                renderMemberDetails(member,reports);
             }
         },
         error: connectionError
