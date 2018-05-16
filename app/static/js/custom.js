@@ -933,6 +933,7 @@ function removeMember(id){
 
 /**
  * Ajax - Removes A Specific FingerPrint
+ * @param userId
  * @param fingerId
  * @param reports
  */
