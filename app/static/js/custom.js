@@ -734,7 +734,6 @@ function waitForIt() {
  */
 function connectionError() {
     openModal('اختلال در شبکه',asset("images/fingerprint-information-symbol.svg"));
-
 }
 
 
@@ -779,6 +778,36 @@ function scanTimeout() {
 
 
 /**
+ * Gets Members List
+ */
+function getMembersList(members) {
+    if(App_router !== "setting"){
+        return
+    }
+
+    renderMembers(members);
+}
+
+
+/**
+ * Renders Members List
+ * @param members
+ */
+function renderMembers(members) {
+    clearList();
+    $('<app-members-table :members="members"></app-members-table>')
+        .appendTo('#list');
+
+    new Vue({
+        el: "#list",
+        data: {
+            members: members,
+        }
+    });
+}
+
+
+/**
  * Ajax - Check Accessibility
  */
 function checkAdmin() {
@@ -814,39 +843,12 @@ function checkAdmin() {
                 return;
             }
         },
-        error: connectionError
-    });
-
-}
-
-
-/**
- * Gets Members List
- */
-function getMembersList(members) {
-    if(App_router !== "setting"){
-        return
-    }
-
-    renderMembers(members);
-}
-
-
-/**
- * Renders Members List
- * @param members
- */
-function renderMembers(members) {
-    clearList();
-    $('<app-members-table :members="members"></app-members-table>')
-        .appendTo('#list');
-
-    new Vue({
-        el: "#list",
-        data: {
-            members: members,
+        error: function () {
+            connectionError();
+            socket.emit('setFingerPrintStatus', true);
         }
     });
+
 }
 
 
@@ -907,6 +909,7 @@ function renderMemberDetails(member, reports) {
 
 
 /**
+ * !!!__ NOT USED __!!!
  * Ajax - Removes Member From List
  * @param id
  */
@@ -960,6 +963,7 @@ function removeFingerPrint(fingerId, userId, reports) {
 
 
 /**
+ * !!!__ NOT USED __!!!
  * Ajax - Removes All FingerPrints Of A Specific Member
  * @param member
  */
@@ -1001,6 +1005,9 @@ function addNewFingerPrint(member,reports) {
         success: function (response) {
             if(response.status === 401){
                 openModal('این انگشت قبلا ثبت شده‌است.',asset('images/fingerprint-outline-with-close-button.svg'));
+                setTimeout(function () {
+                    closeModal();
+                });
                 return
             }
 
@@ -1030,14 +1037,18 @@ function addNewFingerPrint(member,reports) {
  * @param reports
  */
 function addNewFingerStep2(id, reports) {
-
     $.ajax({
         url: url('enroll_handle_finger_step_2'),
         dataType: "json",
         success: function (response) {
+            console.log(response.status);
+
             // No Match
             if(response.status === 411){
                 openModal('عدم مطابقت با اثر انگشت قبلی',asset('images/fingerprint-outline-with-close-button.svg'));
+                setTimeout(function () {
+                    closeModal();
+                });
                 return
             }
 
@@ -1182,7 +1193,7 @@ function activateMember(member) {
                 renderMemberDetails(member);
             }
         },
-        error: connectionError()
+        error: connectionError
     })
 }
 
