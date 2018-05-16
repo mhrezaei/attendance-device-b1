@@ -419,6 +419,8 @@ def enroll_handle_finger_step_2():
 
     our_result['member'] = []
 
+    recorded_fingers_count = Finger.where('user_id', our_result['id']).count()
+    maximum_allowed_fingers = db.table('users').where('id', our_result['id']).pluck('maximum_allowed_fingers')
     is_active = db.table('users').where('id', our_result['id']).pluck('is_active')
 
     # Retrieve all fingers related to this specific user
@@ -455,6 +457,8 @@ def enroll_handle_finger_step_2():
         'updated_at': this_user.updated_at,
         'related_fingers': user_finger,
         'rfid_unique_id': unique_id,
+        'recorded_fingers_count': recorded_fingers_count,
+        'maximum_allowed_fingers': maximum_allowed_fingers,
         'is_active': is_active
     })
 
@@ -511,6 +515,8 @@ def enroll_handle_rfid():
 
             our_result['member'] = []
 
+            recorded_fingers_count = Finger.where('user_id', our_result['id']).count()
+            maximum_allowed_fingers = db.table('users').where('id', our_result['id']).pluck('maximum_allowed_fingers')
             is_active = db.table('users').where('id', our_result['id']).pluck('is_active')
 
 
@@ -539,6 +545,8 @@ def enroll_handle_rfid():
                 'updated_at': this_user.updated_at,
                 'related_fingers': user_finger,
                 'rfid_unique_id': unique_id,
+                'recorded_fingers_count': recorded_fingers_count,
+                'maximum_allowed_fingers': maximum_allowed_fingers,
                 'is_active': is_active
             })
 
@@ -568,6 +576,8 @@ def omit_rfid_card():
 
     our_result['member'] = []
 
+    recorded_fingers_count = Finger.where('user_id', our_result['id']).count()
+    maximum_allowed_fingers = db.table('users').where('id', our_result['id']).pluck('maximum_allowed_fingers')
     is_active = db.table('users').where('id', our_result['id']).pluck('is_active')
 
 
@@ -604,6 +614,8 @@ def omit_rfid_card():
         'updated_at': this_user.updated_at,
         'related_fingers': user_finger,
         'rfid_unique_id': unique_id,
+        'recorded_fingers_count': recorded_fingers_count,
+        'maximum_allowed_fingers': maximum_allowed_fingers,
         'is_active': is_active
     })
 
@@ -628,6 +640,8 @@ def omit_single_fingerprint_per_user():
 
     our_result['member'] = []
 
+    recorded_fingers_count = Finger.where('user_id', our_result['id']).count()
+    maximum_allowed_fingers = db.table('users').where('id', our_result['id']).pluck('maximum_allowed_fingers')
     is_active = db.table('users').where('id', our_result['id']).pluck('is_active')
 
     # Retrieve all fingers related to this specific user
@@ -663,6 +677,8 @@ def omit_single_fingerprint_per_user():
         'updated_at': this_user.updated_at,
         'related_fingers': user_finger,
         'rfid_unique_id': unique_id,
+        'recorded_fingers_count': recorded_fingers_count,
+        'maximum_allowed_fingers': maximum_allowed_fingers,
         'is_active': is_active
     })
 
