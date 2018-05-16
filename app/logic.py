@@ -143,7 +143,7 @@ def run_fingerprint():
                                                              entered_at=the_entered_at, hash=the_hash,
                                                              accuracy=the_accuracy)
 
-                                our_result['last_action'] = 'You have no records yet.'
+                                our_result['last_action'] = 'None'
                                 publish('fingerPrintStatus', our_result)
 
 
@@ -306,7 +306,7 @@ def run_rfid():
 
                             our_result['status'] = 31
                             our_result['message'] = 'Successful log for this RFID card inserted in the database.'
-
+                            our_result['last_action'] = 'None'  # The user has forgotten to attend exit on his or her last attendance or it's the first record
                             publish('fingerPrintStatus', our_result)
                             sleep(5)
 
@@ -360,8 +360,7 @@ def run_rfid():
                                     # flash('More than 60 seconds spent from this finger scan!')
                                     # flash('It is a NEW ENTER!')
 
-                                    our_result[
-                                        'last_action'] = 'None'  # The user has forgotten to attend exit on his or her last attendance
+                                    our_result['last_action'] = 'None'  # The user has forgotten to attend exit on his or her last attendance or it's the first record
 
                                     db.table('user_logs').insert(user_id=user_related_with_this_rfid_card,
                                                                  template_position=unique_id,
