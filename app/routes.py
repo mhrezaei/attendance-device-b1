@@ -640,7 +640,7 @@ def omit_single_fingerprint_per_user():
     this_template_position = db.table('fingers').where('id', our_result['id_primary_in_fingers_table']).pluck('template_position')
 
     db.table('fingers').where('template_position', this_template_position).delete()
-    fingerprint.deleteTemplate(this_template_position) # Deletes fingerprint from fingerprint sensor memory
+    fingerprint.deleteTemplate(int(this_template_position)) # Deletes fingerprint from fingerprint sensor memory
 
 
     our_result['status'] = 701
