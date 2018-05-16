@@ -571,12 +571,12 @@ Vue.component('app-details',{
             addNewCard(this.member, this.reports);
         },
         activateMember: function () {
-            activateMember(this.member);
+            activateMember(this.member, this.reports);
 
 
         },
         deactivateMember: function () {
-            deactivateMember(this.member)
+            deactivateMember(this.member, this.reports)
         }
 
     }
@@ -1007,7 +1007,7 @@ function addNewFingerPrint(member,reports) {
                 openModal('این انگشت قبلا ثبت شده‌است.',asset('images/fingerprint-outline-with-close-button.svg'));
                 setTimeout(function () {
                     closeModal();
-                });
+                },3000);
                 return
             }
 
@@ -1041,14 +1041,13 @@ function addNewFingerStep2(id, reports) {
         url: url('enroll_handle_finger_step_2'),
         dataType: "json",
         success: function (response) {
-            console.log(response.status);
 
             // No Match
             if(response.status === 411){
                 openModal('عدم مطابقت با اثر انگشت قبلی',asset('images/fingerprint-outline-with-close-button.svg'));
                 setTimeout(function () {
                     closeModal();
-                });
+                },3000);
                 return
             }
 
@@ -1059,7 +1058,7 @@ function addNewFingerStep2(id, reports) {
             }
 
             // Match and saved
-            if(response.status === 413){
+            if(response.status === 415){
                 openModal('اثر انگشت با موفقیت ثبت شد.',asset('images/fingerprint-outline-with-check-mark.svg'));
                 setTimeout(function () {
                     closeModal();
@@ -1145,7 +1144,7 @@ function addNewCard(member,reports) {
 /**
  * Ajax - Deactivate Member
  */
-function deactivateMember(member) {
+function deactivateMember(member, reports) {
     waitForIt();
 
     $.ajax({
@@ -1162,7 +1161,7 @@ function deactivateMember(member) {
                     closeModal();
                 }, 3000);
                 member.is_active = false;
-                renderMemberDetails(member);
+                renderMemberDetails(member,reports);
             }
         },
         error: connectionError
@@ -1173,7 +1172,7 @@ function deactivateMember(member) {
 /**
  * Ajax - Activate Member
  */
-function activateMember(member) {
+function activateMember(member, reports) {
     waitForIt();
 
     $.ajax({
@@ -1190,7 +1189,7 @@ function activateMember(member) {
                     closeModal();
                 }, 3000);
                 member.is_active = true;
-                renderMemberDetails(member);
+                renderMemberDetails(member, reports);
             }
         },
         error: connectionError
