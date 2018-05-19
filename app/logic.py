@@ -24,7 +24,7 @@ def run_fingerprint():
         # sleep(0.5) #TODO: 1 second or not
         our_result = {'status': 0, 'first_name': '', 'last_name': '', 'last_action': ''}
 
-        read_image = None
+        # read_image = None
         try:
             read_image = fingerprint.readImage()
 
