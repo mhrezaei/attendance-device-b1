@@ -31,6 +31,9 @@ def run_fingerprint():
         except SerialException:
             return 'SerialException happened.'
 
+        # except 'The received packet do not begin with a valid header!':
+        #     print('---------------CAUGHT YOU---------------')
+
         if read_image != 0:
             finger_read_time = int(time())
 
