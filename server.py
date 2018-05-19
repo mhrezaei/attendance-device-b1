@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# from builtins import KeyboardInterrupt
+from builtins import KeyboardInterrupt
 
 from app.config import app, socket, publish, worker
 from app.logic import receive, run_fingerprint, run_rfid
