@@ -36,13 +36,13 @@ if __name__ == '__main__':
         rfid_thread = Thread(target=rfid_handler, args=(event_rfid,))
         flask_thread = Thread(target=flask_handler)
         flask_thread.start()
-        time.sleep(0.5)
+        # time.sleep(0.5)
         fingerprint_thread.start()
-        time.sleep(0.5)
+        # time.sleep(0.5)
         rfid_thread.start()
-        time.sleep(0.5)
-        while 1:
-            time.sleep(0.5)
+        # time.sleep(0.5)
+        # while 1:
+        #     time.sleep(0.5)
     except KeyboardInterrupt:
         print(' * Terminating... ')
         event_fingerprint.clear()
