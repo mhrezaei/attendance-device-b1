@@ -20,20 +20,18 @@ def receive(action, message):
 
 
 def run_fingerprint():
-    # try:
     if store['fingerPrintEnabled']: #boolean
         # sleep(0.5) #TODO: 1 second or not
         our_result = {'status': 0, 'first_name': '', 'last_name': '', 'last_action': ''}
 
-        # read_image = fingerprint.readImage()
-        # read_image = None
-        # try:
-        #     read_image = fingerprint.readImage()
-        #
-        # except SerialException:
-        #     return 'SerialException happened.'
+        read_image = None
+        try:
+            read_image = fingerprint.readImage()
 
-        if fingerprint.readImage() != 0:
+        except SerialException:
+            return 'SerialException happened.'
+
+        if read_image != 0:
             finger_read_time = int(time())
 
             fingerprint.convertImage(0x01)
@@ -231,12 +229,8 @@ def run_fingerprint():
 
                                         our_result['last_action'] = str(the_very_last_entered_at)
                                         publish('fingerPrintStatus', our_result)
-        else:
-            sleep(0.1)
-            print('Fingerprint sensor is not enabled yet.')
-
-    # except 'The received packet do not begin with a valid header!':
-    #     print('CAUGHT EXCEPTION!')
+    else:
+        sleep(1)
 
 
 def run_rfid():
