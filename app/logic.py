@@ -243,8 +243,10 @@ def run_fingerprint():
             print(' * Terminating... ')
             os.system('kill -9 %d' % os.getpid())
 
-        except:
-            print('EXCEPTION HAPPENED - TURNING ON THE SENSOR AGAIN.')
+        except Exception as e:
+            template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+            message = template.format(type(e).__name__, e.args)
+            print(message)
 
 
     else:
