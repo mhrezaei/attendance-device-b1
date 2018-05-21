@@ -10,7 +10,7 @@ from globla_variables import attendance_not_allowed_timeout
 import RPi.GPIO as GPIO
 import SimpleMFRC522
 import os
-
+import spi
 
 store['fingerPrintEnabled'] = False
 
@@ -420,3 +420,4 @@ def run_rfid():
 
     finally:
         GPIO.cleanup()
+        spi.closeSPI()
