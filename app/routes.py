@@ -430,7 +430,7 @@ def enroll_handle_finger_step_2():
     db.table('fingers').insert(user_id=our_result['id'], template_position=position_number)
 
     update_recorded_fingers_count()
-    
+
     our_result['member'] = []
 
     recorded_fingers_count = Finger.where('user_id', our_result['id']).count()
@@ -650,6 +650,7 @@ def omit_single_fingerprint_per_user():
     db.table('fingers').where('template_position', this_template_position).delete()
     fingerprint.deleteTemplate(int(this_template_position)) # Deletes fingerprint from fingerprint sensor memory
 
+    update_recorded_fingers_count()
 
     our_result['status'] = 701
     our_result['message'] = 'This fingerprint is NOT valid anymore.'
