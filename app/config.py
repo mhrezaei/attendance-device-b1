@@ -8,7 +8,7 @@ from pyfingerprint.pyfingerprint import PyFingerprint
 fingerprint = PyFingerprint('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'secret!'
+app.config['SECRET_KEY'] = r'\x14Y\x1c\xd7\x105\xf1\xb5\xee\xb6\x03\x92\xae\x1e\xe1\xce\x14p\xd1\x13\r?\x88f\x10+\xff\xee|!'
 
 socket = SocketIO(app)
 worker = SocketWorker()
