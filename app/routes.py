@@ -11,7 +11,12 @@ import SimpleMFRC522
 
 store['clients'] = []
 
-
+def update_recorded_fingers_count():
+    users = db.table('users').get()
+    for user in users:
+        recorded_fingers_count = db.table('fingers').where('user_id', user.id).count()
+        db.table('users').where('id', user.id).update(recorded_fingers_count=recorded_fingers_count)
+    return
 # --------------#
 #   Sockets     #
 #               #
@@ -58,6 +63,7 @@ def settings():
 
 @app.route('/settings_process')
 def settings_process():
+    update_recorded_fingers_count()
     our_result = dict()
     # store['fingerPrintEnabled'] = False
     time.sleep(0.05)
@@ -423,6 +429,8 @@ def enroll_handle_finger_step_2():
 
     db.table('fingers').insert(user_id=our_result['id'], template_position=position_number)
 
+    update_recorded_fingers_count()
+    
     our_result['member'] = []
 
     recorded_fingers_count = Finger.where('user_id', our_result['id']).count()
@@ -725,11 +733,4 @@ def deactivate_user():
     return jsonify(our_result)
 
 
-@app.route('/update_recorded_fingers_count', methods=['GET']) #TODO: Temporal - use this as a function whenever needed
-def update_recorded_fingers_count():
-    users = db.table('users').get()
-    for user in users:
-        recorded_fingers_count = db.table('fingers').where('user_id', user.id).count()
-        db.table('users').where('id', user.id).update(recorded_fingers_count=recorded_fingers_count)
 
-    return 'Done'
