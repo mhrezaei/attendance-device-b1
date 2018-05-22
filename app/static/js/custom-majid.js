@@ -137,6 +137,7 @@ jQuery(function($){
     socket.on('auth', function (data) {
         console.log(data);
         socket.emit('setFingerPrintStatus', true);
+        socket.emit('setRfidStatus', true);
     });
 
 
@@ -682,6 +683,7 @@ function closeSetting() {
     clearList();
     App_router = "standby";
     socket.emit('setFingerPrintStatus', true);
+    socket.emit('setRfidStatus', true);
 }
 
 
@@ -812,6 +814,7 @@ function renderMembers(members) {
  */
 function checkAdmin() {
     socket.emit('setFingerPrintStatus', false);
+    socket.emit('setRfidStatus', false);
     $.ajax({
         url: url("settings_process"),
         dataType: "json",
@@ -819,6 +822,7 @@ function checkAdmin() {
             // If Not admin
             if(response.status === 203){
                 socket.emit('setFingerPrintStatus', true);
+                socket.emit('setRfidStatus', true);
                 isNotAdmin();
                 return;
             }
@@ -826,6 +830,7 @@ function checkAdmin() {
             // If No Match Found
             if(response.status === 204){
                 socket.emit('setFingerPrintStatus', true);
+                socket.emit('setRfidStatus', true);
                 noMatchFound();
                 return;
             }
@@ -833,6 +838,7 @@ function checkAdmin() {
             // If Timeout
             if(response.status === 205){
                 socket.emit('setFingerPrintStatus', true);
+                socket.emit('setRfidStatus', true);
                 scanTimeout();
                 return;
             }
@@ -846,6 +852,7 @@ function checkAdmin() {
         error: function () {
             connectionError();
             socket.emit('setFingerPrintStatus', true);
+            socket.emit('setRfidStatus', true);
         }
     });
 
