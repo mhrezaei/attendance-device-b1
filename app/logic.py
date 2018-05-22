@@ -13,6 +13,7 @@ import os
 import spi
 
 store['fingerPrintEnabled'] = False
+store['rfidEnabled'] = False
 
 def receive(action, message):
     if action == 'fingerPrintStatus':
@@ -430,7 +431,7 @@ def run_rfid():
 
     finally:
         GPIO.cleanup()
-        spi.closeSPI()
+        # spi.closeSPI()
 
             # current_time = int(time())
             # current_time_str = str(current_time)
