@@ -431,7 +431,7 @@ def run_rfid():
 
     finally:
         GPIO.cleanup()
-        # spi.closeSPI()
+        spi.closeSPI()
 
             # current_time = int(time())
             # current_time_str = str(current_time)
