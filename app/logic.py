@@ -254,6 +254,7 @@ def run_fingerprint():
 
 
 def run_rfid():
+    # if store['fingerPrintEnabled']:  # boolean
     our_result = dict()
     our_result['status'] = 30
     our_result['message'] = 'Nothing done yet.'
@@ -418,6 +419,23 @@ def run_rfid():
                 publish('fingerPrintStatus', our_result)
 
 
+    except KeyboardInterrupt:
+        print(' * Terminating... ')
+        os.system('kill -9 %d' % os.getpid())
+
+    except Exception as e:
+        template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+        message = template.format(type(e).__name__, e.args)
+        print(message)
+
     finally:
         GPIO.cleanup()
         spi.closeSPI()
+
+            # current_time = int(time())
+            # current_time_str = str(current_time)
+
+            # close_spi_clause = current_time_str[-2:]
+            #
+            # if close_spi_clause == '00':
+            #     spi.closeSPI()

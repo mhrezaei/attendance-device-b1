@@ -7,7 +7,7 @@ from pprint import pprint
 from globla_variables import settings_timeout, enroll_finger_timeout, enroll_rfid_timeout
 import RPi.GPIO as GPIO
 import SimpleMFRC522
-
+import spi
 
 store['clients'] = []
 
@@ -26,13 +26,13 @@ def socket_connect():
     # store['fingerPrintEnabled'] = True
     socket.emit('auth', request.sid)
     store['clients'].append(request.sid)
-    print('Connect' + request.sid)
+    print('Connect: ' + request.sid)
 
 @socket.on('disconnect')
 def socket_disconnect():
     store['fingerPrintEnabled'] = False
     store['clients'].remove(request.sid)
-    print('Disconnect' + request.sid)
+    print('Disconnect: ' + request.sid)
 
 
 @socket.on('setFingerPrintStatus')
@@ -481,8 +481,8 @@ def enroll_handle_finger_step_2():
 
     maximum_allowed_fingers = db.table('users').where('id', our_result['id']).pluck('maximum_allowed_fingers')
     our_result['maximum_allowed_fingers'] = maximum_allowed_fingers
-    recorded_fingers_count = Finger.where('user_id', our_result['id']).count()
-    updated_recorded_fingers_count = recorded_fingers_count + 1
+    updated_recorded_fingers_count = Finger.where('user_id', our_result['id']).count()
+    # updated_recorded_fingers_count = recorded_fingers_count + 1
     db.table('users').where('id', our_result['id']).update(recorded_fingers_count=updated_recorded_fingers_count)
     our_result['recorded_fingers_count'] = updated_recorded_fingers_count
     our_result['status'] = 415
@@ -507,8 +507,9 @@ def enroll_handle_rfid():
         check_time = time.time() + enroll_rfid_timeout
 
         while time.time() < check_time:
+            spi.openSPI()
             reader.write(rfid_owner_user_id)
-
+            # spi.closeSPI()
             our_result['status'] = 501
             our_result['message'] = 'Tag has been written successfully on the card.'
 
