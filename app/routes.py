@@ -26,19 +26,23 @@ def socket_connect():
     # store['fingerPrintEnabled'] = True
     socket.emit('auth', request.sid)
     store['clients'].append(request.sid)
-    print('Connect: ' + request.sid)
+    print('Socket Connect: ' + request.sid)
 
 @socket.on('disconnect')
 def socket_disconnect():
     store['fingerPrintEnabled'] = False
+    store['rfidEnabled'] = False
     store['clients'].remove(request.sid)
-    print('Disconnect: ' + request.sid)
+    print('Socket Disconnect: ' + request.sid)
 
 
 @socket.on('setFingerPrintStatus')
 def set_fingerprint_status(data):
     store['fingerPrintEnabled'] = data
 
+@socket.on('setRfidStatus')
+def set_rfid_status(data):
+    store['rfidEnabled'] = data
 
 # --------------#
 #   Endpoints   #
