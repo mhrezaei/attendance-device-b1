@@ -49,6 +49,7 @@ def run_fingerprint():
                 # If finger match was found
                 if position_number != -1:
                     print('Found Template')
+                    # sleep(2)
                     # flash('Found template at position #' + str(position_number))
                     our_result['status'] = 3
                     # flash('The accuracy score is: ' + str(accuracy_score))
@@ -61,6 +62,7 @@ def run_fingerprint():
                     if is_active_clause == 0:  # This user is NOT active
                         our_result['status'] = 20
                         publish('fingerPrintStatus', our_result)
+                        sleep(2)
 
                     elif is_active_clause != 0:  # This user is active
 
@@ -95,6 +97,7 @@ def run_fingerprint():
                             # flash('attendance_not_allowed_timeout has NOT passed.')
                             # print('STATUS 18 - NOT allowed to apply user log.')
                             publish('fingerPrintStatus', our_result)
+                            sleep(2)
 
                         elif finger_read_time >= check_time:  # attendance_not_allowed_timeout has passed. Ready to apply user log.
                             # print('STATUS 19 - Allowed to apply user log.')
@@ -107,6 +110,7 @@ def run_fingerprint():
                                 # flash('Finger does NOT exist!')
                                 our_result['status'] = 5
                                 publish('fingerPrintStatus', our_result)
+                                sleep(2)
 
                             # If the user_id exists in the fingers table
                             elif template_position_existence_clause != 0:
@@ -152,6 +156,7 @@ def run_fingerprint():
 
                                     our_result['last_action'] = 'None'
                                     publish('fingerPrintStatus', our_result)
+                                    sleep(2)
 
 
                                 # The user_logs table has this user_id
@@ -186,6 +191,7 @@ def run_fingerprint():
                                                                      entered_at=the_entered_at, hash=the_hash,
                                                                      accuracy=the_accuracy)
                                         publish('fingerPrintStatus', our_result)
+                                        sleep(2)
 
                                     # exited_at field is empty
                                     elif the_exited_at is None:
@@ -224,6 +230,7 @@ def run_fingerprint():
                                                                          entered_at=the_new_entered_at, hash=the_hash,
                                                                          accuracy=the_accuracy)
                                             publish('fingerPrintStatus', our_result)
+                                            sleep(2)
 
                                         # Less than specified times spent from this finger scan
                                         else:
@@ -239,6 +246,7 @@ def run_fingerprint():
 
                                             our_result['last_action'] = str(the_very_last_entered_at)
                                             publish('fingerPrintStatus', our_result)
+                                            sleep(2)
 
         except KeyboardInterrupt:
             print(' * Terminating... ')
