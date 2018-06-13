@@ -26,8 +26,6 @@ def run_fingerprint():
     if store['fingerPrintEnabled']: #boolean
         # sleep(0.5) #TODO: 1 second or not
         our_result = {'status': 0, 'first_name': '', 'last_name': '', 'last_action': ''}
-        the_flag = 0
-        the_device = 'fingerprint'
 
         # read_image = None
         try:
@@ -45,184 +43,214 @@ def run_fingerprint():
                 # If finger match was NOT found
                 if position_number == -1:
                     # flash('No match found!')
-                    our_result['status'] = 1000
+                    our_result['status'] = 2
                     publish('fingerPrintStatus', our_result)
 
                 # If finger match was found
                 if position_number != -1:
                     print('Found Template')
-                    fingerprint.loadTemplate(position_number, 0x01)
-                    characterics = str(fingerprint.downloadCharacteristics(0x01)).encode('utf-8')
+                    # sleep(2)
+                    # flash('Found template at position #' + str(position_number))
+                    our_result['status'] = 3
+                    # flash('The accuracy score is: ' + str(accuracy_score))
+                    our_result['status'] = 4
 
-                    user_related_with_this_finger = db.table('fingers').where('template_position', position_number).pluck('user_id')
+                    user_related_with_this_finger = db.table('fingers').where('template_position',
+                                                                              position_number).pluck('user_id')
                     is_active_clause = db.table('users').where('id', user_related_with_this_finger).pluck('is_active')
 
                     if is_active_clause == 0:  # This user is NOT active
-                        our_result['status'] = 1001
+                        our_result['status'] = 20
                         publish('fingerPrintStatus', our_result)
                         sleep(2)
 
                     elif is_active_clause != 0:  # This user is active
 
-                        user_related_with_this_finger = db.table('fingers').where('template_position', position_number).pluck('user_id')
-                        this_user_last_effect = db.table('user_logs').where('user_id', user_related_with_this_finger).order_by('id', 'desc').pluck('effected_at')
+                        this_finger_last_attendance_action = 0
 
-                        if this_user_last_effect is None: # This user has no records in the table yet. It's a fresh record.
-                            the_user_id = user_related_with_this_finger
-                            the_effected_at = datetime.now()
-                            the_type = 'normal_in' #@TODO: Must be dynamic later.
-                            the_template_position = position_number
-                            the_hash = hashlib.sha256(characterics).hexdigest()
-                            the_accuracy = accuracy_score
+                        user_related_with_this_finger = db.table('fingers').where('template_position',
+                                                                                  position_number).pluck('user_id')
 
-                            the_first_name = db.table('users').where('id', user_related_with_this_finger).pluck('first_name')
-                            the_last_name = db.table('users').where('id', user_related_with_this_finger).pluck('last_name')
+                        this_finger_last_enter = db.table('user_logs').where('user_id',
+                                                                             user_related_with_this_finger).order_by(
+                            'id', 'desc').pluck('entered_at')
+                        if this_finger_last_enter is not None:
+                            this_finger_last_enter = int(this_finger_last_enter.strftime('%s'))  # Converted to epoch
+                            this_finger_last_attendance_action = this_finger_last_enter
 
-                            our_result['first_name'] = the_first_name
-                            our_result['last_name'] = the_last_name
-                            our_result['last_action'] = 'None'
+                        this_finger_last_exit = db.table('user_logs').where('user_id',
+                                                                            user_related_with_this_finger).order_by(
+                            'id', 'desc').pluck('exited_at')
+                        if this_finger_last_exit is not None:
+                            this_finger_last_exit = int(this_finger_last_exit.strftime('%s'))  # Converted to epoch
+                            if this_finger_last_exit > this_finger_last_enter:
+                                this_finger_last_attendance_action = this_finger_last_exit
 
-                            db.table('user_logs').insert(flag=the_flag,
-                                                         user_id=the_user_id,
-                                                         effected_at=the_effected_at,
-                                                         type=the_type,
-                                                         device=the_device,
-                                                         template_position=the_template_position,
-                                                         hash=the_hash,
-                                                         accuracy=the_accuracy)
-                            our_result['status'] = 1002
-                            publish('fingerPrintStatus', our_result) #@TODO: Don't forget to set a fresh status right after 'if' and update wiki.
+                        check_time = int(this_finger_last_attendance_action + attendance_not_allowed_timeout)
+
+                        print('finger_read_time: ' + str(finger_read_time))
+                        print('this_finger_last_attendance_action: ' + str(this_finger_last_attendance_action))
+                        print('check_time: ' + str(check_time))
+
+                        if finger_read_time < check_time:  # attendance_not_allowed_timeout has NOT passed. NOT ready to apply user log.
+                            our_result['status'] = 18
+                            # flash('attendance_not_allowed_timeout has NOT passed.')
+                            # print('STATUS 18 - NOT allowed to apply user log.')
+                            publish('fingerPrintStatus', our_result)
                             sleep(2)
 
-                        if this_user_last_effect is not None: # This user already has a record in the table.
-                            last_effect_type = db.table('user_logs').where('user_id', user_related_with_this_finger).order_by('id', 'desc').pluck('type')
+                        elif finger_read_time >= check_time:  # attendance_not_allowed_timeout has passed. Ready to apply user log.
+                            # print('STATUS 19 - Allowed to apply user log.')
+                            # Executing Queries
+                            template_position_existence_clause = db.table('fingers').where('template_position',
+                                                                                           position_number).count()
 
-                            if last_effect_type == 'normal_in':
-                                this_finger_last_attendance_action = int(this_user_last_effect.strftime('%s'))  # Converted to epoch
-                                check_time = int(this_finger_last_attendance_action + attendance_not_allowed_timeout)
+                            # If the user_id does NOT exist in the fingers table
+                            if template_position_existence_clause == 0:
+                                # flash('Finger does NOT exist!')
+                                our_result['status'] = 5
+                                publish('fingerPrintStatus', our_result)
+                                sleep(2)
 
-                                if finger_read_time < check_time:  # attendance_not_allowed_timeout has NOT passed. NOT ready to apply user log.
-                                    # flash('attendance_not_allowed_timeout has NOT passed.')
-                                    # print('STATUS 18 - NOT allowed to apply user log.')
-                                    our_result['status'] = 1003
+                            # If the user_id exists in the fingers table
+                            elif template_position_existence_clause != 0:
+                                # flash('Finger exists!')
+                                our_result['status'] = 6
+                                # Loads the found template to char buffer 1
+                                fingerprint.loadTemplate(position_number, 0x01)
+
+                                # Downloads the characteristics of template loaded in char buffer 1
+                                characterics = str(fingerprint.downloadCharacteristics(0x01)).encode('utf-8')
+
+                                # Hashes characteristics of template
+                                # flash('SHA-2 hash of template: ' + hashlib.sha256(characterics).hexdigest())
+                                our_result['status'] = 7
+
+                                the_user_id = db.table('fingers').where('template_position',
+                                                                        int(position_number)).pluck(
+                                    'user_id')
+                                the_first_name = db.table('users').where('id', the_user_id).pluck('first_name')
+                                the_last_name = db.table('users').where('id', the_user_id).pluck('last_name')
+                                # Now we have the user_id associated with the template_position
+                                # flash('The user_id is: ' + str(the_user_id))
+                                our_result['status'] = 8
+
+                                our_result['first_name'] = the_first_name
+                                our_result['last_name'] = the_last_name
+
+                                user_id_existence_clause_2 = db.table('user_logs').where('user_id',
+                                                                                         the_user_id).order_by('id',
+                                                                                                               'desc').pluck(
+                                    'id')
+                                # The user_logs table does NOT have this user_id, inserting the first record of this user_id
+                                if user_id_existence_clause_2 is None:
+                                    # flash('The user_logs table does NOT have this user_id. Inserting the record.')
+                                    the_template_position = position_number
+                                    the_entered_at = datetime.now()  # time right now
+                                    the_hash = hashlib.sha256(characterics).hexdigest()
+                                    the_accuracy = accuracy_score
+                                    db.table('user_logs').insert(user_id=the_user_id,
+                                                                 template_position=the_template_position,
+                                                                 entered_at=the_entered_at, hash=the_hash,
+                                                                 accuracy=the_accuracy)
+
+                                    our_result['last_action'] = 'None'
                                     publish('fingerPrintStatus', our_result)
                                     sleep(2)
 
-                                elif finger_read_time >= check_time:  # attendance_not_allowed_timeout has passed. Ready to apply user log.
-                                    # print('STATUS 19 - Allowed to apply user log.')
-                                    the_first_name = db.table('users').where('id', user_related_with_this_finger).pluck('first_name')
-                                    the_last_name = db.table('users').where('id', user_related_with_this_finger).pluck('last_name')
 
-                                    the_very_last_normal_in_effected_at = db.table('user_logs').where('user_id', user_related_with_this_finger).where('type', 'normal_in').order_by('id', 'desc').pluck('effected_at')
+                                # The user_logs table has this user_id
+                                elif user_id_existence_clause_2 is not None:
+                                    # Retrieve the exited_at associated with the template_position from the fingers table
+                                    the_exited_at = db.table('user_logs').where('user_id', the_user_id).order_by('id',
+                                                                                                                 'desc').pluck(
+                                        'exited_at')
 
-                                    # the_very_last_normal_in_effected_at_epoch = int(the_very_last_normal_in_effected_at.strftime('%s'))  # Converted to epoch
-
-                                    check_working_hours_time = the_very_last_normal_in_effected_at + timedelta(seconds=working_hours)
-
-                                    the_new_effected_at = datetime.now()  # time right now
-
-                                    # More than specified time spent from this finger scan
-                                    if the_new_effected_at > check_working_hours_time:
-                                        our_result['first_name'] = the_first_name
-                                        our_result['last_name'] = the_last_name
-                                        our_result['last_action'] = str(the_very_last_normal_in_effected_at)
-
-
-                                        the_user_id = user_related_with_this_finger
-                                        the_effected_at = the_new_effected_at
-                                        the_type = 'normal_in'
+                                    # exited_at field is NOT empty
+                                    if the_exited_at is not None:
+                                        # flash('exited_at field is NOT empty!')
+                                        our_result['status'] = 10
+                                        # flash('Inserting NEW record.')
+                                        our_result['status'] = 11
+                                        # time.sleep(3)
                                         the_template_position = position_number
+                                        the_entered_at = datetime.now()  # time right now
                                         the_hash = hashlib.sha256(characterics).hexdigest()
                                         the_accuracy = accuracy_score
 
-                                        db.table('user_logs').insert(flag=the_flag,
-                                                                     user_id=the_user_id,
-                                                                     effected_at=the_effected_at,
-                                                                     type=the_type,
-                                                                     device=the_device,
+                                        the_very_last_exited_at = db.table('user_logs').where('user_id',
+                                                                                              the_user_id).order_by(
+                                            'id',
+                                            'desc').pluck(
+                                            'exited_at')
+
+                                        our_result['last_action'] = str(the_very_last_exited_at)
+
+                                        db.table('user_logs').insert(user_id=the_user_id,
                                                                      template_position=the_template_position,
-                                                                     hash=the_hash,
+                                                                     entered_at=the_entered_at, hash=the_hash,
                                                                      accuracy=the_accuracy)
-                                        our_result['status'] = 1004
-                                        publish('fingerPrintStatus', our_result)  # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
+                                        publish('fingerPrintStatus', our_result)
                                         sleep(2)
 
+                                    # exited_at field is empty
+                                    elif the_exited_at is None:
+                                        # flash('exited_at field is empty!')
+                                        our_result['status'] = 12
 
-                                    elif the_new_effected_at <= check_working_hours_time:
-                                        our_result['first_name'] = the_first_name
-                                        our_result['last_name'] = the_last_name
-                                        our_result['last_action'] = str(the_very_last_normal_in_effected_at)
+                                        # Retrieve the entered_at associated with the template_position from the fingers table
+                                        the_very_last_entered_at = db.table('user_logs').where('user_id',
+                                                                                               the_user_id).order_by(
+                                            'id',
+                                            'desc').pluck(
+                                            'entered_at')
 
-                                        the_user_id = user_related_with_this_finger
-                                        the_effected_at = datetime.now()
-                                        the_type = 'normal_out'  # @TODO: Must be dynamic later.
-                                        the_template_position = position_number
-                                        the_hash = hashlib.sha256(characterics).hexdigest()
-                                        the_accuracy = accuracy_score
+                                        our_result['status'] = 13
+                                        temp_time = the_very_last_entered_at + timedelta(
+                                            seconds=working_hours)
+                                        # flash('temp_time: ' + str(temp_time))
+                                        the_new_entered_at = datetime.now()  # time right now
 
+                                        # More than specified time spent from this finger scan
+                                        if the_new_entered_at > temp_time:
+                                            # flash('More than 60 seconds spent from this finger scan!')
+                                            our_result['status'] = 14
+                                            # flash('It is a NEW ENTER!')
+                                            our_result['status'] = 15
 
-                                        db.table('user_logs').insert(flag=the_flag,
-                                                                     user_id=the_user_id,
-                                                                     effected_at=the_effected_at,
-                                                                     type=the_type,
-                                                                     device=the_device,
-                                                                     template_position=the_template_position,
-                                                                     hash=the_hash,
-                                                                     accuracy=the_accuracy)
-                                        our_result['status'] = 1005
-                                        publish('fingerPrintStatus', our_result)  # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
-                                        sleep(2)
+                                            the_template_position = position_number
+                                            the_hash = hashlib.sha256(characterics).hexdigest()
+                                            the_accuracy = accuracy_score
 
+                                            our_result[
+                                                'last_action'] = 'None'  # The user has forgotten to attend exit on his or her last attendance
 
-                            elif last_effect_type == 'normal_out':
-                                this_finger_last_attendance_action = int(this_user_last_effect.strftime('%s'))  # Converted to epoch
-                                check_time = int(this_finger_last_attendance_action + attendance_not_allowed_timeout)
+                                            db.table('user_logs').insert(user_id=the_user_id,
+                                                                         template_position=the_template_position,
+                                                                         entered_at=the_new_entered_at, hash=the_hash,
+                                                                         accuracy=the_accuracy)
+                                            publish('fingerPrintStatus', our_result)
+                                            sleep(2)
 
-                                the_very_last_normal_in_effected_at = db.table('user_logs').where('user_id', user_related_with_this_finger).where('type', 'normal_in').order_by('id', 'desc').pluck('effected_at')
+                                        # Less than specified times spent from this finger scan
+                                        else:
+                                            # flash('Less than 60 seconds spent from this finger scan!')
+                                            our_result['status'] = 16
+                                            # flash('It is an EXIT!')
+                                            our_result['status'] = 17
+                                            # time.sleep(3)
+                                            the_exited_at = datetime.now()  # time right now
 
-                                if finger_read_time < check_time:  # attendance_not_allowed_timeout has NOT passed. NOT ready to apply user log.
-                                    # flash('attendance_not_allowed_timeout has NOT passed.')
-                                    # print('STATUS 18 - NOT allowed to apply user log.')
-                                    our_result['status'] = 1006
-                                    publish('fingerPrintStatus', our_result) # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
-                                    sleep(2)
+                                            db.table('user_logs').where('entered_at', the_very_last_entered_at).update(
+                                                exited_at=the_exited_at)
 
-                                elif finger_read_time >= check_time:  # attendance_not_allowed_timeout has passed. Ready to apply user log.
-                                    # print('STATUS 19 - Allowed to apply user log.')
-                                    the_first_name = db.table('users').where('id', user_related_with_this_finger).pluck('first_name')
-                                    the_last_name = db.table('users').where('id', user_related_with_this_finger).pluck('last_name')
-                                    # Now we have the user_id associated with the template_position
-                                    # flash('The user_id is: ' + str(the_user_id))
-
-                                    our_result['first_name'] = the_first_name
-                                    our_result['last_name'] = the_last_name
-                                    our_result['last_action'] = str(the_very_last_normal_in_effected_at)
-
-                                    the_user_id = user_related_with_this_finger
-                                    the_effected_at = datetime.now()
-                                    the_type = 'normal_in'  # @TODO: Must be dynamic later.
-                                    the_template_position = position_number
-                                    the_hash = hashlib.sha256(characterics).hexdigest()
-                                    the_accuracy = accuracy_score
-
-                                    db.table('user_logs').insert(flag=the_flag,
-                                                                 user_id=the_user_id,
-                                                                 effected_at=the_effected_at,
-                                                                 type=the_type,
-                                                                 device=the_device,
-                                                                 template_position=the_template_position,
-                                                                 hash=the_hash,
-                                                                 accuracy=the_accuracy)
-                                    our_result['status'] = 1007
-                                    publish('fingerPrintStatus', our_result)  # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
-                                    sleep(2)
+                                            our_result['last_action'] = str(the_very_last_entered_at)
+                                            publish('fingerPrintStatus', our_result)
+                                            sleep(2)
 
         except KeyboardInterrupt:
             print(' * Terminating... ')
             os.system('kill -9 %d' % os.getpid())
-
-        except SerialException:
-            print('Serial Exception happened.')
 
         except Exception as e:
             template = "An exception of type {0} occurred. Arguments:\n{1!r}"
