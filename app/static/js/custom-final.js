@@ -143,11 +143,11 @@ jQuery(function($){
 
     // On fingerPrintStatus
     socket.on('fingerPrintStatus', function (data) {
-        if (data.status <= 2) {
+        if (data.status === 1000) {
             console.log(data.status);
             noMatchFound();
         }
-        if ((data.status >= 3 && data.status <= 15) || data.status === 31 || data.status === 35) {
+        if (data.status === 1002 || data.status === 1004 || data.status === 1007 || data.status === 2002 || data.status === 2004 || data.status === 2007) {
             console.log(data.status);
             console.log(data.last_action);
 
@@ -164,18 +164,18 @@ jQuery(function($){
             setTimeout(closeModal, 3000);
         }
 
-        if ((data.status >= 16 && data.status <= 17) || data.status === 36 || data.status === 37) {
+        if (data.status === 1005 || data.status === 2005) {
             console.log(data.status);
 
             let lastAction = "";
             console.log(data.last_action);
-            if(data.last_action === "None" && data.last_action === "None"){
+            if(data.last_action === "None"){
                 lastAction = "ثبت نشده";
             }else {
                 lastAction = toPersianDate(data.last_action) + " ،" + toPersianTime(data.last_action);
             }
 
-            if(data.last_action === "None" && data.last_action === "None"){
+            if(data.last_action === "None"){
                 lastAction = "ثبت نشده";
             }else {
                 lastAction = toPersianDate(data.last_action) + " ،" + toPersianTime(data.last_action);
@@ -186,7 +186,7 @@ jQuery(function($){
             setTimeout(closeModal, 3000);
         }
 
-        if (data.status === 18 || data.status === 32) {
+        if (data.status === 1003 || data.status === 1006 || data.status === 2003 || data.status === 2006) {
             console.log(data.status);
             openModal('فاصله بین دو تردد کافی نیست.');
             setTimeout(function () {
@@ -194,7 +194,7 @@ jQuery(function($){
             },3000);
         }
 
-        if (data.status === 20 || data.status === 34) {
+        if (data.status === 1001 || data.status === 2001) {
             console.log(data.status);
             openModal('حساب شما غیر فعال است.');
             setTimeout(function () {
@@ -202,7 +202,7 @@ jQuery(function($){
             },3000)
         }
 
-        if (data.status === 33) {
+        if (data.status === 2000) {
             console.log(data.status);
             openModal('این کارت ثبت نشده.');
             setTimeout(function () {
