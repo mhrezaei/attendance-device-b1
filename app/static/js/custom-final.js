@@ -159,7 +159,7 @@ jQuery(function($){
                 lastAction = toPersianDate(data.last_action) + " " + toPersianTime(data.last_action);
             }
 
-            let msg = data.first_name + ' ' + data.last_name + 'خوش آمدید. آخرین خروج شما: ' + lastAction;
+            let msg = data.first_name + ' ' + data.last_name + ' خوش آمدید. آخرین خروج شما: ' + lastAction;
             openModal(msg, asset('images/welcome.svg'));
             setTimeout(closeModal, 3000);
         }
@@ -181,7 +181,7 @@ jQuery(function($){
                 lastAction = toPersianDate(data.last_action) + " ،" + toPersianTime(data.last_action);
             }
 
-            let msg = data.first_name + ' ' + data.last_name + 'خدا نگهدار. آخرین ورود شما: ' + lastAction;
+            let msg = data.first_name + ' ' + data.last_name + ' خدا نگهدار. آخرین ورود شما: ' + lastAction;
             openModal(msg, asset('images/exit.svg'));
             setTimeout(closeModal, 3000);
         }
