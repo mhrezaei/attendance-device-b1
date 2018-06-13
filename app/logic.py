@@ -45,7 +45,7 @@ def run_fingerprint():
                 # If finger match was NOT found
                 if position_number == -1:
                     # flash('No match found!')
-                    our_result['status'] = 2
+                    our_result['status'] = 1000
                     publish('fingerPrintStatus', our_result)
 
                 # If finger match was found
@@ -53,17 +53,12 @@ def run_fingerprint():
                     print('Found Template')
                     fingerprint.loadTemplate(position_number, 0x01)
                     characterics = str(fingerprint.downloadCharacteristics(0x01)).encode('utf-8')
-                    # sleep(2)
-                    # flash('Found template at position #' + str(position_number))
-                    our_result['status'] = 3
-                    # flash('The accuracy score is: ' + str(accuracy_score))
-                    our_result['status'] = 4
 
                     user_related_with_this_finger = db.table('fingers').where('template_position', position_number).pluck('user_id')
                     is_active_clause = db.table('users').where('id', user_related_with_this_finger).pluck('is_active')
 
                     if is_active_clause == 0:  # This user is NOT active
-                        our_result['status'] = 20
+                        our_result['status'] = 1001
                         publish('fingerPrintStatus', our_result)
                         sleep(2)
 
@@ -95,6 +90,7 @@ def run_fingerprint():
                                                          template_position=the_template_position,
                                                          hash=the_hash,
                                                          accuracy=the_accuracy)
+                            our_result['status'] = 1002
                             publish('fingerPrintStatus', our_result) #@TODO: Don't forget to set a fresh status right after 'if' and update wiki.
                             sleep(2)
 
@@ -106,9 +102,9 @@ def run_fingerprint():
                                 check_time = int(this_finger_last_attendance_action + attendance_not_allowed_timeout)
 
                                 if finger_read_time < check_time:  # attendance_not_allowed_timeout has NOT passed. NOT ready to apply user log.
-                                    our_result['status'] = 18
                                     # flash('attendance_not_allowed_timeout has NOT passed.')
                                     # print('STATUS 18 - NOT allowed to apply user log.')
+                                    our_result['status'] = 1003
                                     publish('fingerPrintStatus', our_result)
                                     sleep(2)
 
@@ -127,8 +123,6 @@ def run_fingerprint():
 
                                     # More than specified time spent from this finger scan
                                     if the_new_effected_at > check_working_hours_time:
-                                        our_result['status'] = 8
-
                                         our_result['first_name'] = the_first_name
                                         our_result['last_name'] = the_last_name
                                         our_result['last_action'] = str(the_very_last_normal_in_effected_at)
@@ -149,13 +143,12 @@ def run_fingerprint():
                                                                      template_position=the_template_position,
                                                                      hash=the_hash,
                                                                      accuracy=the_accuracy)
+                                        our_result['status'] = 1004
                                         publish('fingerPrintStatus', our_result)  # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
                                         sleep(2)
 
 
                                     elif the_new_effected_at <= check_working_hours_time:
-                                        our_result['status'] = 8
-
                                         our_result['first_name'] = the_first_name
                                         our_result['last_name'] = the_last_name
                                         our_result['last_action'] = str(the_very_last_normal_in_effected_at)
@@ -176,6 +169,7 @@ def run_fingerprint():
                                                                      template_position=the_template_position,
                                                                      hash=the_hash,
                                                                      accuracy=the_accuracy)
+                                        our_result['status'] = 1005
                                         publish('fingerPrintStatus', our_result)  # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
                                         sleep(2)
 
@@ -186,11 +180,10 @@ def run_fingerprint():
 
                                 the_very_last_normal_in_effected_at = db.table('user_logs').where('user_id', user_related_with_this_finger).where('type', 'normal_in').order_by('id', 'desc').pluck('effected_at')
 
-
                                 if finger_read_time < check_time:  # attendance_not_allowed_timeout has NOT passed. NOT ready to apply user log.
-                                    our_result['status'] = 18
                                     # flash('attendance_not_allowed_timeout has NOT passed.')
                                     # print('STATUS 18 - NOT allowed to apply user log.')
+                                    our_result['status'] = 1006
                                     publish('fingerPrintStatus', our_result) # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
                                     sleep(2)
 
@@ -200,7 +193,6 @@ def run_fingerprint():
                                     the_last_name = db.table('users').where('id', user_related_with_this_finger).pluck('last_name')
                                     # Now we have the user_id associated with the template_position
                                     # flash('The user_id is: ' + str(the_user_id))
-                                    our_result['status'] = 8
 
                                     our_result['first_name'] = the_first_name
                                     our_result['last_name'] = the_last_name
@@ -221,6 +213,7 @@ def run_fingerprint():
                                                                  template_position=the_template_position,
                                                                  hash=the_hash,
                                                                  accuracy=the_accuracy)
+                                    our_result['status'] = 1007
                                     publish('fingerPrintStatus', our_result)  # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
                                     sleep(2)
 
