@@ -193,8 +193,7 @@ def user_logs_process():
     our_result['status'] = 300
     our_result['message'] = 'Nothing done yet.'
 
-    # our_result['id'] = request.form['user_id'].encode("utf-8")
-    our_result['id'] = 26
+    our_result['id'] = request.form['user_id'].encode("utf-8")
 
     our_result['reports'] = ''
 
