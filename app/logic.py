@@ -26,7 +26,7 @@ def run_fingerprint():
     if store['fingerPrintEnabled']: #boolean
         # sleep(0.5) #TODO: 1 second or not
         our_result = {'status': 0, 'first_name': '', 'last_name': '', 'last_action': ''}
-        the_flag = 0
+        the_is_synced = 0
         the_device = 'fingerprint'
 
         # read_image = None
@@ -82,7 +82,7 @@ def run_fingerprint():
                             our_result['last_name'] = the_last_name
                             our_result['last_action'] = 'None'
 
-                            db.table('user_logs').insert(flag=the_flag,
+                            db.table('user_logs').insert(is_synced=the_is_synced,
                                                          user_id=the_user_id,
                                                          effected_at=the_effected_at,
                                                          type=the_type,
@@ -135,7 +135,7 @@ def run_fingerprint():
                                         the_hash = hashlib.sha256(characterics).hexdigest()
                                         the_accuracy = accuracy_score
 
-                                        db.table('user_logs').insert(flag=the_flag,
+                                        db.table('user_logs').insert(is_synced=the_is_synced,
                                                                      user_id=the_user_id,
                                                                      effected_at=the_effected_at,
                                                                      type=the_type,
@@ -161,7 +161,7 @@ def run_fingerprint():
                                         the_accuracy = accuracy_score
 
 
-                                        db.table('user_logs').insert(flag=the_flag,
+                                        db.table('user_logs').insert(is_synced=the_is_synced,
                                                                      user_id=the_user_id,
                                                                      effected_at=the_effected_at,
                                                                      type=the_type,
@@ -205,7 +205,7 @@ def run_fingerprint():
                                     the_hash = hashlib.sha256(characterics).hexdigest()
                                     the_accuracy = accuracy_score
 
-                                    db.table('user_logs').insert(flag=the_flag,
+                                    db.table('user_logs').insert(is_synced=the_is_synced,
                                                                  user_id=the_user_id,
                                                                  effected_at=the_effected_at,
                                                                  type=the_type,
@@ -241,7 +241,7 @@ def run_rfid():
         our_result['message'] = 'Nothing done yet.'
         sleep(1)
         reader = SimpleMFRC522.SimpleMFRC522()
-        the_flag = 0
+        the_is_synced = 0
         the_device = 'rfid'
 
         try:
@@ -286,7 +286,7 @@ def run_rfid():
                             our_result['last_name'] = the_last_name
                             our_result['last_action'] = 'None'
 
-                            db.table('user_logs').insert(flag=the_flag,
+                            db.table('user_logs').insert(is_synced=the_is_synced,
                                                          user_id=the_user_id,
                                                          effected_at=the_effected_at,
                                                          type=the_type,
@@ -336,7 +336,7 @@ def run_rfid():
                                         the_type = 'normal_in'
                                         the_rfid_unique_id = unique_id
 
-                                        db.table('user_logs').insert(flag=the_flag,
+                                        db.table('user_logs').insert(is_synced=the_is_synced,
                                                                      user_id=the_user_id,
                                                                      effected_at=the_effected_at,
                                                                      type=the_type,
@@ -357,7 +357,7 @@ def run_rfid():
                                         the_type = 'normal_out'  # @TODO: Must be dynamic later.
                                         the_rfid_unique_id = unique_id
 
-                                        db.table('user_logs').insert(flag=the_flag,
+                                        db.table('user_logs').insert(is_synced=the_is_synced,
                                                                      user_id=the_user_id,
                                                                      effected_at=the_effected_at,
                                                                      type=the_type,
@@ -397,7 +397,7 @@ def run_rfid():
                                     the_type = 'normal_in'  # @TODO: Must be dynamic later.
                                     the_rfid_unique_id = unique_id
 
-                                    db.table('user_logs').insert(flag=the_flag,
+                                    db.table('user_logs').insert(is_synced=the_is_synced,
                                                                  user_id=the_user_id,
                                                                  effected_at=the_effected_at,
                                                                  type=the_type,
