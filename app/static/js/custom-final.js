@@ -84,6 +84,12 @@ function forms_digit_fa(enDigit) {
  */
 var App_router = "standby";
 var App_modalState = "close";
+var trans = {
+    "fingerprint": "اثر انگشت",
+    "rfid": "کارت",
+    "normal_in": "ورود عادی",
+    "normal_out": "خروج عادی",
+};
 
 
 /*
@@ -432,19 +438,19 @@ Vue.component('app-details',{
                             <thead> 
                                 <tr> 
                                 <th style="width: 60px;">ردیف</th> 
-                                <th>تاریخ ورود</th> 
-                                <th>ساعت ورود</th> 
-                                <th>تاریخ خروج</th> 
-                                <th>ساعت خروج</th> 
+                                <th>تاریخ تردد</th> 
+                                <th>ساعت تردد</th> 
+                                <th>نوع تردد</th> 
+                                <th>ابزار شناسایی</th> 
                                 </tr> 
                             </thead> 
                             <tbody>
                                 <tr v-for="(report , index) in reports">
                                     <td>{{ convertDigit(index + 1) }}</td>
-                                    <td>{{ setDate(report.entered_at) }}</td>
-                                    <td>{{ setTime(report.entered_at) }}</td>
-                                    <td>{{ setDate(report.exited_at) }}</td>
-                                    <td>{{ setTime(report.exited_at) }}</td>
+                                    <td>{{ setDate(report.effected_at) }}</td>
+                                    <td>{{ setTime(report.effected_at) }}</td>
+                                    <td>{{ trans[report.type] }}</td>
+                                    <td>{{ trans[report.device] }}</td>
                                 </tr>
                             </tbody>
                         </table> 
