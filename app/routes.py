@@ -187,12 +187,14 @@ def settings_process():
 
 @app.route('/user_logs_process', methods=['GET', 'POST'])
 def user_logs_process():
+    print('SALAM')
     our_result = dict()
 
     our_result['status'] = 300
     our_result['message'] = 'Nothing done yet.'
 
-    our_result['id'] = request.form['user_id'].encode("utf-8")
+    # our_result['id'] = request.form['user_id'].encode("utf-8")
+    our_result['id'] = 26
 
     our_result['reports'] = ''
 
@@ -208,8 +210,11 @@ def user_logs_process():
         user_report = []
         for user_log in all_logs_associated_with_this_user:
             user_report.append({
-                'entered_at': str(user_log['entered_at']),
-                'exited_at': str(user_log['exited_at'])
+                'effected_at': str(user_log['effected_at']),
+                'type': str(user_log['type']),
+                'device': str(user_log['device'])
+                # 'entered_at': str(user_log['entered_at']),
+                # 'exited_at': str(user_log['exited_at'])
             })
 
         our_result['reports'] = user_report
