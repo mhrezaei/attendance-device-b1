@@ -84,12 +84,6 @@ function forms_digit_fa(enDigit) {
  */
 var App_router = "standby";
 var App_modalState = "close";
-var trans = {
-    "fingerprint": "اثر انگشت",
-    "rfid": "کارت",
-    "normal_in": "ورود عادی",
-    "normal_out": "خروج عادی",
-};
 
 
 /*
@@ -567,7 +561,13 @@ Vue.component('app-details',{
     props: ['member','reports'],
     data: function () {
       return {
-          activation: this.member.is_active
+          activation: this.member.is_active,
+          trans: {
+              "fingerprint": "اثر انگشت",
+              "rfid": "کارت",
+              "normal_in": "ورود عادی",
+              "normal_out": "خروج عادی",
+          }
       }
     },
     methods:{
