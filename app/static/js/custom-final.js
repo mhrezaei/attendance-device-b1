@@ -84,6 +84,12 @@ function forms_digit_fa(enDigit) {
  */
 var App_router = "standby";
 var App_modalState = "close";
+var trans = {
+    "fingerprint": "اثر انگشت",
+    "rfid": "کارت",
+    "normal_in": "ورود عادی",
+    "normal_out": "خروج عادی",
+};
 
 
 /*
@@ -143,11 +149,20 @@ jQuery(function($){
 
     // On fingerPrintStatus
     socket.on('fingerPrintStatus', function (data) {
-        if (data.status === 1000) {
+        if (
+            data.status === 1000
+        ) {
             console.log(data.status);
             noMatchFound();
         }
-        if (data.status === 1002 || data.status === 1004 || data.status === 1007 || data.status === 2002 || data.status === 2004 || data.status === 2007) {
+        if (
+            data.status === 1002 ||
+            data.status === 1004 ||
+            data.status === 1007 ||
+            data.status === 2002 ||
+            data.status === 2004 ||
+            data.status === 2007
+        ) {
             console.log(data.status);
             console.log(data.last_action);
 
@@ -160,11 +175,15 @@ jQuery(function($){
             }
 
             let msg = data.first_name + ' ' + data.last_name + ' خوش آمدید. آخرین خروج شما: ' + lastAction;
+
             openModal(msg, asset('images/welcome.svg'));
             setTimeout(closeModal, 3000);
         }
 
-        if (data.status === 1005 || data.status === 2005) {
+        if (
+            data.status === 1005 ||
+            data.status === 2005
+        ) {
             console.log(data.status);
 
             let lastAction = "";
@@ -186,7 +205,12 @@ jQuery(function($){
             setTimeout(closeModal, 3000);
         }
 
-        if (data.status === 1003 || data.status === 1006 || data.status === 2003 || data.status === 2006) {
+        if (
+            data.status === 1003 ||
+            data.status === 1006 ||
+            data.status === 2003 ||
+            data.status === 2006
+        ) {
             console.log(data.status);
             openModal('فاصله بین دو تردد کافی نیست.');
             setTimeout(function () {
@@ -194,7 +218,10 @@ jQuery(function($){
             },3000);
         }
 
-        if (data.status === 1001 || data.status === 2001) {
+        if (
+            data.status === 1001 ||
+            data.status === 2001
+        ) {
             console.log(data.status);
             openModal('حساب شما غیر فعال است.');
             setTimeout(function () {
@@ -202,7 +229,9 @@ jQuery(function($){
             },3000)
         }
 
-        if (data.status === 2000) {
+        if (
+            data.status === 2000
+        ) {
             console.log(data.status);
             openModal('این کارت ثبت نشده.');
             setTimeout(function () {
@@ -432,19 +461,19 @@ Vue.component('app-details',{
                             <thead> 
                                 <tr> 
                                 <th style="width: 60px;">ردیف</th> 
-                                <th>تاریخ ورود</th> 
-                                <th>ساعت ورود</th> 
-                                <th>تاریخ خروج</th> 
-                                <th>ساعت خروج</th> 
+                                <th>تاریخ تردد</th> 
+                                <th>ساعت تردد</th> 
+                                <th>نوع تردد</th> 
+                                <th>ابزار شناسایی</th> 
                                 </tr> 
                             </thead> 
                             <tbody>
                                 <tr v-for="(report , index) in reports">
                                     <td>{{ convertDigit(index + 1) }}</td>
-                                    <td>{{ setDate(report.entered_at) }}</td>
-                                    <td>{{ setTime(report.entered_at) }}</td>
-                                    <td>{{ setDate(report.exited_at) }}</td>
-                                    <td>{{ setTime(report.exited_at) }}</td>
+                                    <td>{{ setDate(report.effected_at) }}</td>
+                                    <td>{{ setTime(report.effected_at) }}</td>
+                                    <td>{{ trans[report.type] }}</td>
+                                    <td>{{ trans[report.device] }}</td>
                                 </tr>
                             </tbody>
                         </table> 
