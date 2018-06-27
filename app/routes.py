@@ -187,7 +187,6 @@ def settings_process():
 
 @app.route('/user_logs_process', methods=['GET', 'POST'])
 def user_logs_process():
-    print('SALAM')
     our_result = dict()
 
     our_result['status'] = 300
