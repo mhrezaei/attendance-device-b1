@@ -1,9 +1,12 @@
-from time import sleep, time
+from time import sleep, time, strftime, localtime
 from datetime import datetime, timedelta
+import urllib2
+import urllib
+import schedule
 
 from serial import SerialException
 
-from config import store, socket, publish, fingerprint, db, User, UserLog
+from config import store, socket, publish, fingerprint, db, User, UserLog, api_token
 import hashlib
 from globla_variables import working_hours
 from globla_variables import attendance_not_allowed_timeout
@@ -22,12 +25,77 @@ def receive(action, message):
     pass
 
 
+def send_actual_attend_to_laravel(sending_user_id, sending_effected_at,
+                                  sending_type, sending_device, sending_device_template_position,
+                                  sending_device_hash, sending_device_accuracy, sending_rfid_unique_id):
+    try:
+        url = 'http://192.168.1.87/yasna-core/public/attendance/api/v1/users/attends' #@TODO: Must be dynamic later.
+
+        # Prepare the data
+        query_args = {
+            'user_id': int(sending_user_id),
+            'effected_at': str(sending_effected_at),
+            'type': str(sending_type),
+            'device': str(sending_device),
+            'device_template_position': int(sending_device_template_position),
+            'device_hash': str(sending_device_hash),
+            'device_accuracy': int(sending_device_accuracy),
+            'rfid_unique_id': str(sending_rfid_unique_id),
+        }
+
+        header = {"Accept": "application/json",
+                  "Authorization": '760483978406f1195959ef81a90c91ef'}  # @TODO: Ask - Must be dynamic later? How?
+
+        data = urllib.urlencode(query_args)
+
+        # Send HTTP POST request
+        request = urllib2.Request(url, data, header)
+
+        # Sends the request and catches the response
+        response = urllib2.urlopen(request)
+
+        # Extracts the response
+        html = response.read()
+
+        print(html)
+
+    except Exception as e:
+        template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+        message = template.format(type(e).__name__, e.args)
+        print(message)
+
+
+
+def handle_the_is_synced_field():
+    remained_is_synced_0 = UserLog.where('is_synced', 0).get()
+
+    for is_synced_0 in remained_is_synced_0:
+        is_synced_0.update(is_synced=1)
+        # print(is_synced_0.user_id)
+        # print(is_synced_0.effected_at)
+        send_actual_attend_to_laravel(int(is_synced_0.user_id),
+                                      str(is_synced_0.effected_at),
+                                      str(is_synced_0.type),
+                                      str(is_synced_0.device),
+                                      int(is_synced_0.template_position),
+                                      str(is_synced_0.hash),
+                                      int(is_synced_0.accuracy),
+                                      str(is_synced_0.rfid_unique_id)
+                                      )
+        print('record: ' + str(is_synced_0.id) + " is synced now.")
+
+    print('------Nothing left to sync------' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())))
+
+schedule.every(15).seconds.do(handle_the_is_synced_field)
+
 def run_fingerprint():
+    schedule.run_pending()
     if store['fingerPrintEnabled']: #boolean
         # sleep(0.5) #TODO: 1 second or not
         our_result = {'status': 0, 'first_name': '', 'last_name': '', 'last_action': ''}
         the_is_synced = 0
         the_device = 'fingerprint'
+        the_rfid_unique_id = 0
 
         # read_image = None
         try:
@@ -90,6 +158,18 @@ def run_fingerprint():
                                                          template_position=the_template_position,
                                                          hash=the_hash,
                                                          accuracy=the_accuracy)
+
+                            # Uncomment for real-time attend to laravel
+                            # send_actual_attend_to_laravel(the_is_synced,
+                            #                               the_user_id,
+                            #                               the_effected_at,
+                            #                               the_type,
+                            #                               the_device,
+                            #                               the_template_position,
+                            #                               the_hash,
+                            #                               the_accuracy,
+                            #                               the_rfid_unique_id)
+
                             our_result['status'] = 1002
                             publish('fingerPrintStatus', our_result) #@TODO: Don't forget to set a fresh status right after 'if' and update wiki.
                             sleep(2)
@@ -213,6 +293,18 @@ def run_fingerprint():
                                                                  template_position=the_template_position,
                                                                  hash=the_hash,
                                                                  accuracy=the_accuracy)
+
+                                    # Uncomment for real-time attend to laravel
+                                    # send_actual_attend_to_laravel(the_is_synced,
+                                    #                               the_user_id,
+                                    #                               the_effected_at,
+                                    #                               the_type,
+                                    #                               the_device,
+                                    #                               the_template_position,
+                                    #                               the_hash,
+                                    #                               the_accuracy,
+                                    #                               the_rfid_unique_id)
+
                                     our_result['status'] = 1007
                                     publish('fingerPrintStatus', our_result)  # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
                                     sleep(2)

@@ -33,5 +33,5 @@ class Finger(Model):
 class UserLog(Model):
     __table__ = 'user_logs'
     __guarded__ = ['id']
-    __fillable__ = ['flag'] #@TODO: Consider changing 'flag' to 'is_synced'
+    __fillable__ = ['is_synced']
 
