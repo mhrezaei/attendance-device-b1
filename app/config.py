@@ -15,6 +15,7 @@ worker = SocketWorker()
 publish = worker.publish
 store = Store()
 
+api_token = '760483978406f1195959ef81a90c91ef'
 
 
 import routes
