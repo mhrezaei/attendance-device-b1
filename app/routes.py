@@ -212,8 +212,6 @@ def user_logs_process():
                 'effected_at': str(user_log['effected_at']),
                 'type': str(user_log['type']),
                 'device': str(user_log['device'])
-                # 'entered_at': str(user_log['entered_at']),
-                # 'exited_at': str(user_log['exited_at'])
             })
 
         our_result['reports'] = user_report
