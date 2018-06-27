@@ -208,8 +208,9 @@ def user_logs_process():
         user_report = []
         for user_log in all_logs_associated_with_this_user:
             user_report.append({
-                'entered_at': str(user_log['entered_at']),
-                'exited_at': str(user_log['exited_at'])
+                'effected_at': str(user_log['effected_at']),
+                'type': str(user_log['type']),
+                'device': str(user_log['device'])
             })
 
         our_result['reports'] = user_report
