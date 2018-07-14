@@ -18,6 +18,7 @@ import spi
 store['fingerPrintEnabled'] = False
 store['rfidEnabled'] = False
 
+
 def receive(action, message):
     if action == 'fingerPrintStatus':
         print(message)
@@ -29,7 +30,7 @@ def send_actual_attend_to_laravel(sending_user_id, sending_effected_at,
                                   sending_type, sending_device, sending_device_template_position,
                                   sending_device_hash, sending_device_accuracy, sending_rfid_unique_id):
     try:
-        url = 'http://192.168.1.87/yasna-core/public/attendance/api/v1/users/attends' #@TODO: Must be dynamic later.
+        url = 'http://192.168.1.87/yasna-core/public/attendance/api/v1/users/attends'  # @TODO: Must be dynamic later.
 
         # Prepare the data
         query_args = {
@@ -65,7 +66,6 @@ def send_actual_attend_to_laravel(sending_user_id, sending_effected_at,
         print(message)
 
 
-
 def handle_the_is_synced_field():
     remained_is_synced_0 = UserLog.where('is_synced', 0).get()
 
@@ -86,11 +86,13 @@ def handle_the_is_synced_field():
 
     print('------Nothing left to sync------' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())))
 
+
 schedule.every(15).seconds.do(handle_the_is_synced_field)
+
 
 def run_fingerprint():
     schedule.run_pending()
-    if store['fingerPrintEnabled']: #boolean
+    if store['fingerPrintEnabled']:  # boolean
         # sleep(0.5) #TODO: 1 second or not
         our_result = {'status': 0, 'first_name': '', 'last_name': '', 'last_action': ''}
         the_is_synced = 0
@@ -122,7 +124,8 @@ def run_fingerprint():
                     fingerprint.loadTemplate(position_number, 0x01)
                     characterics = str(fingerprint.downloadCharacteristics(0x01)).encode('utf-8')
 
-                    user_related_with_this_finger = db.table('fingers').where('template_position', position_number).pluck('user_id')
+                    user_related_with_this_finger = db.table('fingers').where('template_position',
+                                                                              position_number).pluck('user_id')
                     is_active_clause = db.table('users').where('id', user_related_with_this_finger).pluck('is_active')
 
                     if is_active_clause == 0:  # This user is NOT active
@@ -132,19 +135,24 @@ def run_fingerprint():
 
                     elif is_active_clause != 0:  # This user is active
 
-                        user_related_with_this_finger = db.table('fingers').where('template_position', position_number).pluck('user_id')
-                        this_user_last_effect = db.table('user_logs').where('user_id', user_related_with_this_finger).order_by('id', 'desc').pluck('effected_at')
+                        user_related_with_this_finger = db.table('fingers').where('template_position',
+                                                                                  position_number).pluck('user_id')
+                        this_user_last_effect = db.table('user_logs').where('user_id',
+                                                                            user_related_with_this_finger).order_by(
+                            'id', 'desc').pluck('effected_at')
 
-                        if this_user_last_effect is None: # This user has no records in the table yet. It's a fresh record.
+                        if this_user_last_effect is None:  # This user has no records in the table yet. It's a fresh record.
                             the_user_id = user_related_with_this_finger
                             the_effected_at = datetime.now()
-                            the_type = 'normal_in' #@TODO: Must be dynamic later.
+                            the_type = 'normal_in'  # @TODO: Must be dynamic later.
                             the_template_position = position_number
                             the_hash = hashlib.sha256(characterics).hexdigest()
                             the_accuracy = accuracy_score
 
-                            the_first_name = db.table('users').where('id', user_related_with_this_finger).pluck('first_name')
-                            the_last_name = db.table('users').where('id', user_related_with_this_finger).pluck('last_name')
+                            the_first_name = db.table('users').where('id', user_related_with_this_finger).pluck(
+                                'first_name')
+                            the_last_name = db.table('users').where('id', user_related_with_this_finger).pluck(
+                                'last_name')
 
                             our_result['first_name'] = the_first_name
                             our_result['last_name'] = the_last_name
@@ -171,14 +179,19 @@ def run_fingerprint():
                             #                               the_rfid_unique_id)
 
                             our_result['status'] = 1002
-                            publish('fingerPrintStatus', our_result) #@TODO: Don't forget to set a fresh status right after 'if' and update wiki.
+                            publish('fingerPrintStatus',
+                                    our_result)  # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
                             sleep(2)
 
-                        if this_user_last_effect is not None: # This user already has a record in the table.
-                            last_effect_type = db.table('user_logs').where('user_id', user_related_with_this_finger).order_by('id', 'desc').pluck('type')
+                        if this_user_last_effect is not None:  # This user already has a record in the table.
+                            last_effect_type = db.table('user_logs').where('user_id',
+                                                                           user_related_with_this_finger).order_by('id',
+                                                                                                                   'desc').pluck(
+                                'type')
 
                             if last_effect_type == 'normal_in':
-                                this_user_last_attendance_action = int(this_user_last_effect.strftime('%s'))  # Converted to epoch
+                                this_user_last_attendance_action = int(
+                                    this_user_last_effect.strftime('%s'))  # Converted to epoch
                                 check_time = int(this_user_last_attendance_action + attendance_not_allowed_timeout)
 
                                 if finger_read_time < check_time:  # attendance_not_allowed_timeout has NOT passed. NOT ready to apply user log.
@@ -190,14 +203,19 @@ def run_fingerprint():
 
                                 elif finger_read_time >= check_time:  # attendance_not_allowed_timeout has passed. Ready to apply user log.
                                     # print('STATUS 19 - Allowed to apply user log.')
-                                    the_first_name = db.table('users').where('id', user_related_with_this_finger).pluck('first_name')
-                                    the_last_name = db.table('users').where('id', user_related_with_this_finger).pluck('last_name')
+                                    the_first_name = db.table('users').where('id', user_related_with_this_finger).pluck(
+                                        'first_name')
+                                    the_last_name = db.table('users').where('id', user_related_with_this_finger).pluck(
+                                        'last_name')
 
-                                    the_very_last_normal_in_effected_at = db.table('user_logs').where('user_id', user_related_with_this_finger).where('type', 'normal_in').order_by('id', 'desc').pluck('effected_at')
+                                    the_very_last_normal_in_effected_at = db.table('user_logs').where('user_id',
+                                                                                                      user_related_with_this_finger).where(
+                                        'type', 'normal_in').order_by('id', 'desc').pluck('effected_at')
 
                                     # the_very_last_normal_in_effected_at_epoch = int(the_very_last_normal_in_effected_at.strftime('%s'))  # Converted to epoch
 
-                                    check_working_hours_time = the_very_last_normal_in_effected_at + timedelta(seconds=working_hours)
+                                    check_working_hours_time = the_very_last_normal_in_effected_at + timedelta(
+                                        seconds=working_hours)
 
                                     the_new_effected_at = datetime.now()  # time right now
 
@@ -206,7 +224,6 @@ def run_fingerprint():
                                         our_result['first_name'] = the_first_name
                                         our_result['last_name'] = the_last_name
                                         our_result['last_action'] = str(the_very_last_normal_in_effected_at)
-
 
                                         the_user_id = user_related_with_this_finger
                                         the_effected_at = the_new_effected_at
@@ -224,7 +241,8 @@ def run_fingerprint():
                                                                      hash=the_hash,
                                                                      accuracy=the_accuracy)
                                         our_result['status'] = 1004
-                                        publish('fingerPrintStatus', our_result)  # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
+                                        publish('fingerPrintStatus',
+                                                our_result)  # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
                                         sleep(2)
 
 
@@ -240,7 +258,6 @@ def run_fingerprint():
                                         the_hash = hashlib.sha256(characterics).hexdigest()
                                         the_accuracy = accuracy_score
 
-
                                         db.table('user_logs').insert(is_synced=the_is_synced,
                                                                      user_id=the_user_id,
                                                                      effected_at=the_effected_at,
@@ -250,27 +267,34 @@ def run_fingerprint():
                                                                      hash=the_hash,
                                                                      accuracy=the_accuracy)
                                         our_result['status'] = 1005
-                                        publish('fingerPrintStatus', our_result)  # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
+                                        publish('fingerPrintStatus',
+                                                our_result)  # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
                                         sleep(2)
 
 
                             elif last_effect_type == 'normal_out':
-                                this_user_last_attendance_action = int(this_user_last_effect.strftime('%s'))  # Converted to epoch
+                                this_user_last_attendance_action = int(
+                                    this_user_last_effect.strftime('%s'))  # Converted to epoch
                                 check_time = int(this_user_last_attendance_action + attendance_not_allowed_timeout)
 
-                                the_very_last_normal_in_effected_at = db.table('user_logs').where('user_id', user_related_with_this_finger).where('type', 'normal_in').order_by('id', 'desc').pluck('effected_at')
+                                the_very_last_normal_in_effected_at = db.table('user_logs').where('user_id',
+                                                                                                  user_related_with_this_finger).where(
+                                    'type', 'normal_in').order_by('id', 'desc').pluck('effected_at')
 
                                 if finger_read_time < check_time:  # attendance_not_allowed_timeout has NOT passed. NOT ready to apply user log.
                                     # flash('attendance_not_allowed_timeout has NOT passed.')
                                     # print('STATUS 18 - NOT allowed to apply user log.')
                                     our_result['status'] = 1006
-                                    publish('fingerPrintStatus', our_result) # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
+                                    publish('fingerPrintStatus',
+                                            our_result)  # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
                                     sleep(2)
 
                                 elif finger_read_time >= check_time:  # attendance_not_allowed_timeout has passed. Ready to apply user log.
                                     # print('STATUS 19 - Allowed to apply user log.')
-                                    the_first_name = db.table('users').where('id', user_related_with_this_finger).pluck('first_name')
-                                    the_last_name = db.table('users').where('id', user_related_with_this_finger).pluck('last_name')
+                                    the_first_name = db.table('users').where('id', user_related_with_this_finger).pluck(
+                                        'first_name')
+                                    the_last_name = db.table('users').where('id', user_related_with_this_finger).pluck(
+                                        'last_name')
                                     # Now we have the user_id associated with the template_position
                                     # flash('The user_id is: ' + str(the_user_id))
 
@@ -306,7 +330,8 @@ def run_fingerprint():
                                     #                               the_rfid_unique_id)
 
                                     our_result['status'] = 1007
-                                    publish('fingerPrintStatus', our_result)  # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
+                                    publish('fingerPrintStatus',
+                                            our_result)  # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
                                     sleep(2)
 
         except KeyboardInterrupt:
@@ -339,7 +364,7 @@ def run_rfid():
         try:
             unique_id, rfid_owner_user_id = reader.read_no_block()
 
-            if unique_id is not None: # Detected RFID card.
+            if unique_id is not None:  # Detected RFID card.
                 print('RFID is read.')
                 rfid_read_time = time()
                 unique_id = str(unique_id)
@@ -348,22 +373,26 @@ def run_rfid():
 
                 unique_id_existence_clause = db.table('rfid_cards').where('unique_id', unique_id).count()
 
-                if unique_id_existence_clause: # This RFID card is registered in the rfid_cards table.
+                if unique_id_existence_clause:  # This RFID card is registered in the rfid_cards table.
 
-                    user_related_with_this_rfid_card = db.table('rfid_cards').where('unique_id', unique_id).pluck('user_id')
+                    user_related_with_this_rfid_card = db.table('rfid_cards').where('unique_id', unique_id).pluck(
+                        'user_id')
 
                     the_first_name = db.table('users').where('id', user_related_with_this_rfid_card).pluck('first_name')
                     the_last_name = db.table('users').where('id', user_related_with_this_rfid_card).pluck('last_name')
-                    is_active_clause = db.table('users').where('id', user_related_with_this_rfid_card).pluck('is_active')
+                    is_active_clause = db.table('users').where('id', user_related_with_this_rfid_card).pluck(
+                        'is_active')
 
-                    if is_active_clause == 0: # This user is NOT active anymore.
+                    if is_active_clause == 0:  # This user is NOT active anymore.
                         our_result['status'] = 2001
                         # flash('This user is not active anymore.')
                         publish('fingerPrintStatus', our_result)
 
-                    elif is_active_clause != 0: # This user is active.
+                    elif is_active_clause != 0:  # This user is active.
 
-                        this_user_last_effect = db.table('user_logs').where('user_id', user_related_with_this_rfid_card).order_by('id', 'desc').pluck('effected_at')
+                        this_user_last_effect = db.table('user_logs').where('user_id',
+                                                                            user_related_with_this_rfid_card).order_by(
+                            'id', 'desc').pluck('effected_at')
 
                         if this_user_last_effect is None:  # This user has no records in the table yet. It's a fresh record.
                             the_user_id = user_related_with_this_rfid_card
@@ -371,8 +400,10 @@ def run_rfid():
                             the_type = 'normal_in'  # @TODO: Must be dynamic later.
                             the_rfid_unique_id = unique_id
 
-                            the_first_name = db.table('users').where('id', user_related_with_this_rfid_card).pluck('first_name')
-                            the_last_name = db.table('users').where('id', user_related_with_this_rfid_card).pluck('last_name')
+                            the_first_name = db.table('users').where('id', user_related_with_this_rfid_card).pluck(
+                                'first_name')
+                            the_last_name = db.table('users').where('id', user_related_with_this_rfid_card).pluck(
+                                'last_name')
 
                             our_result['first_name'] = the_first_name
                             our_result['last_name'] = the_last_name
@@ -391,10 +422,13 @@ def run_rfid():
                             sleep(2)
 
                         if this_user_last_effect is not None:  # This user already has a record in the table.
-                            last_effect_type = db.table('user_logs').where('user_id', user_related_with_this_rfid_card).order_by('id', 'desc').pluck('type')
+                            last_effect_type = db.table('user_logs').where('user_id',
+                                                                           user_related_with_this_rfid_card).order_by(
+                                'id', 'desc').pluck('type')
 
                             if last_effect_type == 'normal_in':
-                                this_user_last_attendance_action = int(this_user_last_effect.strftime('%s'))  # Converted to epoch
+                                this_user_last_attendance_action = int(
+                                    this_user_last_effect.strftime('%s'))  # Converted to epoch
                                 check_time = int(this_user_last_attendance_action + attendance_not_allowed_timeout)
 
                                 if rfid_read_time < check_time:  # attendance_not_allowed_timeout has NOT passed. NOT ready to apply user log.
@@ -406,14 +440,21 @@ def run_rfid():
 
                                 elif rfid_read_time >= check_time:  # attendance_not_allowed_timeout has passed. Ready to apply user log.
                                     # print('STATUS 19 - Allowed to apply user log.')
-                                    the_first_name = db.table('users').where('id', user_related_with_this_rfid_card).pluck('first_name')
-                                    the_last_name = db.table('users').where('id', user_related_with_this_rfid_card).pluck('last_name')
+                                    the_first_name = db.table('users').where('id',
+                                                                             user_related_with_this_rfid_card).pluck(
+                                        'first_name')
+                                    the_last_name = db.table('users').where('id',
+                                                                            user_related_with_this_rfid_card).pluck(
+                                        'last_name')
 
-                                    the_very_last_normal_in_effected_at = db.table('user_logs').where('user_id', user_related_with_this_rfid_card).where('type', 'normal_in').order_by('id', 'desc').pluck('effected_at')
+                                    the_very_last_normal_in_effected_at = db.table('user_logs').where('user_id',
+                                                                                                      user_related_with_this_rfid_card).where(
+                                        'type', 'normal_in').order_by('id', 'desc').pluck('effected_at')
 
                                     # the_very_last_normal_in_effected_at_epoch = int(the_very_last_normal_in_effected_at.strftime('%s'))  # Converted to epoch
 
-                                    check_working_hours_time = the_very_last_normal_in_effected_at + timedelta(seconds=working_hours)
+                                    check_working_hours_time = the_very_last_normal_in_effected_at + timedelta(
+                                        seconds=working_hours)
 
                                     the_new_effected_at = datetime.now()  # time right now
 
@@ -435,7 +476,8 @@ def run_rfid():
                                                                      device=the_device,
                                                                      rfid_unique_id=the_rfid_unique_id)
                                         our_result['status'] = 2004
-                                        publish('fingerPrintStatus', our_result)  # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
+                                        publish('fingerPrintStatus',
+                                                our_result)  # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
                                         sleep(2)
 
 
@@ -456,27 +498,36 @@ def run_rfid():
                                                                      device=the_device,
                                                                      rfid_unique_id=the_rfid_unique_id)
                                         our_result['status'] = 2005
-                                        publish('fingerPrintStatus', our_result)  # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
+                                        publish('fingerPrintStatus',
+                                                our_result)  # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
                                         sleep(2)
 
 
                             elif last_effect_type == 'normal_out':
-                                this_user_last_attendance_action = int(this_user_last_effect.strftime('%s'))  # Converted to epoch
+                                this_user_last_attendance_action = int(
+                                    this_user_last_effect.strftime('%s'))  # Converted to epoch
                                 check_time = int(this_user_last_attendance_action + attendance_not_allowed_timeout)
 
-                                the_very_last_normal_in_effected_at = db.table('user_logs').where('user_id', user_related_with_this_rfid_card).where('type', 'normal_in').order_by('id', 'desc').pluck('effected_at')
+                                the_very_last_normal_in_effected_at = db.table('user_logs').where('user_id',
+                                                                                                  user_related_with_this_rfid_card).where(
+                                    'type', 'normal_in').order_by('id', 'desc').pluck('effected_at')
 
                                 if rfid_read_time < check_time:  # attendance_not_allowed_timeout has NOT passed. NOT ready to apply user log.
                                     # flash('attendance_not_allowed_timeout has NOT passed.')
                                     # print('STATUS 18 - NOT allowed to apply user log.')
                                     our_result['status'] = 2006
-                                    publish('fingerPrintStatus', our_result)  # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
+                                    publish('fingerPrintStatus',
+                                            our_result)  # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
                                     sleep(2)
 
                                 elif rfid_read_time >= check_time:  # attendance_not_allowed_timeout has passed. Ready to apply user log.
                                     # print('STATUS 19 - Allowed to apply user log.')
-                                    the_first_name = db.table('users').where('id', user_related_with_this_rfid_card).pluck('first_name')
-                                    the_last_name = db.table('users').where('id', user_related_with_this_rfid_card).pluck('last_name')
+                                    the_first_name = db.table('users').where('id',
+                                                                             user_related_with_this_rfid_card).pluck(
+                                        'first_name')
+                                    the_last_name = db.table('users').where('id',
+                                                                            user_related_with_this_rfid_card).pluck(
+                                        'last_name')
                                     # Now we have the user_id associated with the template_position
                                     # flash('The user_id is: ' + str(the_user_id))
 
@@ -496,10 +547,11 @@ def run_rfid():
                                                                  device=the_device,
                                                                  rfid_unique_id=the_rfid_unique_id)
                                     our_result['status'] = 2007
-                                    publish('fingerPrintStatus', our_result)  # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
+                                    publish('fingerPrintStatus',
+                                            our_result)  # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
                                     sleep(2)
 
-                else: # This RFID card is NOT registered in the rfid_cards table.
+                else:  # This RFID card is NOT registered in the rfid_cards table.
                     our_result['status'] = 2000
                     # flash('This RFID card is not registered.')
                     publish('fingerPrintStatus', our_result)
