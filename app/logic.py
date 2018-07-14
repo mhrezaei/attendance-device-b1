@@ -30,7 +30,7 @@ def send_actual_attend_to_laravel(sending_user_id, sending_effected_at,
                                   sending_type, sending_device, sending_device_template_position,
                                   sending_device_hash, sending_device_accuracy, sending_rfid_unique_id):
     try:
-        url = 'http://192.168.1.52/yasna-core/public/attendance/api/v1/users/attends'  # @TODO: Must be dynamic later.
+        url = 'http://yasna.local/attendance/api/v1/users/attends'  # @TODO: Must be dynamic later.
 
         # Prepare the data
         query_args = {
