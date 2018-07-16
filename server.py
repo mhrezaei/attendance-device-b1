@@ -43,7 +43,7 @@ if __name__ == '__main__':
         time.sleep(0.1)
         rfid_thread.start()
         time.sleep(0.1)
-        while True: # This makes KeyboardInterrupt work and kill the running program
+        while True:  # This makes KeyboardInterrupt work and kill the running program
             time.sleep(0.01)
     except KeyboardInterrupt:
         print(' * Terminating... ')
