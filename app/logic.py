@@ -19,7 +19,7 @@ store['rfidEnabled'] = False
 
 
 def trigger_relay_on_enter():
-    relay_pin = 11  # pin 11 --- relay
+    relay_pin = 11  # Pin 11 -- GPIO 17 -- relay
     GPIO.setmode(GPIO.BOARD)  # Numbers GPIOs by physical location
     GPIO.setup(relay_pin, GPIO.OUT)  # Set relay_pin's mode to output
     GPIO.output(relay_pin, GPIO.HIGH)
@@ -34,9 +34,16 @@ def receive(action, message):
     pass
 
 
-def send_actual_attend_to_laravel(sending_user_id, sending_effected_at,
-                                  sending_type, sending_device, sending_device_template_position,
-                                  sending_device_hash, sending_device_accuracy, sending_rfid_unique_id):
+def send_actual_attend_to_laravel(
+                                  sending_user_id,
+                                  sending_effected_at,
+                                  sending_type,
+                                  sending_device,
+                                  sending_device_template_position,
+                                  sending_device_hash,
+                                  sending_device_accuracy,
+                                  sending_rfid_unique_id
+                                  ):
     try:
         url = 'http://yasna.local/attendance/api/v1/users/attends'  # @TODO: Must be dynamic later.
 
@@ -53,7 +60,8 @@ def send_actual_attend_to_laravel(sending_user_id, sending_effected_at,
         }
 
         header = {"Accept": "application/json",
-                  "Authorization": '760483978406f1195959ef81a90c91ef'}  # @TODO: Ask - Must be dynamic later? How?
+                  "Authorization": '760483978406f1195959ef81a90c91ef'
+                  }  # @TODO: Ask - Must be dynamic later? How?
 
         data = urllib.urlencode(query_args)
 
@@ -78,10 +86,11 @@ def handle_the_is_synced_field():
     remained_is_synced_0 = UserLog.where('is_synced', 0).get()
 
     for is_synced_0 in remained_is_synced_0:
-        is_synced_0.update(is_synced=1)
+        # is_synced_0.update(is_synced=1)
         # print(is_synced_0.user_id)
         # print(is_synced_0.effected_at)
-        send_actual_attend_to_laravel(int(is_synced_0.user_id),
+        send_actual_attend_to_laravel(
+                                      int(is_synced_0.user_id),
                                       str(is_synced_0.effected_at),
                                       str(is_synced_0.type),
                                       str(is_synced_0.device),
@@ -90,12 +99,10 @@ def handle_the_is_synced_field():
                                       int(is_synced_0.accuracy),
                                       str(is_synced_0.rfid_unique_id)
                                       )
-        print('record: ' + str(is_synced_0.id) + " is synced now.")
+        # print('record: ' + str(is_synced_0.id) + " is synced now.")
+        print('Sent one row of is_synced = 0')
 
     print('------Nothing left to sync------' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())))
-
-
-schedule.every(15).seconds.do(handle_the_is_synced_field)
 
 
 def run_fingerprint():
@@ -586,3 +593,39 @@ def run_rfid():
 
     else:
         sleep(1)
+
+
+# def request_to_refresh_user_logs_table():
+#     try:
+#         url = 'http://yasna.local/attendance/api/v1/users/attends'  # @TODO: Must be dynamic later.
+#
+#         # Prepare the data
+#         query_args = {
+#             'is_synced': int(0),
+#         }
+#
+#         header = {"Accept": "application/json",
+#                   "Authorization": '760483978406f1195959ef81a90c91ef'
+#                   }  # @TODO: Must be dynamic later.
+#
+#         data = urllib.urlencode(query_args)
+#
+#         # Send HTTP POST request
+#         request = urllib2.Request(url, data, header)
+#
+#         # Sends the request and catches the response
+#         response = urllib2.urlopen(request)
+#
+#         # Extracts the response
+#         html = response.read()
+#
+#         print(html)
+#
+#     except Exception as e:
+#         template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+#         message = template.format(type(e).__name__, e.args)
+#         print(message)
+
+
+schedule.every(15).seconds.do(handle_the_is_synced_field)
+# schedule.every(300).seconds.do(request_to_refresh_user_logs_table)  # every 5 minutes
