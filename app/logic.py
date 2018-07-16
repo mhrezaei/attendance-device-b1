@@ -9,6 +9,7 @@ from config import store, socket, publish, fingerprint, db, User, UserLog, api_t
 import hashlib
 from globla_variables import working_hours
 from globla_variables import attendance_not_allowed_timeout
+from globla_variables import handle_the_is_synced_field_period
 import RPi.GPIO as GPIO
 import SimpleMFRC522
 import os
@@ -35,6 +36,7 @@ def receive(action, message):
 
 
 def send_actual_attend_to_laravel(
+                                  sending_is_synced,
                                   sending_user_id,
                                   sending_effected_at,
                                   sending_type,
@@ -49,6 +51,7 @@ def send_actual_attend_to_laravel(
 
         # Prepare the data
         query_args = {
+            'is_synced': int(sending_is_synced),
             'user_id': int(sending_user_id),
             'effected_at': str(sending_effected_at),
             'type': str(sending_type),
@@ -90,6 +93,7 @@ def handle_the_is_synced_field():
         # print(is_synced_0.user_id)
         # print(is_synced_0.effected_at)
         send_actual_attend_to_laravel(
+                                      int(1),
                                       int(is_synced_0.user_id),
                                       str(is_synced_0.effected_at),
                                       str(is_synced_0.type),
@@ -99,8 +103,9 @@ def handle_the_is_synced_field():
                                       int(is_synced_0.accuracy),
                                       str(is_synced_0.rfid_unique_id)
                                       )
+        is_synced_0.update(is_synced=1)
         # print('record: ' + str(is_synced_0.id) + " is synced now.")
-        print('Sent one row of is_synced = 0')
+        print('Sent one row of is_synced=0')
 
     print('------Nothing left to sync------' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())))
 
@@ -627,5 +632,5 @@ def run_rfid():
 #         print(message)
 
 
-schedule.every(15).seconds.do(handle_the_is_synced_field)
+schedule.every(handle_the_is_synced_field_period).seconds.do(handle_the_is_synced_field)
 # schedule.every(300).seconds.do(request_to_refresh_user_logs_table)  # every 5 minutes
