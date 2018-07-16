@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 import urllib2
 import urllib
 import schedule
-
 from serial import SerialException
 
 from config import store, socket, publish, fingerprint, db, User, UserLog, api_token
@@ -17,6 +16,15 @@ import spi
 
 store['fingerPrintEnabled'] = False
 store['rfidEnabled'] = False
+
+
+def trigger_relay_on_enter():
+    relay_pin = 11  # pin 11 --- relay
+    GPIO.setmode(GPIO.BOARD)  # Numbers GPIOs by physical location
+    GPIO.setup(relay_pin, GPIO.OUT)  # Set relay_pin's mode to output
+    GPIO.output(relay_pin, GPIO.HIGH)
+    sleep(2)
+    GPIO.output(relay_pin, GPIO.LOW)
 
 
 def receive(action, message):
@@ -158,6 +166,7 @@ def run_fingerprint():
                             our_result['last_name'] = the_last_name
                             our_result['last_action'] = 'None'
 
+                            trigger_relay_on_enter()
                             db.table('user_logs').insert(is_synced=the_is_synced,
                                                          user_id=the_user_id,
                                                          effected_at=the_effected_at,
@@ -232,6 +241,7 @@ def run_fingerprint():
                                         the_hash = hashlib.sha256(characterics).hexdigest()
                                         the_accuracy = accuracy_score
 
+                                        trigger_relay_on_enter()
                                         db.table('user_logs').insert(is_synced=the_is_synced,
                                                                      user_id=the_user_id,
                                                                      effected_at=the_effected_at,
@@ -244,7 +254,6 @@ def run_fingerprint():
                                         publish('fingerPrintStatus',
                                                 our_result)  # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
                                         sleep(2)
-
 
                                     elif the_new_effected_at <= check_working_hours_time:
                                         our_result['first_name'] = the_first_name
@@ -270,7 +279,6 @@ def run_fingerprint():
                                         publish('fingerPrintStatus',
                                                 our_result)  # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
                                         sleep(2)
-
 
                             elif last_effect_type == 'normal_out':
                                 this_user_last_attendance_action = int(
@@ -309,6 +317,7 @@ def run_fingerprint():
                                     the_hash = hashlib.sha256(characterics).hexdigest()
                                     the_accuracy = accuracy_score
 
+                                    trigger_relay_on_enter()
                                     db.table('user_logs').insert(is_synced=the_is_synced,
                                                                  user_id=the_user_id,
                                                                  effected_at=the_effected_at,
@@ -409,6 +418,7 @@ def run_rfid():
                             our_result['last_name'] = the_last_name
                             our_result['last_action'] = 'None'
 
+                            trigger_relay_on_enter()
                             db.table('user_logs').insert(is_synced=the_is_synced,
                                                          user_id=the_user_id,
                                                          effected_at=the_effected_at,
@@ -469,6 +479,7 @@ def run_rfid():
                                         the_type = 'normal_in'
                                         the_rfid_unique_id = unique_id
 
+                                        trigger_relay_on_enter()
                                         db.table('user_logs').insert(is_synced=the_is_synced,
                                                                      user_id=the_user_id,
                                                                      effected_at=the_effected_at,
@@ -479,7 +490,6 @@ def run_rfid():
                                         publish('fingerPrintStatus',
                                                 our_result)  # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
                                         sleep(2)
-
 
                                     elif the_new_effected_at <= check_working_hours_time:
                                         our_result['first_name'] = the_first_name
@@ -501,7 +511,6 @@ def run_rfid():
                                         publish('fingerPrintStatus',
                                                 our_result)  # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
                                         sleep(2)
-
 
                             elif last_effect_type == 'normal_out':
                                 this_user_last_attendance_action = int(
@@ -540,6 +549,7 @@ def run_rfid():
                                     the_type = 'normal_in'  # @TODO: Must be dynamic later.
                                     the_rfid_unique_id = unique_id
 
+                                    trigger_relay_on_enter()
                                     db.table('user_logs').insert(is_synced=the_is_synced,
                                                                  user_id=the_user_id,
                                                                  effected_at=the_effected_at,
@@ -555,7 +565,6 @@ def run_rfid():
                     our_result['status'] = 2000
                     # flash('This RFID card is not registered.')
                     publish('fingerPrintStatus', our_result)
-
 
         except KeyboardInterrupt:
             print(' * Terminating... ')
