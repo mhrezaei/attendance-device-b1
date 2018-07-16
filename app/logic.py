@@ -244,6 +244,7 @@ def run_fingerprint():
                                         the_accuracy = accuracy_score
 
                                         trigger_relay_on_enter()
+
                                         db.table('user_logs').insert(is_synced=the_is_synced,
                                                                      user_id=the_user_id,
                                                                      effected_at=the_effected_at,
@@ -320,6 +321,7 @@ def run_fingerprint():
                                     the_accuracy = accuracy_score
 
                                     trigger_relay_on_enter()
+
                                     db.table('user_logs').insert(is_synced=the_is_synced,
                                                                  user_id=the_user_id,
                                                                  effected_at=the_effected_at,
@@ -421,6 +423,7 @@ def run_rfid():
                             our_result['last_action'] = 'None'
 
                             trigger_relay_on_enter()
+
                             db.table('user_logs').insert(is_synced=the_is_synced,
                                                          user_id=the_user_id,
                                                          effected_at=the_effected_at,
@@ -482,6 +485,7 @@ def run_rfid():
                                         the_rfid_unique_id = unique_id
 
                                         trigger_relay_on_enter()
+
                                         db.table('user_logs').insert(is_synced=the_is_synced,
                                                                      user_id=the_user_id,
                                                                      effected_at=the_effected_at,
@@ -552,6 +556,7 @@ def run_rfid():
                                     the_rfid_unique_id = unique_id
 
                                     trigger_relay_on_enter()
+
                                     db.table('user_logs').insert(is_synced=the_is_synced,
                                                                  user_id=the_user_id,
                                                                  effected_at=the_effected_at,
