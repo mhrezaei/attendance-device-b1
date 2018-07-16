@@ -14,6 +14,8 @@ import SimpleMFRC522
 import os
 import spi
 
+
+
 store['fingerPrintEnabled'] = False
 store['rfidEnabled'] = False
 
