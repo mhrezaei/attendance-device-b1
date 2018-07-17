@@ -10,10 +10,12 @@ import hashlib
 from globla_variables import working_hours
 from globla_variables import attendance_not_allowed_timeout
 from globla_variables import handle_the_is_synced_field_period
+from globla_variables import request_to_refresh_for_crud_on_laravel_period
 import RPi.GPIO as GPIO
 import SimpleMFRC522
 import os
 import spi
+import json
 
 store['fingerPrintEnabled'] = False
 store['rfidEnabled'] = False
@@ -600,37 +602,55 @@ def run_rfid():
         sleep(1)
 
 
-# def request_to_refresh_user_logs_table():
-#     try:
-#         url = 'http://yasna.local/attendance/api/v1/users/attends'  # @TODO: Must be dynamic later.
-#
-#         # Prepare the data
-#         query_args = {
-#             'is_synced': int(0),
-#         }
-#
-#         header = {"Accept": "application/json",
-#                   "Authorization": '760483978406f1195959ef81a90c91ef'
-#                   }  # @TODO: Must be dynamic later.
-#
-#         data = urllib.urlencode(query_args)
-#
-#         # Send HTTP POST request
-#         request = urllib2.Request(url, data, header)
-#
-#         # Sends the request and catches the response
-#         response = urllib2.urlopen(request)
-#
-#         # Extracts the response
-#         html = response.read()
-#
-#         print(html)
-#
-#     except Exception as e:
-#         template = "An exception of type {0} occurred. Arguments:\n{1!r}"
-#         message = template.format(type(e).__name__, e.args)
-#         print(message)
+def request_to_refresh_for_crud_on_laravel():
+    try:
+        url = 'http://yasna.local/attendance/api/v1/sync/cruds'  # @TODO: Must be dynamic later.
+
+        # Prepare the data
+        query_args = {}
+
+        header = {
+            "Accept": "application/json",
+            "Authorization": '760483978406f1195959ef81a90c91ef'}  # @TODO: Must be dynamic later.
+
+        data = urllib.urlencode(query_args)
+
+        # Send HTTP POST request
+        request = urllib2.Request(url, data, header)
+
+        # Sends the request and catches the response
+        response = urllib2.urlopen(request)
+
+        # Extracts the response
+        html = response.read()
+
+        # print(html)
+
+        parsed = json.loads(html)
+
+        if html[10:13] == '200':  # Successful request - status: 200  @TODO: There might be a better way.
+            for key, value in parsed.items():
+                if key == 'results':
+                    for i in range(0, len(value)):
+                        UserLog.insert(
+                            is_synced=1,
+                            user_id=int(value[i]['user_id']),
+                            effected_at=str(value[i]['effected_at']),
+                            type=str(value[i]['type']),
+                            device=str(value[i]['device']),
+                            template_position=int(value[i]['device_template_position']),
+                            hash=str(value[i]['device_hash']),
+                            accuracy=int(value[i]['device_accuracy']),
+                            rfid_unique_id=str(value[i]['rfid_unique_id']),
+                        )
+
+        # else:  # @TODO: Else if status != 200
+
+    except Exception as e:
+        template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+        message = template.format(type(e).__name__, e.args)
+        print(message)
 
 
 schedule.every(handle_the_is_synced_field_period).seconds.do(handle_the_is_synced_field)
-# schedule.every(300).seconds.do(request_to_refresh_user_logs_table)  # every 5 minutes
+schedule.every(request_to_refresh_for_crud_on_laravel_period).seconds.do(request_to_refresh_for_crud_on_laravel)
