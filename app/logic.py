@@ -22,6 +22,7 @@ store['rfidEnabled'] = False
 
 
 def trigger_relay_on_enter():
+    print('***trigger_relay_on_enter***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
     relay_pin = 11  # Pin 11 -- GPIO 17 -- relay
     GPIO.setmode(GPIO.BOARD)  # Numbers GPIOs by physical location
     GPIO.setup(relay_pin, GPIO.OUT)  # Set relay_pin's mode to output
@@ -38,17 +39,18 @@ def receive(action, message):
 
 
 def send_actual_attend_to_laravel(
-                                  sending_is_synced,
-                                  sending_user_id,
-                                  sending_effected_at,
-                                  sending_type,
-                                  sending_device,
-                                  sending_device_template_position,
-                                  sending_device_hash,
-                                  sending_device_accuracy,
-                                  sending_rfid_unique_id
-                                  ):
+        sending_is_synced,
+        sending_user_id,
+        sending_effected_at,
+        sending_type,
+        sending_device,
+        sending_device_template_position,
+        sending_device_hash,
+        sending_device_accuracy,
+        sending_rfid_unique_id
+):
     try:
+        print('***send_actual_attend_to_laravel***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
         url = 'http://yasna.local/attendance/api/v1/users/attends'  # @TODO: Must be dynamic later.
 
         # Prepare the data
@@ -88,25 +90,22 @@ def send_actual_attend_to_laravel(
 
 
 def handle_the_is_synced_field():
+    print('***handle_the_is_synced_field***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
     remained_is_synced_0 = UserLog.where('is_synced', 0).get()
 
     for is_synced_0 in remained_is_synced_0:
-        # is_synced_0.update(is_synced=1)
-        # print(is_synced_0.user_id)
-        # print(is_synced_0.effected_at)
         send_actual_attend_to_laravel(
-                                      int(1),
-                                      int(is_synced_0.user_id),
-                                      str(is_synced_0.effected_at),
-                                      str(is_synced_0.type),
-                                      str(is_synced_0.device),
-                                      int(is_synced_0.template_position),
-                                      str(is_synced_0.hash),
-                                      int(is_synced_0.accuracy),
-                                      str(is_synced_0.rfid_unique_id)
-                                      )
+            int(1),
+            int(is_synced_0.user_id),
+            str(is_synced_0.effected_at),
+            str(is_synced_0.type),
+            str(is_synced_0.device),
+            int(is_synced_0.template_position),
+            str(is_synced_0.hash),
+            int(is_synced_0.accuracy),
+            str(is_synced_0.rfid_unique_id)
+        )
         is_synced_0.update(is_synced=1)
-        # print('record: ' + str(is_synced_0.id) + " is synced now.")
         print('Sent one row of is_synced=0')
 
     print('------Nothing left to sync------' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())))
@@ -602,9 +601,53 @@ def run_rfid():
         sleep(1)
 
 
+def send_synced_id_list_to_laravel(the_id_list):
+    try:
+        print('***send_synced_id_list_to_laravel***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
+        url = 'http://yasna.local/attendance/api/v1/updates/is_synceds'  # @TODO: Must be dynamic later.
+
+        # Prepare the data
+        query_args = {
+            'id_list': the_id_list
+        }
+
+        header = {
+            "Accept": "application/json",
+            "Authorization": '760483978406f1195959ef81a90c91ef'}  # @TODO: Must be dynamic later.
+
+        data = urllib.urlencode(query_args)
+
+        # Send HTTP POST request
+        request = urllib2.Request(url, data, header)
+
+        # Sends the request and catches the response
+        response = urllib2.urlopen(request)
+
+        # Extracts the response
+        html = response.read()
+
+        # print(html)
+        parsed = json.loads(html)
+
+        if html[10:13] == '200':
+            for key, value in parsed.items():
+                if key == 'results':
+                    first_character_removed = value.replace('[', '')
+                    final_desired_string = first_character_removed.replace(']', '')
+                    print(final_desired_string)
+
+        # else:  # @TODO: Else if status != 200
+
+    except Exception as e:
+        template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+        message = template.format(type(e).__name__, e.args)
+        print(message)
+
+
 def request_to_refresh_for_crud_on_laravel():
     try:
-        url = 'http://yasna.local/attendance/api/v1/sync/cruds'  # @TODO: Must be dynamic later.
+        print('***request_to_refresh_for_crud_on_laravel***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
+        url = 'http://yasna.local/attendance/api/v1/syncs/cruds'  # @TODO: Must be dynamic later.
 
         # Prepare the data
         query_args = {}
@@ -628,6 +671,7 @@ def request_to_refresh_for_crud_on_laravel():
 
         parsed = json.loads(html)
 
+        synced_id_list = []
         if html[10:13] == '200':  # Successful request - status: 200  @TODO: There might be a better way.
             for key, value in parsed.items():
                 if key == 'results':
@@ -643,6 +687,9 @@ def request_to_refresh_for_crud_on_laravel():
                             accuracy=int(value[i]['device_accuracy']),
                             rfid_unique_id=str(value[i]['rfid_unique_id']),
                         )
+                        synced_id_list.insert(0, value[i]['id'])
+
+        send_synced_id_list_to_laravel(str(synced_id_list))
 
         # else:  # @TODO: Else if status != 200
 
