@@ -11,6 +11,9 @@ from globla_variables import working_hours
 from globla_variables import attendance_not_allowed_timeout
 from globla_variables import handle_the_is_synced_field_period
 from globla_variables import request_to_refresh_for_crud_on_laravel_period
+from globla_variables import sync_users_period
+from globla_variables import maximum_allowed_fingers_for_usual_users
+from globla_variables import maximum_allowed_fingers_for_admin_users
 import RPi.GPIO as GPIO
 import SimpleMFRC522
 import os
@@ -646,7 +649,8 @@ def send_synced_id_list_to_laravel(the_id_list):
 
 def request_to_refresh_for_crud_on_laravel():
     try:
-        print('***request_to_refresh_for_crud_on_laravel***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
+        print('***request_to_refresh_for_crud_on_laravel***----' + strftime('%Y-%m-%d %H:%M:%S',
+                                                                            localtime(time())) + '\n\n')
         url = 'http://yasna.local/attendance/api/v1/syncs/cruds'  # @TODO: Must be dynamic later.
 
         # Prepare the data
@@ -699,5 +703,74 @@ def request_to_refresh_for_crud_on_laravel():
         print(message)
 
 
+def sync_users():
+    try:
+        print('***sync_users***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
+        url = 'http://yasna.local/attendance/api/v1/syncs/users'  # @TODO: Must be dynamic later.
+
+        # Prepare the data
+        query_args = {}
+
+        header = {
+            "Accept": "application/json",
+            "Authorization": '760483978406f1195959ef81a90c91ef'}  # @TODO: Must be dynamic later.
+
+        data = urllib.urlencode(query_args)
+
+        # Send HTTP POST request
+        request = urllib2.Request(url, data, header)
+
+        # print(request)
+
+        # Sends the request and catches the response
+        response = urllib2.urlopen(request)
+
+        # print(response)
+
+        # Extracts the response
+        html = response.read()
+
+        # print(html)
+        parsed = json.loads(html)
+
+        if html[10:13] == '200':
+            for key, value in parsed.items():
+                if key == 'metadata':
+                    is_admin_code_melli_list = value
+
+        if html[10:13] == '200':
+            for key, value in parsed.items():
+                if key == 'results':
+                    for i in range(0, len(value)):
+                        code_melli_existence_clause = User.where('code_melli', value[i]['code_melli']).count()
+                        if not code_melli_existence_clause:  # This code_melli does not exist. Insert it.
+                            print('Inserted a new user.')
+                            User.insert(
+                                user_name=str(value[i]['email']),
+                                first_name=value[i]['name_first'],
+                                last_name=value[i]['name_last'],
+                                code_melli=str(value[i]['code_melli']),
+                                is_admin=0,
+                                maximum_allowed_fingers=maximum_allowed_fingers_for_usual_users,
+                                recorded_fingers_count=0,
+                                is_active=1,
+                            )
+
+                            if value[i]['code_melli'] in is_admin_code_melli_list:  # This code_melli belongs to an admin.
+                                print('Updated the inserted user, to an admin.')
+                                User.where('code_melli', str(value[i]['code_melli'])).update(
+                                    is_admin=1,
+                                    maximum_allowed_fingers=maximum_allowed_fingers_for_admin_users,
+                                )
+
+            print('Done with syncing users.')
+
+    except Exception as e:
+        template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+        message = template.format(type(e).__name__, e.args)
+        print(message)
+
+
 schedule.every(handle_the_is_synced_field_period).seconds.do(handle_the_is_synced_field)
 schedule.every(request_to_refresh_for_crud_on_laravel_period).seconds.do(request_to_refresh_for_crud_on_laravel)
+schedule.every(sync_users_period).seconds.do(sync_users)
