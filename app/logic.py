@@ -706,7 +706,7 @@ def request_to_refresh_for_crud_on_laravel():
 def sync_users():
     try:
         print('***sync_users***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
-        url = 'http://yasna.local/attendance/api/v1/syncs/users'  # @TODO: Must be dynamic later.
+        url = 'http://yasna.local/attendance/api/v1/users/lists'  # @TODO: Must be dynamic later.
 
         # Prepare the data
         query_args = {}
@@ -735,35 +735,31 @@ def sync_users():
 
         if html[10:13] == '200':
             for key, value in parsed.items():
-                if key == 'metadata':
-                    is_admin_code_melli_list = value
-
-        if html[10:13] == '200':
-            for key, value in parsed.items():
                 if key == 'results':
-                    for i in range(0, len(value)):
-                        code_melli_existence_clause = User.where('code_melli', value[i]['code_melli']).count()
+                    # print(len(value['users']))
+                    for i in range(0, len(value['users'])):
+                        code_melli_existence_clause = User.where('code_melli', value['users'][i]['code_melli']).count()
                         if not code_melli_existence_clause:  # This code_melli does not exist. Insert it.
                             print('Inserted a new user.')
                             User.insert(
-                                user_name=str(value[i]['email']),
-                                first_name=value[i]['name_first'],
-                                last_name=value[i]['name_last'],
-                                code_melli=str(value[i]['code_melli']),
+                                user_name=str(value['users'][i]['email']),
+                                first_name=value['users'][i]['name_first'],
+                                last_name=value['users'][i]['name_last'],
+                                code_melli=str(value['users'][i]['code_melli']),
                                 is_admin=0,
-                                maximum_allowed_fingers=maximum_allowed_fingers_for_usual_users,
+                                maximum_allowed_fingers=3,  # @TODO: Make it dynamic later.
                                 recorded_fingers_count=0,
                                 is_active=1,
                             )
 
-                            if value[i]['code_melli'] in is_admin_code_melli_list:  # This code_melli belongs to an admin.
-                                print('Updated the inserted user, to an admin.')
-                                User.where('code_melli', str(value[i]['code_melli'])).update(
+                            if str(value['users'][i]['code_melli']) in value['admin_users']:
+                                print('Updated the user to an admin.')
+                                User.where('code_melli', str(value['users'][i]['code_melli'])).update(
                                     is_admin=1,
-                                    maximum_allowed_fingers=maximum_allowed_fingers_for_admin_users,
+                                    maximum_allowed_fingers=5,  # @TODO: Make it dynamic later.
                                 )
 
-            print('Done with syncing users.')
+                    print('Done with syncing users.')
 
     except Exception as e:
         template = "An exception of type {0} occurred. Arguments:\n{1!r}"
