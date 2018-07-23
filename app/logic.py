@@ -736,7 +736,6 @@ def sync_users():
         if html[10:13] == '200':
             for key, value in parsed.items():
                 if key == 'results':
-                    # print(len(value['users']))
                     for i in range(0, len(value['users'])):
                         code_melli_existence_clause = User.where('code_melli', value['users'][i]['code_melli']).count()
                         if not code_melli_existence_clause:  # This code_melli does not exist. Insert it.
@@ -747,17 +746,18 @@ def sync_users():
                                 last_name=value['users'][i]['name_last'],
                                 code_melli=str(value['users'][i]['code_melli']),
                                 is_admin=0,
-                                maximum_allowed_fingers=3,  # @TODO: Make it dynamic later.
+                                maximum_allowed_fingers=maximum_allowed_fingers_for_usual_users,
                                 recorded_fingers_count=0,
                                 is_active=1,
                             )
 
-                            if str(value['users'][i]['code_melli']) in value['admin_users']:
-                                print('Updated the user to an admin.')
-                                User.where('code_melli', str(value['users'][i]['code_melli'])).update(
-                                    is_admin=1,
-                                    maximum_allowed_fingers=5,  # @TODO: Make it dynamic later.
-                                )
+                            if 'is_admin' in value['users'][i].keys():
+                                if value['users'][i]['is_admin'] == 1:
+                                    print('Updated the user to an admin.')
+                                    User.where('code_melli', str(value['users'][i]['code_melli'])).update(
+                                        is_admin=1,
+                                        maximum_allowed_fingers=maximum_allowed_fingers_for_admin_users,
+                                    )
 
                     print('Done with syncing users.')
 
