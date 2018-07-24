@@ -703,6 +703,10 @@ def request_to_refresh_for_crud_on_laravel():
         print(message)
 
 
+def unmatched_values_list(list1, list2):
+    return list(set(list1) - set(list2))
+
+
 def sync_users():
     try:
         print('***sync_users***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
@@ -733,13 +737,16 @@ def sync_users():
         # print(html)
         parsed = json.loads(html)
 
+        code_mellis_list_in_attendance_machine = list(User.get().pluck('code_melli'))
+        code_mellis_list_sent_from_laravel = []
+
         if html[10:13] == '200':
             for key, value in parsed.items():
                 if key == 'results':
                     for i in range(0, len(value['users'])):
+                        code_mellis_list_sent_from_laravel.insert(0, value['users'][i]['code_melli'])
                         code_melli_existence_clause = User.where('code_melli', value['users'][i]['code_melli']).count()
                         if not code_melli_existence_clause:  # This code_melli does not exist. Insert it.
-                            print('Inserted a new user.')
                             User.insert(
                                 user_name=str(value['users'][i]['email']),
                                 first_name=value['users'][i]['name_first'],
@@ -750,14 +757,20 @@ def sync_users():
                                 recorded_fingers_count=0,
                                 is_active=1,
                             )
+                            print('Inserted a new user.')
 
                             if 'is_admin' in value['users'][i].keys():
                                 if value['users'][i]['is_admin'] == 1:
-                                    print('Updated the user to an admin.')
                                     User.where('code_melli', str(value['users'][i]['code_melli'])).update(
                                         is_admin=1,
                                         maximum_allowed_fingers=maximum_allowed_fingers_for_admin_users,
                                     )
+                                    print('Updated the user to an admin.')
+
+                    for code_melli in unmatched_values_list(code_mellis_list_in_attendance_machine,
+                                                            code_mellis_list_sent_from_laravel):
+                        User.where('code_melli', str(code_melli)).update(is_active=0)
+                        print('One user is inactive.')
 
                     print('Done with syncing users.')
 
