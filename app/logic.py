@@ -781,23 +781,23 @@ def sync_users():
         print(message)
 
 
-def look_up_nearby_bluetooth_devices():
-    try:
-        print('***look_up_nearby_bluetooth_devices***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
-        bdaddr_list = []
-        nearby_devices = bluetooth.discover_devices()
-        for bdaddr in nearby_devices:
-            bdaddr_list.insert(0, bdaddr)
-            if bdaddr in bdaddr_list:
-                print('Detected\t' + str(bluetooth.lookup_name(bdaddr)) + '\t' + " [" + str(bdaddr) + "]")
-
-    except Exception as e:
-        template = "An exception of type {0} occurred. Arguments:\n{1!r}"
-        message = template.format(type(e).__name__, e.args)
-        print(message)
+# def look_up_nearby_bluetooth_devices():
+#     try:
+#         print('***look_up_nearby_bluetooth_devices***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
+#         bdaddr_list = []
+#         nearby_devices = bluetooth.discover_devices()
+#         for bdaddr in nearby_devices:
+#             bdaddr_list.insert(0, bdaddr)
+#             if bdaddr in bdaddr_list:
+#                 print('Detected\t' + str(bluetooth.lookup_name(bdaddr)) + '\t' + " [" + str(bdaddr) + "]")
+#
+#     except Exception as e:
+#         template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+#         message = template.format(type(e).__name__, e.args)
+#         print(message)
 
 
 schedule.every(handle_the_is_synced_field_period).seconds.do(handle_the_is_synced_field)
 schedule.every(request_to_refresh_for_crud_on_laravel_period).seconds.do(request_to_refresh_for_crud_on_laravel)
 schedule.every(sync_users_period).seconds.do(sync_users)
-schedule.every(1).seconds.do(look_up_nearby_bluetooth_devices)
+# schedule.every(1).seconds.do(look_up_nearby_bluetooth_devices)
