@@ -5,7 +5,7 @@ from app.config import app, socket, publish, worker
 from app.logic import receive, run_fingerprint, run_rfid
 
 from threading import Thread, Event
-import time
+from time import strftime, localtime, time, sleep
 import os
 
 
@@ -29,8 +29,10 @@ def rfid_handler(ev_rfid):
 
 
 if __name__ == '__main__':
+    print('Start: ' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
     event_fingerprint = Event()
     event_rfid = Event()
+
     try:
         event_fingerprint.set()
         event_rfid.set()
@@ -38,13 +40,14 @@ if __name__ == '__main__':
         rfid_thread = Thread(target=rfid_handler, args=(event_rfid,))
         flask_thread = Thread(target=flask_handler)
         flask_thread.start()
-        time.sleep(0.1)
+        sleep(0.1)
         fingerprint_thread.start()
-        time.sleep(0.1)
+        sleep(0.1)
         rfid_thread.start()
-        time.sleep(0.1)
+        sleep(0.1)
         while True:  # This makes KeyboardInterrupt work and kill the running program
-            time.sleep(0.01)
+            sleep(0.01)
+
     except KeyboardInterrupt:
         print(' * Terminating... ')
         event_fingerprint.clear()
