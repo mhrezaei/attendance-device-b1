@@ -29,7 +29,7 @@ def socket_connect():
     # store['fingerPrintEnabled'] = True
     socket.emit('auth', request.sid)
     store['clients'].append(request.sid)
-    print('Socket Connect: ' + request.sid)
+    print('Socket Connect: ' + request.sid + '\n\n')
 
 
 @socket.on('disconnect')
@@ -37,7 +37,7 @@ def socket_disconnect():
     store['fingerPrintEnabled'] = False
     store['rfidEnabled'] = False
     store['clients'].remove(request.sid)
-    print('Socket Disconnect: ' + request.sid)
+    print('Socket Disconnect: ' + request.sid + '\n\n')
 
 
 @socket.on('setFingerPrintStatus')
@@ -174,7 +174,6 @@ def settings_process():
 
             return jsonify(our_result)
 
-
         else:  # The finger does NOT belong to an admin
             pprint('You are NOT ADMIN')
             our_result['status'] = 203
@@ -215,7 +214,6 @@ def user_logs_process():
             })
 
         our_result['reports'] = user_report
-
 
     else:  # This user_id has no record in user_logs table
         our_result['status'] = 302
