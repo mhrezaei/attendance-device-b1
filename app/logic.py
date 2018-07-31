@@ -7,13 +7,13 @@ from serial import SerialException
 
 from config import store, socket, publish, fingerprint, db, User, UserLog, api_token
 import hashlib
-from globla_variables import working_hours
-from globla_variables import attendance_not_allowed_timeout
-from globla_variables import handle_the_is_synced_field_period
-from globla_variables import request_to_refresh_for_crud_on_laravel_period
-from globla_variables import sync_users_period
-from globla_variables import maximum_allowed_fingers_for_usual_users
-from globla_variables import maximum_allowed_fingers_for_admin_users
+from global_variables import working_hours
+from global_variables import attendance_not_allowed_timeout
+from global_variables import handle_the_is_synced_field_period
+from global_variables import request_to_refresh_for_crud_on_laravel_period
+from global_variables import sync_users_period
+from global_variables import maximum_allowed_fingers_for_usual_users
+from global_variables import maximum_allowed_fingers_for_admin_users
 import RPi.GPIO as GPIO
 import SimpleMFRC522
 import os

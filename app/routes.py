@@ -4,7 +4,7 @@ from models import *
 import time
 from forms import UserDefineForm, UserEnrollForm
 from pprint import pprint
-from globla_variables import settings_timeout, enroll_finger_timeout, enroll_rfid_timeout
+from global_variables import settings_timeout, enroll_finger_timeout, enroll_rfid_timeout
 import RPi.GPIO as GPIO
 import SimpleMFRC522
 import spi
