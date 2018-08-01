@@ -30,8 +30,8 @@ working_hours = 39600  # 11 hours
 attendance_not_allowed_timeout = 120  # 2 minutes
 
 handle_the_is_synced_field_period = 60  # 1 minute
-request_to_refresh_for_crud_on_laravel_period = 90  # 5 minutes
-sync_users_period = 120  # 15 minutes
+request_to_refresh_for_crud_on_laravel_period = 300  # 5 minutes
+sync_users_period = 900  # 15 minutes
 
 maximum_allowed_fingers_for_usual_users = 3
 maximum_allowed_fingers_for_admin_users = 5
