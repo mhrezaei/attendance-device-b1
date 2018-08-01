@@ -4,12 +4,13 @@ from models import *
 import time
 from forms import UserDefineForm, UserEnrollForm
 from pprint import pprint
-from globla_variables import settings_timeout, enroll_finger_timeout, enroll_rfid_timeout
+from global_variables import settings_timeout, enroll_finger_timeout, enroll_rfid_timeout
 import RPi.GPIO as GPIO
 import SimpleMFRC522
 import spi
 
 store['clients'] = []
+
 
 def update_recorded_fingers_count():
     users = db.table('users').get()
@@ -17,6 +18,8 @@ def update_recorded_fingers_count():
         recorded_fingers_count = db.table('fingers').where('user_id', user.id).count()
         db.table('users').where('id', user.id).update(recorded_fingers_count=recorded_fingers_count)
     return
+
+
 # --------------#
 #   Sockets     #
 #               #
@@ -26,7 +29,7 @@ def socket_connect():
     # store['fingerPrintEnabled'] = True
     socket.emit('auth', request.sid)
     store['clients'].append(request.sid)
-    print('Socket Connect: ' + request.sid)
+    print('Socket Connect: ' + request.sid + '\n\n')
 
 
 @socket.on('disconnect')
@@ -34,7 +37,7 @@ def socket_disconnect():
     store['fingerPrintEnabled'] = False
     store['rfidEnabled'] = False
     store['clients'].remove(request.sid)
-    print('Socket Disconnect: ' + request.sid)
+    print('Socket Disconnect: ' + request.sid + '\n\n')
 
 
 @socket.on('setFingerPrintStatus')
@@ -45,6 +48,7 @@ def set_fingerprint_status(data):
 @socket.on('setRfidStatus')
 def set_rfid_status(data):
     store['rfidEnabled'] = data
+
 
 # --------------#
 #   Endpoints   #
@@ -117,7 +121,6 @@ def settings_process():
             # Retrieve all users from database
             users = db.table('users').get()
 
-
             # Loop in each user in users table
             for user in users:
                 our_result['status'] = 202  # Data found on users table
@@ -125,7 +128,6 @@ def settings_process():
                 recorded_fingers_count = Finger.where('user_id', user.id).count()
                 maximum_allowed_fingers = db.table('users').where('id', user.id).pluck('maximum_allowed_fingers')
                 is_active = db.table('users').where('id', user.id).pluck('is_active')
-
 
                 # Retrieve all fingers related to that specific user
                 this_user_related_fingers = db.table('fingers').where('user_id', user.id).get()
@@ -140,7 +142,7 @@ def settings_process():
                             'created_at': finger['created_at']
                         })
 
-                else: # This user has no registered finger.
+                else:  # This user has no registered finger.
                     user_finger = []
 
                 unique_id_clause = db.table('rfid_cards').where('user_id', user['id']).count()
@@ -150,7 +152,6 @@ def settings_process():
                     unique_id = str(unique_id)
                 else:
                     unique_id = ''
-
 
                 # Update result['members']
                 our_result['members'].append({
@@ -172,7 +173,6 @@ def settings_process():
             our_result['members_count'] = users_table_records_count
 
             return jsonify(our_result)
-
 
         else:  # The finger does NOT belong to an admin
             pprint('You are NOT ADMIN')
@@ -214,7 +214,6 @@ def user_logs_process():
             })
 
         our_result['reports'] = user_report
-
 
     else:  # This user_id has no record in user_logs table
         our_result['status'] = 302
@@ -311,11 +310,7 @@ def get_all_users():  # TODO: Seems NOT enrolling new users when sensor memory i
         # Retrieve all fingers related to that specific user
         this_user_related_fingers = db.table('fingers').where('user_id', user.id).get()
 
-
-
         is_active = db.table('users').where('id', user['id']).pluck('is_active')
-
-
 
         # Add some information about that related finger of that specific user
         if this_user_related_fingers.count():
@@ -414,7 +409,6 @@ def enroll_handle_finger_step_2():
         our_result['message'] = 'Timeout is over.'
         return jsonify(our_result)
 
-
     # Converts read image to characteristics and stores it in char buffer 2
     fingerprint.convertImage(0x02)
 
@@ -505,7 +499,6 @@ def enroll_handle_rfid():
         our_result = dict()
         our_result['id'] = request.form['user_id'].encode("utf-8")
 
-
         rfid_owner_user_id = str(our_result['id'])
 
         our_result['status'] = 500
@@ -527,7 +520,8 @@ def enroll_handle_rfid():
             unique_id_check_clause = db.table('rfid_cards').where('unique_id', unique_id).count()
 
             if unique_id_check_clause:
-                db.table('rfid_cards').where('unique_id', unique_id).update(user_id=our_result['id']) #TODO: update 'updated_at'
+                db.table('rfid_cards').where('unique_id', unique_id).update(
+                    user_id=our_result['id'])  # TODO: update 'updated_at'
 
             else:
                 db.table('rfid_cards').insert(user_id=our_result['id'], unique_id=unique_id)
@@ -540,7 +534,6 @@ def enroll_handle_rfid():
             recorded_fingers_count = Finger.where('user_id', our_result['id']).count()
             maximum_allowed_fingers = db.table('users').where('id', our_result['id']).pluck('maximum_allowed_fingers')
             is_active = db.table('users').where('id', our_result['id']).pluck('is_active')
-
 
             # Retrieve all fingers related to this specific user
             this_user_related_fingers = db.table('fingers').where('user_id', our_result['id']).get()
@@ -582,6 +575,7 @@ def enroll_handle_rfid():
     finally:
         GPIO.cleanup()
 
+
 @app.route('/omit_rfid_card', methods=['GET', 'POST'])
 def omit_rfid_card():
     our_result = dict()
@@ -601,7 +595,6 @@ def omit_rfid_card():
     recorded_fingers_count = Finger.where('user_id', our_result['id']).count()
     maximum_allowed_fingers = db.table('users').where('id', our_result['id']).pluck('maximum_allowed_fingers')
     is_active = db.table('users').where('id', our_result['id']).pluck('is_active')
-
 
     # Retrieve all fingers related to this specific user
     this_user_related_fingers = db.table('fingers').where('user_id', our_result['id']).get()
@@ -653,10 +646,11 @@ def omit_single_fingerprint_per_user():
     our_result['id'] = request.form['user_id'].encode("utf-8")
     our_result['id_primary_in_fingers_table'] = request.form['id_primary'].encode("utf-8")
 
-    this_template_position = db.table('fingers').where('id', our_result['id_primary_in_fingers_table']).pluck('template_position')
+    this_template_position = db.table('fingers').where('id', our_result['id_primary_in_fingers_table']).pluck(
+        'template_position')
 
     db.table('fingers').where('template_position', this_template_position).delete()
-    fingerprint.deleteTemplate(int(this_template_position)) # Deletes fingerprint from fingerprint sensor memory
+    fingerprint.deleteTemplate(int(this_template_position))  # Deletes fingerprint from fingerprint sensor memory
 
     update_recorded_fingers_count()
 
@@ -740,6 +734,3 @@ def deactivate_user():
     our_result['message'] = 'This user has been activated.'
 
     return jsonify(our_result)
-
-
-

@@ -4,16 +4,19 @@ import urllib2
 import urllib
 import schedule
 from serial import SerialException
-
 from config import store, socket, publish, fingerprint, db, User, UserLog, api_token
 import hashlib
-from globla_variables import working_hours
-from globla_variables import attendance_not_allowed_timeout
-from globla_variables import handle_the_is_synced_field_period
-from globla_variables import request_to_refresh_for_crud_on_laravel_period
-from globla_variables import sync_users_period
-from globla_variables import maximum_allowed_fingers_for_usual_users
-from globla_variables import maximum_allowed_fingers_for_admin_users
+from global_variables import working_hours
+from global_variables import attendance_not_allowed_timeout
+from global_variables import handle_the_is_synced_field_period
+from global_variables import request_to_refresh_for_crud_on_laravel_period
+from global_variables import sync_users_period
+from global_variables import maximum_allowed_fingers_for_usual_users
+from global_variables import maximum_allowed_fingers_for_admin_users
+from global_variables import device_template_position_except_fingerprint
+from global_variables import device_hash_except_fingerprint
+from global_variables import device_accuracy_except_fingerprint
+from global_variables import rfid_unique_id_except_rfid
 import RPi.GPIO as GPIO
 import SimpleMFRC522
 import os
@@ -25,14 +28,27 @@ store['fingerPrintEnabled'] = False
 store['rfidEnabled'] = False
 
 
-def trigger_relay_on_enter():
-    print('***trigger_relay_on_enter***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
-    relay_pin = 11  # Pin 11 -- GPIO 17 -- relay
-    GPIO.setmode(GPIO.BOARD)  # Numbers GPIOs by physical location
-    GPIO.setup(relay_pin, GPIO.OUT)  # Set relay_pin's mode to output
-    GPIO.output(relay_pin, GPIO.HIGH)
-    sleep(2)
-    GPIO.output(relay_pin, GPIO.LOW)
+# def trigger_relay_on_enter():
+#     try:
+#         print('\n\n***trigger_relay_on_enter***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
+#         relay_s_pin = 17  # GPIO 17 -- Pin 11 -- relay
+#         GPIO.setmode(GPIO.BCM)  # Numbers GPIOs by physical location
+#         GPIO.setup(relay_s_pin, GPIO.OUT)  # Set relay_s_pin's mode to output
+#         GPIO.output(relay_s_pin, GPIO.HIGH)
+#         sleep(2)
+#         GPIO.output(relay_s_pin, GPIO.LOW)
+#
+#     except KeyboardInterrupt:
+#         print(' * Terminating... ')
+#         os.system('kill -9 %d' % os.getpid())
+#
+#     except Exception as e:
+#         error_template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+#         error_message = error_template.format(type(e).__name__, e.args)
+#         print('\n\n' + error_message + '\n\n')
+#
+#     finally:
+#         GPIO.cleanup()
 
 
 def receive(action, message):
@@ -54,7 +70,7 @@ def send_actual_attend_to_laravel(
         sending_rfid_unique_id
 ):
     try:
-        print('***send_actual_attend_to_laravel***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
+        print('\n\n***send_actual_attend_to_laravel***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
         url = 'http://yasna.local/attendance/api/v1/users/attends'  # @TODO: Must be dynamic later.
 
         # Prepare the data
@@ -87,32 +103,49 @@ def send_actual_attend_to_laravel(
 
         print(html)
 
+    except KeyboardInterrupt:
+        print(' * Terminating... ')
+        os.system('kill -9 %d' % os.getpid())
+
     except Exception as e:
-        template = "An exception of type {0} occurred. Arguments:\n{1!r}"
-        message = template.format(type(e).__name__, e.args)
-        print(message)
+        error_template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+        error_message = error_template.format(type(e).__name__, e.args)
+        print('\n\n' + error_message + '\n\n')
 
 
 def handle_the_is_synced_field():
-    print('***handle_the_is_synced_field***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
-    remained_is_synced_0 = UserLog.where('is_synced', 0).get()
+    try:
+        print('\n\n***handle_the_is_synced_field***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
+        remained_is_synced_0 = UserLog.where('is_synced', 0).get()
 
-    for is_synced_0 in remained_is_synced_0:
-        send_actual_attend_to_laravel(
-            int(1),
-            int(is_synced_0.user_id),
-            str(is_synced_0.effected_at),
-            str(is_synced_0.type),
-            str(is_synced_0.device),
-            int(is_synced_0.template_position),
-            str(is_synced_0.hash),
-            int(is_synced_0.accuracy),
-            str(is_synced_0.rfid_unique_id)
-        )
-        is_synced_0.update(is_synced=1)
-        print('Sent one row of is_synced=0')
+        for is_synced_0 in remained_is_synced_0:
+            send_actual_attend_to_laravel(
+                int(1),
+                int(is_synced_0.user_id),
+                str(is_synced_0.effected_at),
+                str(is_synced_0.type),
+                str(is_synced_0.device),
+                int(is_synced_0.template_position),
+                str(is_synced_0.hash),
+                int(is_synced_0.accuracy),
+                str(is_synced_0.rfid_unique_id)
+            )
+            is_synced_0.update(is_synced=1)
+            print('\n\nSent one row of is_synced=0\n\n')
 
-    print('------Nothing left to sync------' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())))
+        print('------Nothing left to sync------' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
+
+    except KeyboardInterrupt:
+        print(' * Terminating... ')
+        os.system('kill -9 %d' % os.getpid())
+
+    except urllib2.HTTPError as e:  # @TODO: Ask - Right?
+        print('/\/\/\/\/\/\/\/\ HTTPError happened: ' + str(e.code))
+
+    except Exception as e:
+        error_template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+        error_message = error_template.format(type(e).__name__, e.args)
+        print('\n\n' + error_message + '\n\n')
 
 
 def run_fingerprint():
@@ -122,7 +155,6 @@ def run_fingerprint():
         our_result = {'status': 0, 'first_name': '', 'last_name': '', 'last_action': ''}
         the_is_synced = 0
         the_device = 'fingerprint'
-        the_rfid_unique_id = 0
 
         # read_image = None
         try:
@@ -183,7 +215,8 @@ def run_fingerprint():
                             our_result['last_name'] = the_last_name
                             our_result['last_action'] = 'None'
 
-                            trigger_relay_on_enter()
+                            # trigger_relay_on_enter()
+
                             db.table('user_logs').insert(is_synced=the_is_synced,
                                                          user_id=the_user_id,
                                                          effected_at=the_effected_at,
@@ -191,18 +224,9 @@ def run_fingerprint():
                                                          device=the_device,
                                                          template_position=the_template_position,
                                                          hash=the_hash,
-                                                         accuracy=the_accuracy)
-
-                            # Uncomment for real-time attend to laravel
-                            # send_actual_attend_to_laravel(the_is_synced,
-                            #                               the_user_id,
-                            #                               the_effected_at,
-                            #                               the_type,
-                            #                               the_device,
-                            #                               the_template_position,
-                            #                               the_hash,
-                            #                               the_accuracy,
-                            #                               the_rfid_unique_id)
+                                                         accuracy=the_accuracy,
+                                                         rfid_unique_id=str(rfid_unique_id_except_rfid)
+                                                         )
 
                             our_result['status'] = 1002
                             publish('fingerPrintStatus',
@@ -258,7 +282,7 @@ def run_fingerprint():
                                         the_hash = hashlib.sha256(characterics).hexdigest()
                                         the_accuracy = accuracy_score
 
-                                        trigger_relay_on_enter()
+                                        # trigger_relay_on_enter()
 
                                         db.table('user_logs').insert(is_synced=the_is_synced,
                                                                      user_id=the_user_id,
@@ -267,7 +291,9 @@ def run_fingerprint():
                                                                      device=the_device,
                                                                      template_position=the_template_position,
                                                                      hash=the_hash,
-                                                                     accuracy=the_accuracy)
+                                                                     accuracy=the_accuracy,
+                                                                     rfid_unique_id=str(rfid_unique_id_except_rfid)
+                                                                     )
                                         our_result['status'] = 1004
                                         publish('fingerPrintStatus',
                                                 our_result)  # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
@@ -292,7 +318,9 @@ def run_fingerprint():
                                                                      device=the_device,
                                                                      template_position=the_template_position,
                                                                      hash=the_hash,
-                                                                     accuracy=the_accuracy)
+                                                                     accuracy=the_accuracy,
+                                                                     rfid_unique_id=str(rfid_unique_id_except_rfid)
+                                                                     )
                                         our_result['status'] = 1005
                                         publish('fingerPrintStatus',
                                                 our_result)  # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
@@ -335,7 +363,7 @@ def run_fingerprint():
                                     the_hash = hashlib.sha256(characterics).hexdigest()
                                     the_accuracy = accuracy_score
 
-                                    trigger_relay_on_enter()
+                                    # trigger_relay_on_enter()
 
                                     db.table('user_logs').insert(is_synced=the_is_synced,
                                                                  user_id=the_user_id,
@@ -344,18 +372,9 @@ def run_fingerprint():
                                                                  device=the_device,
                                                                  template_position=the_template_position,
                                                                  hash=the_hash,
-                                                                 accuracy=the_accuracy)
-
-                                    # Uncomment for real-time attend to laravel
-                                    # send_actual_attend_to_laravel(the_is_synced,
-                                    #                               the_user_id,
-                                    #                               the_effected_at,
-                                    #                               the_type,
-                                    #                               the_device,
-                                    #                               the_template_position,
-                                    #                               the_hash,
-                                    #                               the_accuracy,
-                                    #                               the_rfid_unique_id)
+                                                                 accuracy=the_accuracy,
+                                                                 rfid_unique_id=str(rfid_unique_id_except_rfid)
+                                                                 )
 
                                     our_result['status'] = 1007
                                     publish('fingerPrintStatus',
@@ -370,10 +389,9 @@ def run_fingerprint():
             print('Serial Exception happened.')
 
         except Exception as e:
-            template = "An exception of type {0} occurred. Arguments:\n{1!r}"
-            message = template.format(type(e).__name__, e.args)
-            print(message)
-
+            error_template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+            error_message = error_template.format(type(e).__name__, e.args)
+            print('\n\n' + error_message + '\n\n')
 
     else:
         sleep(1)
@@ -428,23 +446,22 @@ def run_rfid():
                             the_type = 'normal_in'  # @TODO: Must be dynamic later.
                             the_rfid_unique_id = unique_id
 
-                            the_first_name = db.table('users').where('id', user_related_with_this_rfid_card).pluck(
-                                'first_name')
-                            the_last_name = db.table('users').where('id', user_related_with_this_rfid_card).pluck(
-                                'last_name')
-
                             our_result['first_name'] = the_first_name
                             our_result['last_name'] = the_last_name
                             our_result['last_action'] = 'None'
 
-                            trigger_relay_on_enter()
+                            # trigger_relay_on_enter()
 
                             db.table('user_logs').insert(is_synced=the_is_synced,
                                                          user_id=the_user_id,
                                                          effected_at=the_effected_at,
                                                          type=the_type,
                                                          device=the_device,
-                                                         rfid_unique_id=the_rfid_unique_id)
+                                                         template_position=int(
+                                                             device_template_position_except_fingerprint),
+                                                         hash=str(device_hash_except_fingerprint),
+                                                         accuracy=int(device_accuracy_except_fingerprint),
+                                                         rfid_unique_id=str(the_rfid_unique_id))
 
                             our_result['status'] = 2002
                             publish('fingerPrintStatus',
@@ -499,14 +516,18 @@ def run_rfid():
                                         the_type = 'normal_in'
                                         the_rfid_unique_id = unique_id
 
-                                        trigger_relay_on_enter()
+                                        # trigger_relay_on_enter()
 
                                         db.table('user_logs').insert(is_synced=the_is_synced,
                                                                      user_id=the_user_id,
                                                                      effected_at=the_effected_at,
                                                                      type=the_type,
                                                                      device=the_device,
-                                                                     rfid_unique_id=the_rfid_unique_id)
+                                                                     template_position=int(
+                                                                         device_template_position_except_fingerprint),
+                                                                     hash=str(device_hash_except_fingerprint),
+                                                                     accuracy=int(device_accuracy_except_fingerprint),
+                                                                     rfid_unique_id=str(the_rfid_unique_id))
                                         our_result['status'] = 2004
                                         publish('fingerPrintStatus',
                                                 our_result)  # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
@@ -527,7 +548,11 @@ def run_rfid():
                                                                      effected_at=the_effected_at,
                                                                      type=the_type,
                                                                      device=the_device,
-                                                                     rfid_unique_id=the_rfid_unique_id)
+                                                                     template_position=int(
+                                                                         device_template_position_except_fingerprint),
+                                                                     hash=str(device_hash_except_fingerprint),
+                                                                     accuracy=int(device_accuracy_except_fingerprint),
+                                                                     rfid_unique_id=str(the_rfid_unique_id))
                                         our_result['status'] = 2005
                                         publish('fingerPrintStatus',
                                                 our_result)  # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
@@ -570,14 +595,18 @@ def run_rfid():
                                     the_type = 'normal_in'  # @TODO: Must be dynamic later.
                                     the_rfid_unique_id = unique_id
 
-                                    trigger_relay_on_enter()
+                                    # trigger_relay_on_enter()
 
                                     db.table('user_logs').insert(is_synced=the_is_synced,
                                                                  user_id=the_user_id,
                                                                  effected_at=the_effected_at,
                                                                  type=the_type,
                                                                  device=the_device,
-                                                                 rfid_unique_id=the_rfid_unique_id)
+                                                                 template_position=int(
+                                                                     device_template_position_except_fingerprint),
+                                                                 hash=str(device_hash_except_fingerprint),
+                                                                 accuracy=int(device_accuracy_except_fingerprint),
+                                                                 rfid_unique_id=str(the_rfid_unique_id))
                                     our_result['status'] = 2007
                                     publish('fingerPrintStatus',
                                             our_result)  # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
@@ -593,9 +622,9 @@ def run_rfid():
             os.system('kill -9 %d' % os.getpid())
 
         except Exception as e:
-            template = "An exception of type {0} occurred. Arguments:\n{1!r}"
-            message = template.format(type(e).__name__, e.args)
-            print(message)
+            error_template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+            error_message = error_template.format(type(e).__name__, e.args)
+            print('\n\n' + error_message + '\n\n')
 
         finally:
             GPIO.cleanup()
@@ -607,7 +636,7 @@ def run_rfid():
 
 def send_synced_id_list_to_laravel(the_id_list):
     try:
-        print('***send_synced_id_list_to_laravel***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
+        print('\n\n***send_synced_id_list_to_laravel***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
         url = 'http://yasna.local/attendance/api/v1/updates/is_synceds'  # @TODO: Must be dynamic later.
 
         # Prepare the data
@@ -633,25 +662,43 @@ def send_synced_id_list_to_laravel(the_id_list):
         # print(html)
         parsed = json.loads(html)
 
-        if html[10:13] == '200':
+        http_status = 'Not set yet.'
+
+        for key, value in parsed.items():
+            if key == 'status':
+                http_status = value
+
+        print('\n\nHttp status was: ' + str(http_status) + '\n\n')
+
+        if http_status == 200:
             for key, value in parsed.items():
                 if key == 'results':
-                    first_character_removed = value.replace('[', '')
-                    final_desired_string = first_character_removed.replace(']', '')
-                    print(final_desired_string)
+                    # first_character_removed = value.replace('[', '')
+                    # final_desired_string = first_character_removed.replace(']', '')
+                    # print(final_desired_string)
+                    print(value)
+
+        else:
+            print('\n\nHttp status was not 200.\n\n')
 
         # else:  # @TODO: Else if status != 200
 
+    except KeyboardInterrupt:
+        print(' * Terminating... ')
+        os.system('kill -9 %d' % os.getpid())
+
+    except urllib2.HTTPError as e:  # @TODO: Ask - Right?
+        print('\n\n/\/\/\/\/\/\/\/\ HTTPError happened: ' + str(e.code) + '\n\n')
+
     except Exception as e:
-        template = "An exception of type {0} occurred. Arguments:\n{1!r}"
-        message = template.format(type(e).__name__, e.args)
-        print(message)
+        error_template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+        error_message = error_template.format(type(e).__name__, e.args)
+        print('\n\n' + error_message + '\n\n')
 
 
 def request_to_refresh_for_crud_on_laravel():
     try:
-        print('***request_to_refresh_for_crud_on_laravel***----' + strftime('%Y-%m-%d %H:%M:%S',
-                                                                            localtime(time())) + '\n\n')
+        print('\n\n***request_to_refresh_for_crud_on_laravel***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
         url = 'http://yasna.local/attendance/api/v1/syncs/cruds'  # @TODO: Must be dynamic later.
 
         # Prepare the data
@@ -676,8 +723,17 @@ def request_to_refresh_for_crud_on_laravel():
 
         parsed = json.loads(html)
 
+        http_status = 'Not set yet.'
+
+        for key, value in parsed.items():
+            if key == 'status':
+                http_status = value
+
+        print('\n\nHttp status was: ' + str(http_status) + '\n\n')
+
         synced_id_list = []
-        if html[10:13] == '200':  # Successful request - status: 200  @TODO: There might be a better way.
+
+        if http_status == 200:
             for key, value in parsed.items():
                 if key == 'results':
                     for i in range(0, len(value)):
@@ -694,14 +750,24 @@ def request_to_refresh_for_crud_on_laravel():
                         )
                         synced_id_list.insert(0, value[i]['id'])
 
-        send_synced_id_list_to_laravel(str(synced_id_list))
+            send_synced_id_list_to_laravel(str(synced_id_list))
+
+        else:
+            print('\n\nHttp status was not 200.\n\n')
 
         # else:  # @TODO: Else if status != 200
 
+    except KeyboardInterrupt:
+        print(' * Terminating... ')
+        os.system('kill -9 %d' % os.getpid())
+
+    except urllib2.HTTPError as e:  # @TODO: Ask - Right?
+        print('/\/\/\/\/\/\/\/\ HTTPError happened: ' + str(e.code))
+
     except Exception as e:
-        template = "An exception of type {0} occurred. Arguments:\n{1!r}"
-        message = template.format(type(e).__name__, e.args)
-        print(message)
+        error_template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+        error_message = error_template.format(type(e).__name__, e.args)
+        print('\n\n' + error_message + '\n\n')
 
 
 def unmatched_values_list(list1, list2):
@@ -710,7 +776,7 @@ def unmatched_values_list(list1, list2):
 
 def sync_users():
     try:
-        print('***sync_users***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
+        print('\n\n***sync_users***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
         url = 'http://yasna.local/attendance/api/v1/users/lists'  # @TODO: Must be dynamic later.
 
         # Prepare the data
@@ -741,7 +807,15 @@ def sync_users():
         code_mellis_list_in_attendance_machine = list(User.get().pluck('code_melli'))
         code_mellis_list_sent_from_laravel = []
 
-        if html[10:13] == '200':
+        http_status = 'Not set yet.'
+
+        for key, value in parsed.items():
+            if key == 'status':
+                http_status = value
+
+        print('\n\nHttp status was: ' + str(http_status) + '\n\n')
+
+        if http_status == 200:
             for key, value in parsed.items():
                 if key == 'results':
                     for i in range(0, len(value['users'])):
@@ -775,15 +849,25 @@ def sync_users():
 
                     print('Done with syncing users.')
 
+        else:
+            print('\n\nHttp status was not 200.\n\n')
+
+    except KeyboardInterrupt:
+        print(' * Terminating... ')
+        os.system('kill -9 %d' % os.getpid())
+
+    except urllib2.HTTPError as e:  # @TODO: Ask - Right?
+        print('/\/\/\/\/\/\/\/\ HTTPError happened: ' + str(e.code))
+
     except Exception as e:
-        template = "An exception of type {0} occurred. Arguments:\n{1!r}"
-        message = template.format(type(e).__name__, e.args)
-        print(message)
+        error_template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+        error_message = error_template.format(type(e).__name__, e.args)
+        print('\n\n' + error_message + '\n\n')
 
 
 # def look_up_nearby_bluetooth_devices():
 #     try:
-#         print('***look_up_nearby_bluetooth_devices***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
+#         print('\n\n***look_up_nearby_bluetooth_devices***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
 #         bdaddr_list = []
 #         nearby_devices = bluetooth.discover_devices()
 #         for bdaddr in nearby_devices:
@@ -792,9 +876,9 @@ def sync_users():
 #                 print('Detected\t' + str(bluetooth.lookup_name(bdaddr)) + '\t' + " [" + str(bdaddr) + "]")
 #
 #     except Exception as e:
-#         template = "An exception of type {0} occurred. Arguments:\n{1!r}"
-#         message = template.format(type(e).__name__, e.args)
-#         print(message)
+#         error_template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+#         error_message = error_template.format(type(e).__name__, e.args)
+#         print('\n\n' + error_message + '\n\n')
 
 
 schedule.every(handle_the_is_synced_field_period).seconds.do(handle_the_is_synced_field)
