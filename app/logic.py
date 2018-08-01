@@ -17,6 +17,7 @@ from global_variables import device_template_position_except_fingerprint
 from global_variables import device_hash_except_fingerprint
 from global_variables import device_accuracy_except_fingerprint
 from global_variables import rfid_unique_id_except_rfid
+from global_variables import DOMAIN
 import RPi.GPIO as GPIO
 import SimpleMFRC522
 import os
@@ -28,27 +29,30 @@ store['fingerPrintEnabled'] = False
 store['rfidEnabled'] = False
 
 
-# def trigger_relay_on_enter():
-#     try:
-#         print('\n\n***trigger_relay_on_enter***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
-#         relay_s_pin = 17  # GPIO 17 -- Pin 11 -- relay
-#         GPIO.setmode(GPIO.BCM)  # Numbers GPIOs by physical location
-#         GPIO.setup(relay_s_pin, GPIO.OUT)  # Set relay_s_pin's mode to output
-#         GPIO.output(relay_s_pin, GPIO.HIGH)
-#         sleep(2)
-#         GPIO.output(relay_s_pin, GPIO.LOW)
-#
-#     except KeyboardInterrupt:
-#         print(' * Terminating... ')
-#         os.system('kill -9 %d' % os.getpid())
-#
-#     except Exception as e:
-#         error_template = "An exception of type {0} occurred. Arguments:\n{1!r}"
-#         error_message = error_template.format(type(e).__name__, e.args)
-#         print('\n\n' + error_message + '\n\n')
-#
-#     finally:
-#         GPIO.cleanup()
+def trigger_relay_on_enter():
+    try:
+        print('\n\n***trigger_relay_on_enter***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
+        relay_s_pin = 17  # GPIO 17 -- Pin 11 -- relay
+        GPIO.setmode(GPIO.BCM)  # Numbers GPIOs by GPIO numbers
+        GPIO.setup(relay_s_pin, GPIO.OUT)  # Set relay_s_pin's mode to output
+        GPIO.output(relay_s_pin, GPIO.HIGH)
+        sleep(2)
+        GPIO.output(relay_s_pin, GPIO.LOW)
+
+    except KeyboardInterrupt:
+        print(' * Terminating... ')
+        os.system('kill -9 %d' % os.getpid())
+
+    except RuntimeError:
+        pass
+
+    except Exception as e:
+        error_template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+        error_message = error_template.format(type(e).__name__, e.args)
+        print('\n\n' + error_message + '\n\n')
+
+    finally:
+        GPIO.cleanup()
 
 
 def receive(action, message):
@@ -71,7 +75,7 @@ def send_actual_attend_to_laravel(
 ):
     try:
         print('\n\n***send_actual_attend_to_laravel***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
-        url = 'http://yasna.local/attendance/api/v1/users/attends'  # @TODO: Must be dynamic later.
+        url = 'http://' + DOMAIN + '/attendance/api/v1/users/attends'
 
         # Prepare the data
         query_args = {
@@ -107,6 +111,13 @@ def send_actual_attend_to_laravel(
         print(' * Terminating... ')
         os.system('kill -9 %d' % os.getpid())
 
+    except urllib2.HTTPError as e:  # @TODO: Ask - Right?
+        print('/\/\/\/\/\/\/\/\ HTTPError code: ' + str(e.code))
+        print('/\/\/\/\/\/\/\/\ HTTPError reason: ' + str(e.reason) + '\n\n')
+
+    except urllib2.URLError, e:
+        print('/\/\/\/\/\/\/\/\ URLError reason: ' + str(e.reason) + '\n\n')
+
     except Exception as e:
         error_template = "An exception of type {0} occurred. Arguments:\n{1!r}"
         error_message = error_template.format(type(e).__name__, e.args)
@@ -140,7 +151,11 @@ def handle_the_is_synced_field():
         os.system('kill -9 %d' % os.getpid())
 
     except urllib2.HTTPError as e:  # @TODO: Ask - Right?
-        print('/\/\/\/\/\/\/\/\ HTTPError happened: ' + str(e.code))
+        print('/\/\/\/\/\/\/\/\ HTTPError code: ' + str(e.code))
+        print('/\/\/\/\/\/\/\/\ HTTPError reason: ' + str(e.reason) + '\n\n')
+
+    except urllib2.URLError, e:
+        print('/\/\/\/\/\/\/\/\ URLError reason: ' + str(e.reason) + '\n\n')
 
     except Exception as e:
         error_template = "An exception of type {0} occurred. Arguments:\n{1!r}"
@@ -171,9 +186,11 @@ def run_fingerprint():
 
                 # If finger match was NOT found
                 if position_number == -1:
-                    # flash('No match found!')
+                    # flash('No match was found.')
+                    print('No match was found.')
                     our_result['status'] = 1000
                     publish('fingerPrintStatus', our_result)
+                    sleep(2)
 
                 # If finger match was found
                 if position_number != -1:
@@ -215,7 +232,7 @@ def run_fingerprint():
                             our_result['last_name'] = the_last_name
                             our_result['last_action'] = 'None'
 
-                            # trigger_relay_on_enter()
+                            trigger_relay_on_enter()
 
                             db.table('user_logs').insert(is_synced=the_is_synced,
                                                          user_id=the_user_id,
@@ -282,7 +299,7 @@ def run_fingerprint():
                                         the_hash = hashlib.sha256(characterics).hexdigest()
                                         the_accuracy = accuracy_score
 
-                                        # trigger_relay_on_enter()
+                                        trigger_relay_on_enter()
 
                                         db.table('user_logs').insert(is_synced=the_is_synced,
                                                                      user_id=the_user_id,
@@ -363,7 +380,7 @@ def run_fingerprint():
                                     the_hash = hashlib.sha256(characterics).hexdigest()
                                     the_accuracy = accuracy_score
 
-                                    # trigger_relay_on_enter()
+                                    trigger_relay_on_enter()
 
                                     db.table('user_logs').insert(is_synced=the_is_synced,
                                                                  user_id=the_user_id,
@@ -433,6 +450,7 @@ def run_rfid():
                         our_result['status'] = 2001
                         # flash('This user is not active anymore.')
                         publish('fingerPrintStatus', our_result)
+                        sleep(2)
 
                     elif is_active_clause != 0:  # This user is active.
 
@@ -450,7 +468,7 @@ def run_rfid():
                             our_result['last_name'] = the_last_name
                             our_result['last_action'] = 'None'
 
-                            # trigger_relay_on_enter()
+                            trigger_relay_on_enter()
 
                             db.table('user_logs').insert(is_synced=the_is_synced,
                                                          user_id=the_user_id,
@@ -516,7 +534,7 @@ def run_rfid():
                                         the_type = 'normal_in'
                                         the_rfid_unique_id = unique_id
 
-                                        # trigger_relay_on_enter()
+                                        trigger_relay_on_enter()
 
                                         db.table('user_logs').insert(is_synced=the_is_synced,
                                                                      user_id=the_user_id,
@@ -595,7 +613,7 @@ def run_rfid():
                                     the_type = 'normal_in'  # @TODO: Must be dynamic later.
                                     the_rfid_unique_id = unique_id
 
-                                    # trigger_relay_on_enter()
+                                    trigger_relay_on_enter()
 
                                     db.table('user_logs').insert(is_synced=the_is_synced,
                                                                  user_id=the_user_id,
@@ -616,6 +634,7 @@ def run_rfid():
                     our_result['status'] = 2000
                     # flash('This RFID card is not registered.')
                     publish('fingerPrintStatus', our_result)
+                    sleep(2)
 
         except KeyboardInterrupt:
             print(' * Terminating... ')
@@ -637,7 +656,7 @@ def run_rfid():
 def send_synced_id_list_to_laravel(the_id_list):
     try:
         print('\n\n***send_synced_id_list_to_laravel***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
-        url = 'http://yasna.local/attendance/api/v1/updates/is_synceds'  # @TODO: Must be dynamic later.
+        url = 'http://' + DOMAIN + '/attendance/api/v1/updates/is_synceds'
 
         # Prepare the data
         query_args = {
@@ -673,10 +692,10 @@ def send_synced_id_list_to_laravel(the_id_list):
         if http_status == 200:
             for key, value in parsed.items():
                 if key == 'results':
-                    # first_character_removed = value.replace('[', '')
-                    # final_desired_string = first_character_removed.replace(']', '')
-                    # print(final_desired_string)
-                    print(value)
+                    # print(value)
+                    first_character_removed = value.replace('[', '')
+                    final_desired_string = first_character_removed.replace(']', '')
+                    print(final_desired_string)
 
         else:
             print('\n\nHttp status was not 200.\n\n')
@@ -688,7 +707,11 @@ def send_synced_id_list_to_laravel(the_id_list):
         os.system('kill -9 %d' % os.getpid())
 
     except urllib2.HTTPError as e:  # @TODO: Ask - Right?
-        print('\n\n/\/\/\/\/\/\/\/\ HTTPError happened: ' + str(e.code) + '\n\n')
+        print('/\/\/\/\/\/\/\/\ HTTPError code: ' + str(e.code))
+        print('/\/\/\/\/\/\/\/\ HTTPError reason: ' + str(e.reason) + '\n\n')
+
+    except urllib2.URLError, e:
+        print('/\/\/\/\/\/\/\/\ URLError reason: ' + str(e.reason) + '\n\n')
 
     except Exception as e:
         error_template = "An exception of type {0} occurred. Arguments:\n{1!r}"
@@ -699,7 +722,7 @@ def send_synced_id_list_to_laravel(the_id_list):
 def request_to_refresh_for_crud_on_laravel():
     try:
         print('\n\n***request_to_refresh_for_crud_on_laravel***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
-        url = 'http://yasna.local/attendance/api/v1/syncs/cruds'  # @TODO: Must be dynamic later.
+        url = 'http://' + DOMAIN + '/attendance/api/v1/syncs/cruds'
 
         # Prepare the data
         query_args = {}
@@ -762,7 +785,11 @@ def request_to_refresh_for_crud_on_laravel():
         os.system('kill -9 %d' % os.getpid())
 
     except urllib2.HTTPError as e:  # @TODO: Ask - Right?
-        print('/\/\/\/\/\/\/\/\ HTTPError happened: ' + str(e.code))
+        print('/\/\/\/\/\/\/\/\ HTTPError code: ' + str(e.code))
+        print('/\/\/\/\/\/\/\/\ HTTPError reason: ' + str(e.reason) + '\n\n')
+
+    except urllib2.URLError, e:
+        print('/\/\/\/\/\/\/\/\ URLError reason: ' + str(e.reason) + '\n\n')
 
     except Exception as e:
         error_template = "An exception of type {0} occurred. Arguments:\n{1!r}"
@@ -777,7 +804,7 @@ def unmatched_values_list(list1, list2):
 def sync_users():
     try:
         print('\n\n***sync_users***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
-        url = 'http://yasna.local/attendance/api/v1/users/lists'  # @TODO: Must be dynamic later.
+        url = 'http://' + DOMAIN + '/attendance/api/v1/users/lists'
 
         # Prepare the data
         query_args = {}
@@ -857,7 +884,11 @@ def sync_users():
         os.system('kill -9 %d' % os.getpid())
 
     except urllib2.HTTPError as e:  # @TODO: Ask - Right?
-        print('/\/\/\/\/\/\/\/\ HTTPError happened: ' + str(e.code))
+        print('/\/\/\/\/\/\/\/\ HTTPError code: ' + str(e.code))
+        print('/\/\/\/\/\/\/\/\ HTTPError reason: ' + str(e.reason) + '\n\n')
+
+    except urllib2.URLError, e:
+        print('/\/\/\/\/\/\/\/\ URLError reason: ' + str(e.reason) + '\n\n')
 
     except Exception as e:
         error_template = "An exception of type {0} occurred. Arguments:\n{1!r}"
