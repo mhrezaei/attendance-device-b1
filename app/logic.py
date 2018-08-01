@@ -17,6 +17,7 @@ from global_variables import device_template_position_except_fingerprint
 from global_variables import device_hash_except_fingerprint
 from global_variables import device_accuracy_except_fingerprint
 from global_variables import rfid_unique_id_except_rfid
+from global_variables import DOMAIN
 import RPi.GPIO as GPIO
 import SimpleMFRC522
 import os
@@ -74,7 +75,7 @@ def send_actual_attend_to_laravel(
 ):
     try:
         print('\n\n***send_actual_attend_to_laravel***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
-        url = 'http://yasna.local/attendance/api/v1/users/attends'  # @TODO: Must be dynamic later.
+        url = 'http://' + DOMAIN + '/attendance/api/v1/users/attends'
 
         # Prepare the data
         query_args = {
@@ -655,7 +656,7 @@ def run_rfid():
 def send_synced_id_list_to_laravel(the_id_list):
     try:
         print('\n\n***send_synced_id_list_to_laravel***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
-        url = 'http://yasna.local/attendance/api/v1/updates/is_synceds'  # @TODO: Must be dynamic later.
+        url = 'http://' + DOMAIN + '/attendance/api/v1/updates/is_synceds'
 
         # Prepare the data
         query_args = {
@@ -721,7 +722,7 @@ def send_synced_id_list_to_laravel(the_id_list):
 def request_to_refresh_for_crud_on_laravel():
     try:
         print('\n\n***request_to_refresh_for_crud_on_laravel***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
-        url = 'http://yasna.local/attendance/api/v1/syncs/cruds'  # @TODO: Must be dynamic later.
+        url = 'http://' + DOMAIN + '/attendance/api/v1/syncs/cruds'
 
         # Prepare the data
         query_args = {}
@@ -803,7 +804,7 @@ def unmatched_values_list(list1, list2):
 def sync_users():
     try:
         print('\n\n***sync_users***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
-        url = 'http://yasna.local/attendance/api/v1/users/lists'  # @TODO: Must be dynamic later.
+        url = 'http://' + DOMAIN + '/attendance/api/v1/users/lists'
 
         # Prepare the data
         query_args = {}

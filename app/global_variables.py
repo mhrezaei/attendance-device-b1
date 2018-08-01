@@ -20,6 +20,8 @@ global device_hash_except_fingerprint
 global device_accuracy_except_fingerprint
 global rfid_unique_id_except_rfid
 
+global DOMAIN
+
 
 settings_timeout = 15  # 15 seconds
 enroll_finger_timeout = 5  # 5 seconds
@@ -38,3 +40,5 @@ device_template_position_except_fingerprint = 5000
 device_hash_except_fingerprint = 'No hash for this device.'
 device_accuracy_except_fingerprint = -1
 rfid_unique_id_except_rfid = 0
+
+DOMAIN = 'yasna.local'
