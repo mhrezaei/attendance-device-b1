@@ -41,4 +41,4 @@ device_hash_except_fingerprint = 'No hash for this device.'
 device_accuracy_except_fingerprint = -1
 rfid_unique_id_except_rfid = 0
 
-DOMAIN = 'yasna.local'
+DOMAIN = 'yasna.team'

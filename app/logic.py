@@ -75,7 +75,7 @@ def send_actual_attend_to_laravel(
 ):
     try:
         print('\n\n***send_actual_attend_to_laravel***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
-        url = 'http://' + DOMAIN + '/attendance/api/v1/users/attends'
+        url = 'https://' + DOMAIN + '/attendance/api/v1/users/attends'
 
         # Prepare the data
         query_args = {
@@ -656,7 +656,7 @@ def run_rfid():
 def send_synced_id_list_to_laravel(the_id_list):
     try:
         print('\n\n***send_synced_id_list_to_laravel***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
-        url = 'http://' + DOMAIN + '/attendance/api/v1/updates/is_synceds'
+        url = 'https://' + DOMAIN + '/attendance/api/v1/updates/is_synceds'
 
         # Prepare the data
         query_args = {
@@ -722,7 +722,7 @@ def send_synced_id_list_to_laravel(the_id_list):
 def request_to_refresh_for_crud_on_laravel():
     try:
         print('\n\n***request_to_refresh_for_crud_on_laravel***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
-        url = 'http://' + DOMAIN + '/attendance/api/v1/syncs/cruds'
+        url = 'https://' + DOMAIN + '/attendance/api/v1/syncs/cruds'
 
         # Prepare the data
         query_args = {}
@@ -804,7 +804,7 @@ def unmatched_values_list(list1, list2):
 def sync_users():
     try:
         print('\n\n***sync_users***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
-        url = 'http://' + DOMAIN + '/attendance/api/v1/users/lists'
+        url = 'https://' + DOMAIN + '/attendance/api/v1/users/lists'
 
         # Prepare the data
         query_args = {}
