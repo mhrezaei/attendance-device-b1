@@ -26,7 +26,7 @@ global DOMAIN
 settings_timeout = 15  # 15 seconds
 enroll_finger_timeout = 5  # 5 seconds
 enroll_rfid_timeout = 5  # 5 seconds
-working_hours = 39600  # 11 hours
+working_hours = 72000  # 20 hours
 attendance_not_allowed_timeout = 120  # 2 minutes
 
 handle_the_is_synced_field_period = 60  # 1 minute
