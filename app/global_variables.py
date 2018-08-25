@@ -34,7 +34,6 @@ attendance_not_allowed_timeout = 120  # 2 minutes
 handle_the_is_synced_field_period = 60  # 1 minute
 request_to_refresh_for_crud_on_laravel_period = 300  # 5 minutes
 sync_users_period = 900  # 15 minutes
-trigger_led_for_temp_warning_period = 1800  # 30 minutes
 
 maximum_allowed_fingers_for_usual_users = 3
 maximum_allowed_fingers_for_admin_users = 5

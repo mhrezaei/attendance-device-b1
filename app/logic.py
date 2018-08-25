@@ -18,7 +18,6 @@ from global_variables import device_hash_except_fingerprint
 from global_variables import device_accuracy_except_fingerprint
 from global_variables import rfid_unique_id_except_rfid
 from global_variables import DOMAIN
-from global_variables import trigger_led_for_temp_warning_period
 from global_variables import rp_temp_threshold
 import RPi.GPIO as GPIO
 import SimpleMFRC522
@@ -32,27 +31,56 @@ store['rfidEnabled'] = False
 
 
 def get_rp_temp():
-    desired_line = os.popen("/opt/vc/bin/vcgencmd measure_temp").readline()
-    rp_temp = desired_line.replace("temp=", "")
-    temp_number = rp_temp.replace("'C", "")
-    temp_float = float(temp_number)
+    try:
+        desired_line = os.popen("/opt/vc/bin/vcgencmd measure_temp").readline()
+        rp_temp = desired_line.replace("temp=", "")
+        temp_number = rp_temp.replace("'C", "")
+        temp_float = float(temp_number)
 
-    return temp_float
+        # print('\n\nRaspberry Pi Current Temperature: ' + str(temp_float) + '\n\n')
+
+        return temp_float
+
+    except KeyboardInterrupt:
+        print(' * Terminating... ')
+        os.system('kill -9 %d' % os.getpid())
+
+    except Exception as e:
+        error_template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+        error_message = error_template.format(type(e).__name__, e.args)
+        print('\n\n' + error_message + '\n\n')
 
 
-def trigger_led_for_temp_warning():
-    # led_pin = X  # GPIO X -- Pin Y -- relay
-    # GPIO.setmode(GPIO.BCM)  # Numbers GPIOs by GPIO numbers
-    # GPIO.setup(led_pin, GPIO.OUT)  # Set led_s_pin's mode to output
+def run_led():
+    try:
+        while True:
+            if get_rp_temp() > rp_temp_threshold:
+                led_pin = 18
+                GPIO.setmode(GPIO.BCM)
+                GPIO.setwarnings(False)
+                GPIO.setup(led_pin, GPIO.OUT)  # GPIO 18 -- PIN 12
+                GPIO.output(led_pin, GPIO.HIGH)
+                sleep(0.5)
+                GPIO.output(led_pin, GPIO.LOW)
+                sleep(0.5)
 
-    if get_rp_temp() > rp_temp_threshold:
-        print('Danger')
-        # GPIO.output(led_pin, GPIO.HIGH)
-        # sleep(0.5)
-        # GPIO.output(led_pin, GPIO.LOW)
+            else:
+                pass
 
-    else:
+    except KeyboardInterrupt:
+        print(' * Terminating... ')
+        os.system('kill -9 %d' % os.getpid())
+
+    except RuntimeError:
         pass
+
+    except Exception as e:
+        error_template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+        error_message = error_template.format(type(e).__name__, e.args)
+        print('\n\n' + error_message + '\n\n')
+
+    finally:
+        GPIO.cleanup()
 
 
 def end_of_current_day():
@@ -72,6 +100,7 @@ def trigger_relay_on_enter():
         print('\n\n***trigger_relay_on_enter***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
         relay_s_pin = 17  # GPIO 17 -- Pin 11 -- relay
         GPIO.setmode(GPIO.BCM)  # Numbers GPIOs by GPIO numbers
+        GPIO.setwarnings(False)
         GPIO.setup(relay_s_pin, GPIO.OUT)  # Set relay_s_pin's mode to output
         GPIO.output(relay_s_pin, GPIO.HIGH)
         sleep(2)
@@ -969,4 +998,3 @@ schedule.every(handle_the_is_synced_field_period).seconds.do(handle_the_is_synce
 schedule.every(request_to_refresh_for_crud_on_laravel_period).seconds.do(request_to_refresh_for_crud_on_laravel)
 schedule.every(sync_users_period).seconds.do(sync_users)
 # schedule.every(1).seconds.do(look_up_nearby_bluetooth_devices)
-# schedule.every(trigger_led_for_temp_warning_period).seconds.do(trigger_led_for_temp_warning)
