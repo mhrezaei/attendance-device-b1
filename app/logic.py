@@ -18,6 +18,8 @@ from global_variables import device_hash_except_fingerprint
 from global_variables import device_accuracy_except_fingerprint
 from global_variables import rfid_unique_id_except_rfid
 from global_variables import DOMAIN
+from global_variables import trigger_led_for_temp_warning_period
+from global_variables import rp_temp_threshold
 import RPi.GPIO as GPIO
 import SimpleMFRC522
 import os
@@ -27,6 +29,30 @@ import bluetooth
 
 store['fingerPrintEnabled'] = False
 store['rfidEnabled'] = False
+
+
+def get_rp_temp():
+    desired_line = os.popen("/opt/vc/bin/vcgencmd measure_temp").readline()
+    rp_temp = desired_line.replace("temp=", "")
+    temp_number = rp_temp.replace("'C", "")
+    temp_float = float(temp_number)
+
+    return temp_float
+
+
+def trigger_led_for_temp_warning():
+    # led_pin = X  # GPIO X -- Pin Y -- relay
+    # GPIO.setmode(GPIO.BCM)  # Numbers GPIOs by GPIO numbers
+    # GPIO.setup(led_pin, GPIO.OUT)  # Set led_s_pin's mode to output
+
+    if get_rp_temp() > rp_temp_threshold:
+        print('Danger')
+        # GPIO.output(led_pin, GPIO.HIGH)
+        # sleep(0.5)
+        # GPIO.output(led_pin, GPIO.LOW)
+
+    else:
+        pass
 
 
 def end_of_current_day():
@@ -535,7 +561,7 @@ def run_rfid():
                                                                                                       user_related_with_this_rfid_card).where(
                                         'type', 'normal_in').order_by('id', 'desc').pluck('effected_at')
                                     the_very_last_normal_out_effected_at = db.table('user_logs').where('user_id',
-                                                                                                      user_related_with_this_rfid_card).where(
+                                                                                                       user_related_with_this_rfid_card).where(
                                         'type', 'normal_out').order_by('id', 'desc').pluck('effected_at')
 
                                     # the_very_last_normal_in_effected_at_epoch = int(the_very_last_normal_in_effected_at.strftime('%s'))  # Converted to epoch
@@ -607,7 +633,7 @@ def run_rfid():
                                                                                                   user_related_with_this_rfid_card).where(
                                     'type', 'normal_in').order_by('id', 'desc').pluck('effected_at')
                                 the_very_last_normal_out_effected_at = db.table('user_logs').where('user_id',
-                                                                                                  user_related_with_this_rfid_card).where(
+                                                                                                   user_related_with_this_rfid_card).where(
                                     'type', 'normal_out').order_by('id', 'desc').pluck('effected_at')
 
                                 if rfid_read_time < check_time:  # attendance_not_allowed_timeout has NOT passed. NOT ready to apply user log.
@@ -943,3 +969,4 @@ schedule.every(handle_the_is_synced_field_period).seconds.do(handle_the_is_synce
 schedule.every(request_to_refresh_for_crud_on_laravel_period).seconds.do(request_to_refresh_for_crud_on_laravel)
 schedule.every(sync_users_period).seconds.do(sync_users)
 # schedule.every(1).seconds.do(look_up_nearby_bluetooth_devices)
+# schedule.every(trigger_led_for_temp_warning_period).seconds.do(trigger_led_for_temp_warning)
