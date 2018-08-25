@@ -9,6 +9,7 @@ global attendance_not_allowed_timeout
 global handle_the_is_synced_field_period
 global request_to_refresh_for_crud_on_laravel_period
 global sync_users_period
+global trigger_led_for_temp_warning_period
 
 # Maximum allowed fingers
 global maximum_allowed_fingers_for_usual_users
@@ -19,6 +20,8 @@ global device_template_position_except_fingerprint
 global device_hash_except_fingerprint
 global device_accuracy_except_fingerprint
 global rfid_unique_id_except_rfid
+
+global rp_temp_threshold
 
 global DOMAIN
 
@@ -31,6 +34,7 @@ attendance_not_allowed_timeout = 120  # 2 minutes
 handle_the_is_synced_field_period = 60  # 1 minute
 request_to_refresh_for_crud_on_laravel_period = 300  # 5 minutes
 sync_users_period = 900  # 15 minutes
+trigger_led_for_temp_warning_period = 1800  # 30 minutes
 
 maximum_allowed_fingers_for_usual_users = 3
 maximum_allowed_fingers_for_admin_users = 5
@@ -39,5 +43,7 @@ device_template_position_except_fingerprint = 5000
 device_hash_except_fingerprint = 'No hash for this device.'
 device_accuracy_except_fingerprint = -1
 rfid_unique_id_except_rfid = 0
+
+rp_temp_threshold = 80.0
 
 DOMAIN = 'yasna.team'
