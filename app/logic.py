@@ -29,6 +29,18 @@ store['fingerPrintEnabled'] = False
 store['rfidEnabled'] = False
 
 
+def end_of_current_day():
+    """
+    Returns the end of the current day.
+
+    :return: (datetime) end_of_the_day
+    """
+    current_time = datetime.now()
+    end_of_the_day = current_time.replace(hour=23, minute=59, second=59, microsecond=0)
+
+    return end_of_the_day
+
+
 def trigger_relay_on_enter():
     try:
         print('\n\n***trigger_relay_on_enter***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
@@ -279,6 +291,10 @@ def run_fingerprint():
                                                                                                       user_related_with_this_finger).where(
                                         'type', 'normal_in').order_by('id', 'desc').pluck('effected_at')
 
+                                    the_very_last_normal_out_effected_at = db.table('user_logs').where('user_id',
+                                                                                                       user_related_with_this_finger).where(
+                                        'type', 'normal_out').order_by('id', 'desc').pluck('effected_at')
+
                                     # the_very_last_normal_in_effected_at_epoch = int(the_very_last_normal_in_effected_at.strftime('%s'))  # Converted to epoch
 
                                     check_working_hours_time = the_very_last_normal_in_effected_at + timedelta(
@@ -290,7 +306,7 @@ def run_fingerprint():
                                     if the_new_effected_at > check_working_hours_time:
                                         our_result['first_name'] = the_first_name
                                         our_result['last_name'] = the_last_name
-                                        our_result['last_action'] = str(the_very_last_normal_in_effected_at)
+                                        our_result['last_action'] = str(the_very_last_normal_out_effected_at)
 
                                         the_user_id = user_related_with_this_finger
                                         the_effected_at = the_new_effected_at
@@ -366,12 +382,15 @@ def run_fingerprint():
                                         'first_name')
                                     the_last_name = db.table('users').where('id', user_related_with_this_finger).pluck(
                                         'last_name')
+                                    the_very_last_normal_out_effected_at = db.table('user_logs').where('user_id',
+                                                                                                       user_related_with_this_finger).where(
+                                        'type', 'normal_out').order_by('id', 'desc').pluck('effected_at')
                                     # Now we have the user_id associated with the template_position
                                     # flash('The user_id is: ' + str(the_user_id))
 
                                     our_result['first_name'] = the_first_name
                                     our_result['last_name'] = the_last_name
-                                    our_result['last_action'] = str(the_very_last_normal_in_effected_at)
+                                    our_result['last_action'] = str(the_very_last_normal_out_effected_at)
 
                                     the_user_id = user_related_with_this_finger
                                     the_effected_at = datetime.now()
@@ -515,6 +534,9 @@ def run_rfid():
                                     the_very_last_normal_in_effected_at = db.table('user_logs').where('user_id',
                                                                                                       user_related_with_this_rfid_card).where(
                                         'type', 'normal_in').order_by('id', 'desc').pluck('effected_at')
+                                    the_very_last_normal_out_effected_at = db.table('user_logs').where('user_id',
+                                                                                                      user_related_with_this_rfid_card).where(
+                                        'type', 'normal_out').order_by('id', 'desc').pluck('effected_at')
 
                                     # the_very_last_normal_in_effected_at_epoch = int(the_very_last_normal_in_effected_at.strftime('%s'))  # Converted to epoch
 
@@ -527,7 +549,7 @@ def run_rfid():
                                     if the_new_effected_at > check_working_hours_time:
                                         our_result['first_name'] = the_first_name
                                         our_result['last_name'] = the_last_name
-                                        our_result['last_action'] = str(the_very_last_normal_in_effected_at)
+                                        our_result['last_action'] = str(the_very_last_normal_out_effected_at)
 
                                         the_user_id = user_related_with_this_rfid_card
                                         the_effected_at = the_new_effected_at
@@ -584,6 +606,9 @@ def run_rfid():
                                 the_very_last_normal_in_effected_at = db.table('user_logs').where('user_id',
                                                                                                   user_related_with_this_rfid_card).where(
                                     'type', 'normal_in').order_by('id', 'desc').pluck('effected_at')
+                                the_very_last_normal_out_effected_at = db.table('user_logs').where('user_id',
+                                                                                                  user_related_with_this_rfid_card).where(
+                                    'type', 'normal_out').order_by('id', 'desc').pluck('effected_at')
 
                                 if rfid_read_time < check_time:  # attendance_not_allowed_timeout has NOT passed. NOT ready to apply user log.
                                     # flash('attendance_not_allowed_timeout has NOT passed.')
@@ -606,7 +631,7 @@ def run_rfid():
 
                                     our_result['first_name'] = the_first_name
                                     our_result['last_name'] = the_last_name
-                                    our_result['last_action'] = str(the_very_last_normal_in_effected_at)
+                                    our_result['last_action'] = str(the_very_last_normal_out_effected_at)
 
                                     the_user_id = user_related_with_this_rfid_card
                                     the_effected_at = datetime.now()
@@ -655,7 +680,8 @@ def run_rfid():
 
 def send_synced_id_list_to_laravel(the_id_list):
     try:
-        print('\n\n***send_synced_id_list_to_laravel***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
+        print('\n\n***send_synced_id_list_to_laravel***----' + strftime('%Y-%m-%d %H:%M:%S',
+                                                                        localtime(time())) + '\n\n')
         url = 'https://' + DOMAIN + '/attendance/api/v1/updates/is_synceds'
 
         # Prepare the data
@@ -721,7 +747,8 @@ def send_synced_id_list_to_laravel(the_id_list):
 
 def request_to_refresh_for_crud_on_laravel():
     try:
-        print('\n\n***request_to_refresh_for_crud_on_laravel***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
+        print('\n\n***request_to_refresh_for_crud_on_laravel***----' + strftime('%Y-%m-%d %H:%M:%S',
+                                                                                localtime(time())) + '\n\n')
         url = 'https://' + DOMAIN + '/attendance/api/v1/syncs/cruds'
 
         # Prepare the data

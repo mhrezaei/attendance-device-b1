@@ -22,7 +22,6 @@ global rfid_unique_id_except_rfid
 
 global DOMAIN
 
-
 settings_timeout = 15  # 15 seconds
 enroll_finger_timeout = 5  # 5 seconds
 enroll_rfid_timeout = 5  # 5 seconds
