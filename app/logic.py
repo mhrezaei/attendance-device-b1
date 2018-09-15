@@ -31,6 +31,11 @@ store['rfidEnabled'] = False
 
 
 def get_rp_temp():
+    """
+    Return Raspberry Pi's current temperature.
+
+    :return: temp_float: float
+    """
     try:
         desired_line = os.popen("/opt/vc/bin/vcgencmd measure_temp").readline()
         rp_temp = desired_line.replace("temp=", "")
@@ -52,6 +57,10 @@ def get_rp_temp():
 
 
 def run_led():
+    """
+    Make the led blink if the current raspberry pi's temperature is less than the specified 'rp_temp_threshold'.
+
+    """
     try:
         while True:
             if get_rp_temp() > rp_temp_threshold:
@@ -85,9 +94,9 @@ def run_led():
 
 def end_of_current_day():
     """
-    Returns the end of the current day.
+    Return the end of the current day.
 
-    :return: (datetime) end_of_the_day
+    :return: end_of_the_day: datetime
     """
     current_time = datetime.now()
     end_of_the_day = current_time.replace(hour=23, minute=59, second=59, microsecond=0)
@@ -96,6 +105,10 @@ def end_of_current_day():
 
 
 def trigger_relay_on_enter():
+    """
+    Trigger the relay (can be called whenever the attendance type is entrance).
+
+    """
     try:
         print('\n\n***trigger_relay_on_enter***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
         relay_s_pin = 17  # GPIO 17 -- Pin 11 -- relay
@@ -123,6 +136,13 @@ def trigger_relay_on_enter():
 
 
 def receive(action, message):
+    """
+    Receive the 'action' and its corresponding message based on the socket communication.
+
+    :param action:
+    :param message:
+    :return:
+    """
     if action == 'fingerPrintStatus':
         print(message)
         socket.emit('fingerPrintStatus', message, broadcast=True)
@@ -140,6 +160,19 @@ def send_actual_attend_to_laravel(
         sending_device_accuracy,
         sending_rfid_unique_id
 ):
+    """
+    Send the actual attend to this endpoint: /attendance/api/v1/users/attends
+
+    :param sending_is_synced: int
+    :param sending_user_id: int
+    :param sending_effected_at: string
+    :param sending_type: string
+    :param sending_device: string
+    :param sending_device_template_position: int
+    :param sending_device_hash: string
+    :param sending_device_accuracy: int
+    :param sending_rfid_unique_id: string
+    """
     try:
         print('\n\n***send_actual_attend_to_laravel***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
         url = 'https://' + DOMAIN + '/attendance/api/v1/users/attends'
@@ -159,7 +192,7 @@ def send_actual_attend_to_laravel(
 
         header = {"Accept": "application/json",
                   "Authorization": '760483978406f1195959ef81a90c91ef'
-                  }  # @TODO: Ask - Must be dynamic later? How?
+                  }
 
         data = urllib.urlencode(query_args)
 
@@ -178,7 +211,7 @@ def send_actual_attend_to_laravel(
         print(' * Terminating... ')
         os.system('kill -9 %d' % os.getpid())
 
-    except urllib2.HTTPError as e:  # @TODO: Ask - Right?
+    except urllib2.HTTPError as e:
         print('/\/\/\/\/\/\/\/\ HTTPError code: ' + str(e.code))
         print('/\/\/\/\/\/\/\/\ HTTPError reason: ' + str(e.reason) + '\n\n')
 
@@ -192,6 +225,12 @@ def send_actual_attend_to_laravel(
 
 
 def handle_the_is_synced_field():
+    """
+    Find the user_logs where 'is_synced' field is still 0 and
+    send them to laravel by 'send_actual_attend_to_laravel'
+    function.
+
+    """
     try:
         print('\n\n***handle_the_is_synced_field***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
         remained_is_synced_0 = UserLog.where('is_synced', 0).get()
@@ -217,7 +256,7 @@ def handle_the_is_synced_field():
         print(' * Terminating... ')
         os.system('kill -9 %d' % os.getpid())
 
-    except urllib2.HTTPError as e:  # @TODO: Ask - Right?
+    except urllib2.HTTPError as e:
         print('/\/\/\/\/\/\/\/\ HTTPError code: ' + str(e.code))
         print('/\/\/\/\/\/\/\/\ HTTPError reason: ' + str(e.reason) + '\n\n')
 
@@ -231,6 +270,12 @@ def handle_the_is_synced_field():
 
 
 def run_fingerprint():
+    """
+    Run the fingerprint thread, specified in 'server.py'. Every other schedule is running in this thread.
+    This can be handled in another independent thread, but since we always need the fingerprint to
+    run, it is handled here in order not to decrease the overall speed of the machine.
+
+    """
     schedule.run_pending()
     if store['fingerPrintEnabled']:  # boolean
         # sleep(0.5) #TODO: 1 second or not
@@ -489,6 +534,10 @@ def run_fingerprint():
 
 
 def run_rfid():
+    """
+    Run the fingerprint thread, specified in 'server.py'.
+
+    """
     if store['rfidEnabled']:  # boolean
         our_result = dict()
         our_result['status'] = 30
@@ -625,7 +674,7 @@ def run_rfid():
                                                                      rfid_unique_id=str(the_rfid_unique_id))
                                         our_result['status'] = 2004
                                         publish('fingerPrintStatus',
-                                                our_result)  # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
+                                                our_result)
                                         sleep(2)
 
                                     elif the_new_effected_at <= check_working_hours_time:
@@ -635,7 +684,7 @@ def run_rfid():
 
                                         the_user_id = user_related_with_this_rfid_card
                                         the_effected_at = datetime.now()
-                                        the_type = 'normal_out'  # @TODO: Must be dynamic later.
+                                        the_type = 'normal_out'
                                         the_rfid_unique_id = unique_id
 
                                         db.table('user_logs').insert(is_synced=the_is_synced,
@@ -650,7 +699,7 @@ def run_rfid():
                                                                      rfid_unique_id=str(the_rfid_unique_id))
                                         our_result['status'] = 2005
                                         publish('fingerPrintStatus',
-                                                our_result)  # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
+                                                our_result)
                                         sleep(2)
 
                             elif last_effect_type == 'normal_out':
@@ -670,7 +719,7 @@ def run_rfid():
                                     # print('STATUS 18 - NOT allowed to apply user log.')
                                     our_result['status'] = 2006
                                     publish('fingerPrintStatus',
-                                            our_result)  # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
+                                            our_result)
                                     sleep(2)
 
                                 elif rfid_read_time >= check_time:  # attendance_not_allowed_timeout has passed. Ready to apply user log.
@@ -690,7 +739,7 @@ def run_rfid():
 
                                     the_user_id = user_related_with_this_rfid_card
                                     the_effected_at = datetime.now()
-                                    the_type = 'normal_in'  # @TODO: Must be dynamic later.
+                                    the_type = 'normal_in'
                                     the_rfid_unique_id = unique_id
 
                                     trigger_relay_on_enter()
@@ -707,7 +756,7 @@ def run_rfid():
                                                                  rfid_unique_id=str(the_rfid_unique_id))
                                     our_result['status'] = 2007
                                     publish('fingerPrintStatus',
-                                            our_result)  # @TODO: Don't forget to set a fresh status right after 'if' and update wiki.
+                                            our_result)
                                     sleep(2)
 
                 else:  # This RFID card is NOT registered in the rfid_cards table.
@@ -734,6 +783,13 @@ def run_rfid():
 
 
 def send_synced_id_list_to_laravel(the_id_list):
+    """
+    Send the received synced id list i.e 'the_id_list' (which is actually an string)
+    to this endpoint: /attendance/api/v1/updates/is_synceds
+
+    :param the_id_list: string
+
+    """
     try:
         print('\n\n***send_synced_id_list_to_laravel***----' + strftime('%Y-%m-%d %H:%M:%S',
                                                                         localtime(time())) + '\n\n')
@@ -787,7 +843,7 @@ def send_synced_id_list_to_laravel(the_id_list):
         print(' * Terminating... ')
         os.system('kill -9 %d' % os.getpid())
 
-    except urllib2.HTTPError as e:  # @TODO: Ask - Right?
+    except urllib2.HTTPError as e:
         print('/\/\/\/\/\/\/\/\ HTTPError code: ' + str(e.code))
         print('/\/\/\/\/\/\/\/\ HTTPError reason: ' + str(e.reason) + '\n\n')
 
@@ -801,6 +857,11 @@ def send_synced_id_list_to_laravel(the_id_list):
 
 
 def request_to_refresh_for_crud_on_laravel():
+    """
+    Send a request to this endpoint: /attendance/api/v1/syncs/cruds
+    in order to refresh the cruds on the laravel.
+
+    """
     try:
         print('\n\n***request_to_refresh_for_crud_on_laravel***----' + strftime('%Y-%m-%d %H:%M:%S',
                                                                                 localtime(time())) + '\n\n')
@@ -880,10 +941,21 @@ def request_to_refresh_for_crud_on_laravel():
 
 
 def unmatched_values_list(list1, list2):
+    """
+    Compares two list values and return the unmatched values of two lists as a new list.
+
+    :param list1: list
+    :param list2: list
+    :return: list
+    """
     return list(set(list1) - set(list2))
 
 
 def sync_users():
+    """
+    Sync users according to their defined 'code_melli' through this endpoint: /attendance/api/v1/users/lists
+
+    """
     try:
         print('\n\n***sync_users***----' + strftime('%Y-%m-%d %H:%M:%S', localtime(time())) + '\n\n')
         url = 'https://' + DOMAIN + '/attendance/api/v1/users/lists'
@@ -893,7 +965,7 @@ def sync_users():
 
         header = {
             "Accept": "application/json",
-            "Authorization": '760483978406f1195959ef81a90c91ef'}  # @TODO: Must be dynamic later.
+            "Authorization": '760483978406f1195959ef81a90c91ef'}
 
         data = urllib.urlencode(query_args)
 
@@ -995,6 +1067,7 @@ def sync_users():
 #         print('\n\n' + error_message + '\n\n')
 
 
+# Schedules are handled here.
 schedule.every(handle_the_is_synced_field_period).seconds.do(handle_the_is_synced_field)
 schedule.every(request_to_refresh_for_crud_on_laravel_period).seconds.do(request_to_refresh_for_crud_on_laravel)
 schedule.every(sync_users_period).seconds.do(sync_users)
