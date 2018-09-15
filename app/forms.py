@@ -1,3 +1,4 @@
+# This file is not used currently, but is remained here for later uses.
 from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, SubmitField, TextAreaField, RadioField, SelectField
 
@@ -6,7 +7,6 @@ from wtforms import validators, ValidationError
 
 # User Define Form
 class UserDefineForm(FlaskForm):
-
     first_name = StringField("First Name", [validators.DataRequired("Please enter the first name.")],
                              render_kw={"placeholder": "First Name"})
     last_name = StringField("Last Name", [validators.DataRequired("Please enter the last name.")],
@@ -26,6 +26,4 @@ class UserEnrollForm(FlaskForm):
 
 # RFID Form
 class RfidWriteForm(FlaskForm):
-
     submit = SubmitField("Enroll this user's RFID Card")
-
