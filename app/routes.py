@@ -13,6 +13,10 @@ store['clients'] = []
 
 
 def update_recorded_fingers_count():
+    """
+    Update the recorded fingers of a user in the 'users' table.
+
+    """
     users = db.table('users').get()
     for user in users:
         recorded_fingers_count = db.table('fingers').where('user_id', user.id).count()
@@ -26,6 +30,10 @@ def update_recorded_fingers_count():
 # --------------#
 @socket.on('connect')
 def socket_connect():
+    """
+    Connect the socket communication.
+
+    """
     # store['fingerPrintEnabled'] = True
     socket.emit('auth', request.sid)
     store['clients'].append(request.sid)
@@ -34,6 +42,10 @@ def socket_connect():
 
 @socket.on('disconnect')
 def socket_disconnect():
+    """
+    Disconnect the socket communication.
+
+    """
     store['fingerPrintEnabled'] = False
     store['rfidEnabled'] = False
     store['clients'].remove(request.sid)
@@ -42,11 +54,19 @@ def socket_disconnect():
 
 @socket.on('setFingerPrintStatus')
 def set_fingerprint_status(data):
+    """
+    Set the current fingerprint status.
+
+    """
     store['fingerPrintEnabled'] = data
 
 
 @socket.on('setRfidStatus')
 def set_rfid_status(data):
+    """
+    Set the current rfid status.
+
+    """
     store['rfidEnabled'] = data
 
 
@@ -58,21 +78,46 @@ def set_rfid_status(data):
 @app.route('/')
 @app.route('/index')
 def index():
+    """
+    Return 'index.html' view.
+
+    :return: index.html
+    """
     return render_template('index.html')
 
 
 @app.route('/index-page')
 def index_page():
+    """
+    Return the 'index-page.html' view.
+
+    PS: This method is not used currently, but is remained here for
+    later uses.
+
+    :return: index-page.html
+    """
     return render_template('index-page.html')
 
 
 @app.route('/settings')
 def settings():
+    """
+    Return the 'settings.html'view.
+
+    PS: This method is not used currently, but is remained here for
+    later uses.
+
+    :return: settings.html
+    """
     return render_template('settings.html')
 
 
 @app.route('/settings_process')
 def settings_process():
+    """
+    This endpoint is triggered whenever someone tries to enter the 'settings'.
+
+    """
     update_recorded_fingers_count()
     our_result = dict()
     # store['fingerPrintEnabled'] = False
@@ -187,6 +232,10 @@ def settings_process():
 
 @app.route('/user_logs_process', methods=['GET', 'POST'])
 def user_logs_process():
+    """
+    This endpoint is triggered when the admin tries to see the details about each user.
+
+    """
     our_result = dict()
 
     our_result['status'] = 300
@@ -227,7 +276,12 @@ def user_logs_process():
 # -------------------------#
 @app.route('/user_define', methods=['POST', 'GET'])
 def user_define():
-    # f.readImage() #TODO: sensor should be off when on this page, unless it is needed
+    """
+    This endpoint is triggered whenever the admin tries to define a new user.
+
+    PS: This method is not used currently, but is remained here for
+    later uses.
+    """
 
     form = UserDefineForm()
 
@@ -241,7 +295,6 @@ def user_define():
             the_last_name = request.form['last_name']
             the_code_melli = request.form['code_melli']
 
-            # TODO: (SOLVED) code_melli existence query
             code_melli_existence_clause = db.table('users').where('code_melli', the_code_melli).count()
             # code_melli_existence_clause = 'CODE MELLI EXISTS NOT'
             # code_melli_existence_clause = db.table('users').where_exists(db.table('users').select(db.raw(1)).where_raw('users.code_melli' == 23))
@@ -264,6 +317,14 @@ def user_define():
 # -------------------------#
 @app.route('/user_enroll', methods=['GET', 'POST'])
 def user_enroll():  # TODO: Seems NOT enrolling new users when sensor memory is fresh - check again
+    """
+    Enroll a new user.
+
+    PS: This method is not used currently, but is remained here for
+    later uses.
+
+    :return:
+    """
     # return render_template('user_enroll.html')
     users = db.table('users').get()
     users_table_records_count = db.table('users').get().count()
@@ -296,6 +357,13 @@ def user_enroll():  # TODO: Seems NOT enrolling new users when sensor memory is 
 
 @app.route('/get_all_users', methods=['GET'])
 def get_all_users():  # TODO: Seems NOT enrolling new users when sensor memory is fresh - check again
+    """
+    This endpoint is triggered whenever someone tries to enter the settings.
+
+    PS: This method is not used currently, but is remained here for
+    later uses.
+
+    """
     our_result = dict()
     our_result['status'] = 0  # No data found
     our_result['members'] = []
@@ -346,6 +414,10 @@ def get_all_users():  # TODO: Seems NOT enrolling new users when sensor memory i
 
 @app.route('/enroll_handle_finger_step_1', methods=['GET', 'POST'])
 def enroll_handle_finger_step_1():
+    """
+    This endpoint is triggered whenever the admin tries to enroll a new finger for the user (step 1).
+
+    """
     our_result = dict()
     our_result['status'] = 400
     our_result['message'] = 'Nothing done yet.'
@@ -391,6 +463,10 @@ def enroll_handle_finger_step_1():
 
 @app.route('/enroll_handle_finger_step_2', methods=['GET', 'POST'])
 def enroll_handle_finger_step_2():
+    """
+    This endpoint is triggered whenever the admin tries to enroll a new finger for the user (step 2).
+
+    """
     our_result = dict()
     our_result['status'] = 410
     our_result['message'] = 'Waiting for the same finger again.'
@@ -494,6 +570,10 @@ def enroll_handle_finger_step_2():
 
 @app.route('/enroll_handle_rfid', methods=['GET', 'POST'])
 def enroll_handle_rfid():
+    """
+    This endpoint is triggered whenever the admin tries to enroll a new rfid card for the user.
+
+    """
     reader = SimpleMFRC522.SimpleMFRC522()
     try:
         our_result = dict()
@@ -578,6 +658,10 @@ def enroll_handle_rfid():
 
 @app.route('/omit_rfid_card', methods=['GET', 'POST'])
 def omit_rfid_card():
+    """
+    This endpoint is triggered whenever the admin tries to omit a defined rfid card.
+
+    """
     our_result = dict()
     our_result['status'] = 600
     our_result['message'] = 'Nothing is done yet.'
@@ -639,6 +723,10 @@ def omit_rfid_card():
 
 @app.route('/omit_single_fingerprint_per_user', methods=['GET', 'POST'])
 def omit_single_fingerprint_per_user():
+    """
+    This endpoint is triggered whenever the admin tries to omit a single fingerprint of the user.
+
+    """
     our_result = dict()
     our_result['status'] = 700
     our_result['message'] = 'Nothing is done yet.'
@@ -706,6 +794,10 @@ def omit_single_fingerprint_per_user():
 
 @app.route('/activate_user', methods=['GET', 'POST'])
 def activate_user():
+    """
+    This endpoint is triggered whenever the admin tries to activate a user.
+
+    """
     our_result = dict()
     our_result['status'] = 800
     our_result['message'] = 'Nothing done yet.'
@@ -722,6 +814,10 @@ def activate_user():
 
 @app.route('/deactivate_user', methods=['GET', 'POST'])
 def deactivate_user():
+    """
+    This endpoint is triggered whenever the admin tries to deactivate a user.
+
+    """
     our_result = dict()
     our_result['status'] = 900
     our_result['message'] = 'Nothing done yet.'
