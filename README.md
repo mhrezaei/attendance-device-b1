@@ -17,3 +17,5 @@ then open [localhost:5000](http://localhost:5000) on your browser.
 
 :warning: **How to terminate?**  
 Press `Alt+Tab` on keyboard to select terminal, then press `Ctrl+C` to terminate the program.
+
+[YasnaTeam](https://yasna.team)
