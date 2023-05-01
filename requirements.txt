@@ -1,5 +1,5 @@
 python==2.7.13
-flask==0.12.2
+flask==2.3.2
 flask-socketio==2.9.6
 orator==0.9.7
 pyfingerprint==1.5
